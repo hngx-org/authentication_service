@@ -1,5 +1,25 @@
 # Authentication API Endpoints
 
+## Introduction
+
+These endpoints serve as the gateway to secure and control access within your application. From user registration to login, account recovery, and two-factor authentication (2FA), these endpoints collectively ensure that only authorized individuals gain entry while providing essential tools for user management and security enhancement. Explore this documentation to understand their functions, implementation, and best practices, empowering you to build a robust and user-friendly authentication system.
+
+### **Conventions**
+
+The base URL to send all API requests is `https://zuriportfolio.com`. HTTPS is required for all API requests.
+
+The Zuri-Portfolio API follows RESTful conventions when possible, with most operations performed via , `POST`, `PATCH` requests on page and database resources. Request and response bodies are encoded as JSON.
+
+**JSON CONVENTIONS**
+
+- Top-level resources have an `"object"` property. This property can be used to determine the type of the resource (e.g. `"firstname"`, `"lastname"`, `“email”` etc.)
+- Top-level resources are addressable by a UUID `"id"` property. You may omit dashes from the ID when making requests to the API, e.g. when copying the ID from a Notion URL.
+- Property names are in `camelCase`  (not `snake_case` or `kebab-case`).
+- Temporal values (dates and datetimes) are encoded in `[ISO 8601]` strings. Datetimes will include the time value (`2020-08-12T02:12:33.231Z`) while dates will include only the date (`2020-08-12`)
+- The Zuri-Portfolio API does not support empty strings. To unset a string value for properties like a `url`Property value object, for example, use an explicit `null` instead of `""`.
+
+##
+
 # Status Codes
 HTTP response codes are used to indicate general classes of success and error. 
 ## Success Code
