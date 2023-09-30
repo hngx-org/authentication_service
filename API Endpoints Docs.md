@@ -1,3 +1,21 @@
+
+# Objects
+
+## User Object
+
+The user object will have the following attributes 
+
+| Property value | Updatable | Type | Description | Example Value |
+|---| ------ |---|---|---|
+| id | Display-only | string (UUID) | Unique identifier for this user. | "e79a0b74-3aba-0bb6ee6" |
+| email | Editable | string | The email address associated with the user's account. | "johndoe@dev.com" |
+| firstName | Display-only | string | User's First Name, as typed during registration. | "John"|
+| lastName | Display-only | string | User's Last Name, as typed during registration. | "Doe" |
+| passwordHash | Editable | string | A securely hashed version of the user's password. | "F/m8DgjRu2xH7G.3QGKgY9"|
+| registrationDate | Display-only | date | A timestamp indicating when the user account was created. | 2023-09-12T02:12:33.231Z |
+| verificationStatus| Editable | string (Enum) | A field to track whether the user's email has been verified. | "Verified" or "Not Verified"                     |
+| accessToken | Editable | string | Access token generated during the login process. |"eyJhbGcikpXVCJ9"|
+
 # Authentication API Endpoints
 
 
