@@ -36,3 +36,102 @@ The user object will have the following attributes
 | 9 | Forgot Password | PATCH | https://zuriportfoloio.com/api/auth/forgot-password | Handles the process of resetting a user's forgotten password. |
 | 10 | LogOut | POST | https://zuriportfoloio.com/api/auth/logout | Allows users to log out or terminate their current session. |
 
+
+### User Signup
+
+#### Sending Request
+
+This cURL command performs a POST request to the specified URL with the given headers and JSON data payload, which includes the **`grant_type`** parameter.
+
+```json
+curl -X POST 'https://zuriportfoloio.com/api/auth/signup' \
+-H 'Content-Type: application/json' \
+-d '{
+	"firstName": "John",
+	"lastName": "Doe",
+	"email": "johndoe@email.com",
+	"password": "password123"
+}'
+```
+
+### User Login with email
+
+#### Sending Request
+
+```json
+# Request Body for User Login with Email
+request_body='{
+  "email": "johndoe@email.com",
+  "password": "password123"
+}'
+
+# cURL Request for User Login with Email
+curl -X POST 'https://zuriportfoloio.com/api/auth/login' \
+-H 'Content-Type: application/json' \
+-d "$request_body"
+```
+
+### User Login with email
+
+#### Sending Request
+
+```json
+# Request Body for User Login with Email
+request_body='{
+  "email": "johndoe@email.com",
+  "password": "password123"
+}'
+
+# cURL Request for User Login with Email
+curl -X POST 'https://zuriportfoloio.com/api/auth/login' \
+-H 'Content-Type: application/json' \
+-d "$request_body"
+```
+
+### **Two-Factor Authentication (2FA)**
+
+#### Sending Request
+
+```json
+# Request Body for Two-Factor Authentication (2FA)
+request_body='{
+  "otp": "123456"
+}'
+
+# cURL Request for Two-Factor Authentication (2FA)
+curl -X POST 'https://zuriportfoloio.com/api/auth/2fa-login' \
+-H 'Content-Type: application/json' \
+-d "$request_body"
+```
+
+### Sign in with Facebook
+
+#### Sending Request
+
+```json
+# Request Body for Sign in with Facebook
+request_body='{
+  "facebookToken": "facebook-auth-token"
+}'
+
+# cURL Request for Sign in with Facebook
+curl -X POST 'https://zuriportfoloio.com/api/auth/facebook' \
+-H 'Content-Type: application/json' \
+-d "$request_body"
+```
+
+### Sign in with Github
+
+#### Sending Request
+
+```json
+# Request Body for Sign in with Github
+request_body='{
+  "githubToken": "github-auth-token"
+}'
+
+# cURL Request for Sign in with Github
+curl -X POST 'https://api.example.com/github-signin' \
+-H 'Content-Type: application/json' \
+-d "$request_body"
+```
