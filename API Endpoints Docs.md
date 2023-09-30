@@ -1,3 +1,20 @@
+# Authentication API Endpoints
+
+# Status Codes
+HTTP response codes are used to indicate general classes of success and error. 
+## Success Code
+| HTTP Status Quote | code | Description |
+| 200 | Success | Successfully processed request. |
+|201 | Created | User created successfully. |
+## Error Codes
+Error responses contain more detail about the error in the response body, in the "code" and "message" properties.
+| HTTP Status Quote | code | message |
+| 400 | Bad Request | The user sent an invalid request. |
+| 401 | Unauthorized | The user failed to authenticate with the server. |
+|404 | Page Not Found | The page was not found. |
+| 403 | Access Denied | The user does not have permission to access the requested resource. |
+| 500 | Internal Server Error | Error processing request from the server. |
+
 
 # Objects
 
@@ -16,7 +33,6 @@ The user object will have the following attributes
 | verificationStatus| Editable | string (Enum) | A field to track whether the user's email has been verified. | "Verified" or "Not Verified"                     |
 | accessToken | Editable | string | Access token generated during the login process. |"eyJhbGcikpXVCJ9"|
 
-# Authentication API Endpoints
 
 
 # Endpoints
