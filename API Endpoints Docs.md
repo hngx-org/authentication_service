@@ -1,3 +1,4 @@
+# Authentication API Endpoints
 
 # Objects
 
@@ -16,7 +17,7 @@ The user object will have the following attributes
 | verificationStatus| Editable | string (Enum) | A field to track whether the user's email has been verified. | "Verified" or "Not Verified"                     |
 | accessToken | Editable | string | Access token generated during the login process. |"eyJhbGcikpXVCJ9"|
 
-# Authentication API Endpoints
+
 
 
 # Endpoints
