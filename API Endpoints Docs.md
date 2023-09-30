@@ -5,7 +5,7 @@ HTTP response codes are used to indicate general classes of success and error.
 ## Success Code
 
 | HTTP Status Quote  | code | Description |
-|---| ------ |---|---|---|
+|---| ------ |---|
 | 200 | Success | Successfully processed request. |
 | 201 | Created | User created successfully. |
 
@@ -13,7 +13,7 @@ HTTP response codes are used to indicate general classes of success and error.
 Error responses contain more detail about the error in the response body, in the "code" and "message" properties.
 
 | HTTP Status Quote  | code | Description |
-|---| ------ |---|---|---|
+|---| ------ |---|
 | 400 | Bad Request | The user sent an invalid request. |
 | 401 | Unauthorized | The user failed to authenticate with the server. |
 | 404 | Page Not Found | The page was not found. |
