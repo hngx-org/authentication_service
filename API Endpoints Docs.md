@@ -1,15 +1,15 @@
 # Authentication API Endpoints
 
-# Status Codes
+### Status Codes
 HTTP response codes are used to indicate general classes of success and error. 
-## Success Code
+### Success Code
 
 | HTTP Status Quote  | code | Description |
 |---| ------ |---|
 | 200 | Success | Successfully processed request. |
 | 201 | Created | User created successfully. |
 
-## Error Codes
+#### Error Codes
 Error responses contain more detail about the error in the response body, in the "code" and "message" properties.
 
 | HTTP Status Quote  | code | Description |
@@ -21,9 +21,9 @@ Error responses contain more detail about the error in the response body, in the
 | 500 | Internal Server Error | Error processing request from the server. |
 
 
-# Objects
+### Objects
 
-## User Object
+#### User Object
 
 The user object will have the following attributes 
 
@@ -41,7 +41,7 @@ The user object will have the following attributes
 
 
 
-# Endpoints
+### Endpoints
 
 [Endpoints](csv/Endpoints.csv)
 
@@ -115,15 +115,15 @@ curl -X POST 'https://zuriportfoloio.com/api/auth/login' \
 #### Sending Request
 
 ```json
-# Request Body for Two-Factor Authentication (2FA)
-request_body='{
+# Request Body for `Two-Factor Authentication` (2FA)
+`request_body`='{
   "otp": "123456"
 }'
 
 # cURL Request for Two-Factor Authentication (2FA)
-curl -X POST 'https://zuriportfoloio.com/api/auth/2fa-login' \
--H 'Content-Type: application/json' \
--d "$request_body"
+curl -X `POST` 'https://zuriportfoloio.com/api/auth/2fa-login' \
+`-H` 'Content-Type: application/json' \
+`-d` "$request_body"
 ```
 
 ### Sign in with Facebook
@@ -137,7 +137,7 @@ request_body='{
 }'
 
 # cURL Request for Sign in with Facebook
-curl -X POST 'https://zuriportfoloio.com/api/auth/facebook' \
+curl -X `POST` 'https://zuriportfoloio.com/api/auth/facebook' \
 -H 'Content-Type: application/json' \
 -d "$request_body"
 ```
@@ -153,7 +153,7 @@ request_body='{
 }'
 
 # cURL Request for Sign in with Github
-curl -X POST 'https://api.example.com/github-signin' \
+curl -X `POST` 'https://api.example.com/github-signin' \
 -H 'Content-Type: application/json' \
 -d "$request_body"
 ```
