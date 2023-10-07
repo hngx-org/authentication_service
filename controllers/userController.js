@@ -23,8 +23,7 @@ async function login(req,res){
 
    return res.json(
       { "token":token,
-         "id":user.id,
-         "email": user.email,
+         "data":user,
           "statusCode":200
        }
       )
