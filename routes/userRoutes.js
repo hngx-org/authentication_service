@@ -5,5 +5,5 @@ const auth = require("../controllers/userController")
 
 module.exports = function(app) {
     router.post("/login", auth.login)
-    app.use('/auth', router )
+    app.use('/api/auth', router )
 }
