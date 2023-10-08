@@ -6,6 +6,12 @@ const Role = require("./Roles");
 const UserRoles = sequelize.define(
   "user_roles",
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrementIdentity: true,
+      autoIncrement: true,
+    },
     user_id: {
       type: DataTypes.UUID,
       references: {
@@ -20,11 +26,15 @@ const UserRoles = sequelize.define(
         key: "id",
       },
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   { freezeTableName: true, timestamps: false },
 );
 
-User.belongsToMany(Role, { through: UserRoles });
-Role.belongsToMany(User, { through: UserRoles });
+User.belongsToMany(Role, { through: UserRoles, foreignKey: "user_id" });
+Role.belongsToMany(User, { through: UserRoles, foreignKey: "role_id" });
 
 module.exports = UserRoles;
