@@ -1,4 +1,4 @@
-const { ExpressValidator, check, validationResult } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 const db = require("../models/index");
 const User = db.user;
 
@@ -50,3 +50,4 @@ const regMiddleware = (req, res, next) => {
 };
 
 module.exports = regMiddleware;
+
