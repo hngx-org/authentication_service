@@ -8,6 +8,10 @@ const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
+const enable2faSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 const resetPasswordSchema = Joi.object({
   token: Joi.string().required(),
   password: Joi.string().required(),
@@ -37,4 +41,16 @@ const resetPassword = (req, res) => {
   res.status(200).json({ message: 'Password reset successfully.' });
 };
 
-module.exports = { forgotPassword, resetPassword };
+
+const enable2fa = (req, res) => {
+  const { error } = enable2faSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  // ... The middleware for sending mails is not ready.
+  res.status(200).json({ message: '2fa enabled successfully ' });
+};
+
+module.exports = { forgotPassword, resetPassword, enable2fa };
