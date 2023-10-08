@@ -149,4 +149,5 @@ const user_permissions = [
   'edit all events',
   'view events',
 ];
+
 module.exports = { permissions, roles, user_permissions, guest_permissions };
