@@ -1,64 +1,64 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-// const User = require('../models/user.model'); ---- still waiting on this user model!!
+const Joi = require("joi");
+const User = require("../models/User");
 
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
 
+const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  password: Joi.string().required(),
+});
 
-const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const forgotPassword = (req, res) => {
+  const { error } = forgotPasswordSchema.validate(req.body);
 
-const validatePassword = (password) => /^(?=.*[0-9!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/.test(password);
-// valid password should be at least 8 characters with at least one symbol or number
-
-async function createUser(req, res, next) {
-    try {
-      const {
-        firstName, 
-        lastName,
-        email,
-        password,
-        isAdmin, //there were no admin roles in the schema!!!
-      } = req.body;
-  
-      if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-
-      if(!validateEmail(email)){
-        return res.status(400).json({ error: 'Incorrect email format' });
-      }
-
-      if(!validatePassword(password)){
-        return res.status(400).json({ error: 'Password should be at least 8 characters with at least one symbol or number' });
-      }
-  
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-  
-      const user = {
-        firstName, 
-        lastName,
-        email,
-        passwordHash: hashedPassword,
-        isAdmin,
-        verificationStatus: false,
-      };
-  
-    //   const newUser = await User.create(user); -- Pls uncomment this when the user model is ready
-  
-      return res.status(201).json({
-        success: true,
-        message: 'User created successfully',
-        data: {
-          user: newUser,
-        },
-      });
-    } catch (error) {
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            // Unique constraint violation (duplicate email)
-            const errorMessage = error.errors[0].message;
-            return res.status(400).json({ error: errorMessage });
-          }
-      next(error.message);
-    }
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
   }
-  
+
+  const { email } = req.body;
+  // ... Implement forgot password functionality here
+  res.status(200).json({ message: "Reset password link sent successfully." });
+};
+
+const resetPassword = (req, res) => {
+  const { error } = resetPasswordSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { token, password } = req.body;
+  // ... Implement reset password functionality here
+  res.status(200).json({ message: "Password reset successfully." });
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const user = await User.findOne({ where: { verificationToken: token } });
+
+    if (!user) {
+      // 404 Error or custom error handling
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    user.verificationStatus = "verified";
+    user.verificationToken = null;
+
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully" });
+  } catch (error) {
+    // Internal error or custom error handling
+    res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+};
+
+module.exports = { forgotPassword, resetPassword, verifyEmail };
