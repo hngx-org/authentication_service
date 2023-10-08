@@ -11,9 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Sync the model with the database
-const db = require("./models/index");
+const sequelize = require("./config/db");
 
-db.sequelize.sync();
+sequelize.authenticate();
 
 
 app.use(passport.initialize()); 
