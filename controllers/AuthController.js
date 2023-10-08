@@ -18,6 +18,11 @@ const resetPasswordSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const verify2faSchema = Joi.object({
+  token: Joi.string().required(),
+  email: Joi.string().required(),
+});
+
 const forgotPassword = (req, res) => {
   const { error } = forgotPasswordSchema.validate(req.body);
 
@@ -86,7 +91,7 @@ if(!user) return res.status(400).json({ message: "User not found" });
 
 // The middleware for sending code is not ready
 
-
+// user.token = generatedTpken;
 
 
   res.status(200).json({ message: 'You have been sent a code ' });
@@ -107,12 +112,15 @@ const verify2fa = (req, res) => {
        } 
   );
 
-if(!user) return res.status(400).json({ message: "User not found" });
+if(!user) return res.status(404).json({ message: "User not found" });
  
 const { token } = req.body;
-user.two_factor_enabled = true;
-user.save();
-  res.status(200).json({ message: '2fa enabled successfully ' });
+if(user.token !== token) return res.status(400).json({ message: "Code is incorrect" });
+ 
+
+  res.status(200).json({ 
+data: user,
+message: '2fa verified successfully' });
 };
 
 module.exports = { forgotPassword, resetPassword, enable2fa , send2faCode, verify2fa};
