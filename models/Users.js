@@ -43,15 +43,21 @@ const User = sequelize.define(
       allowNull: false,
     },
     token: {
-      type: DataTypes.STRING(30)
+      type: DataTypes.STRING(30),
     },
     is_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    two_factor_enabled: {
+    two_factor_auth: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    location: {
+      type: DataTypes.STRING(255),
+    },
+    country: {
+      type: DataTypes.STRING(255),
     },
     created_at: {
       type: DataTypes.DATE,
