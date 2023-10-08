@@ -1,6 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require('./swaggerUi');
+const sampleRoutes = require("./routes/demo");
 const passport = require("passport");
 const defineRolesandPermissions = require("./helpers/populate");
 const userRoute = require("./routes/userRoutes");
@@ -21,11 +24,17 @@ sequelize.authenticate().then(async () => {
 app.use(passport.initialize());
 require("./middleware/authEmail")(passport);
 
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Use your API routes
+app.use('/api', sampleRoutes);
+
 // Routes
 app.use("/auth", userRoute);
 // require('./routes/userRoutes')(app);
 
 app.use("/api/auth", authRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
