@@ -1,7 +1,52 @@
 const bcrypt = require("bcrypt"); 
-const User = require("../models/User");
- const JwtStartegy = require("passport-jwt").Strategy;
- const jwt = require("jsonwebtoken"); 
+const User = require("../models/Users");
+const JwtStartegy = require("passport-jwt").Strategy;
+const jwt = require("jsonwebtoken"); 
+const transporter = require("../middleware/mailConfig")
+const validator = require("validator")
+
+
+async function createUser(req, res) {
+    const { firstName, lastName, email, password } = req.body;
+  
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format.",
+      });
+    }
+  
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists.",
+      });
+    }
+  
+    const hashedPassword = bcrypt.hashSync(password, 10);
+  
+    try {
+      const newUser = await User.create({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: hashedPassword,
+      });
+  
+      res.status(201).json({
+        success: true,
+        message: "User created successfully.",
+        data: newUser,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error creating user.",
+        error: error.message,
+      });
+    }
+  }
 
 async function login(req,res){
  const data = req.body;
@@ -33,6 +78,94 @@ async function login(req,res){
 };
 
 
+const sendVerificationCode = async (req, res) => {
+  const { first_name, last_name, username, email, password, refresh_token } = req.body
+
+  // Validate email format
+  if (!validator.isEmail(email)) {
+      return res.status(400).json({
+          success: false,
+          message: 'Invalid email format.',
+      });
+  }
+
+  // Generating a random 6 digit verification code
+  const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+  ).toString();
+
+
+  await User.create({
+      first_name,
+      last_name,
+      username,
+      email,
+      password,
+      refresh_token,
+      token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
+  })
+
+  // Send an email with the verification code
+  const mailOptions = {
+      from: 'testemail@gmail.com', // Your email address
+      to: email, // User's email address
+      subject: 'Email Verification',
+      text: `Your verification code is: ${verificationCode}`,
+  };
+
+  // Sending the email
+  await transporter.sendMail(mailOptions);
+
+  res.status(200).json({
+      message: 'Verification code sent successfully',
+  });
+}
+
+const confirmVerificationCode = async (req, res) => {
+  try {
+      const { email, verificationCode } = req.body
+
+      // Validate email and verification code
+      if (!email || !verificationCode) {
+          return res.status(400).json({
+              success: false,
+              message: 'Email and verification code are required.',
+          });
+      }
+
+      // Verifing the verification code against the stored code in your database
+      const user = await User.findOne({
+          where: { email, token: verificationCode },
+      });
+
+      if (!user || user.token !== verificationCode) {
+          return res.status(400).json({
+              success: false,
+              message: 'Invalid email or verification code.',
+              data: null,
+          });
+      }
+
+      // Mark the email as verified
+      user.is_verified = true;
+      user.token = null; // Optional, clear the verification code from the database or not
+      //  There is supposed to be a field where we set the state to be true once token is validated
+
+      await user.save();
+
+      res.status(200).json({
+          success: true,
+          message: 'Token verified',
+      });
+  } catch (error) {
+      res.send(error.message)
+  }
+}
+
+
 module.exports = {
- login
+ login,
+ sendVerificationCode,
+ confirmVerificationCode,
+ createUser
 }
