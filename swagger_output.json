@@ -1,0 +1,284 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "zuri portfolio authentication_service API",
+        "description": "Documentation for zuri portfolio authentication_service API."
+    },
+    "host": "localhost:4000",
+    "servers": [
+        {
+            "url": "http://localhost:4000",
+            "description": "Confirmed working well"
+        }
+    ],
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Authentication Endpoints"
+        }
+    ],
+    "schemes": [
+        "https",
+        "http"
+    ],
+    "securityDefinitions": {
+        "JWT": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "in": "header"
+        }
+    },
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/auth/signup": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Endpoint to Register User",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "firstName": {
+                                    "type":"string",
+                                    "example": "john"
+                                },
+                                "lastName": {
+                                    "type":"string",
+                                    "example": "doe"
+                                },
+                                "email": {
+                                    "type":"string",
+                                    "example": "test@gmail.com"
+                                },
+                                "password": {
+                                    "type":"string",
+                                    "example": "myPassword2021"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created, User Created Successfully."
+                    },
+                    "400": {
+                        "description": "Bad Request, The user sent an invalid request."
+                    },
+                    "500": {
+                        "description": "Internal Server Error, Error processing request from the server."
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Endpoint to Login User",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "email": {
+                                    "example": "any"
+                                },
+                                "password":{
+                                    "example":"any"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Successfully processed request."
+                    },
+                    "400": {
+                        "description": "Bad Request, The user sent an invalid request."
+                    },
+                    "500":{
+                        "description":"Internal Server Error, Error processing request from the server."
+                    }
+                }
+            }
+        },
+        "/api/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Handles the process of user's forgotten password.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "email": {
+                                    "type": "string",
+                                    "example": "test-user@mail.com"
+                                }
+                            },
+                            "required": [
+                                "email"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Successfully processed request."
+                    },
+                    "400": {
+                        "description":"Bad Request, The user sent an invalid request."
+                    },
+                    "500": {
+                        "description":"Internal Server Error, Error processing request from the server."
+                    }
+                }
+            }
+        },
+        "/api/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Handles the process of resetting a user's forgotten password.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "token": {
+                                    "type": "string",
+                                    "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "example": "mypassword@2023"
+                                }
+                            },
+                            "required": [
+                                "token",
+                                "password"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description":"Success, Successfully processed request."
+                    },
+                    "400": {
+                        "description":"Bad Request, The user sent an invalid request."
+                    },
+                    "500":{
+                        "description":"Internal Server Error, Error processing request from the server."
+                    }
+                }
+            }
+        },
+        "/api/auth/verify-email": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Handles the verification and confirmation of the authenticity of a user's email address.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "token": {
+                                    "type":"string",
+                                    "example":"42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description":"Success, Successfully processed request."
+                    },
+                    "400": {
+                        "description":"Bad Request, The user sent an invalid request."
+                    },
+                    "404": {
+                        "description":"Not Found, User Not Found."
+                    },
+                    "500": {
+                        "description":"Internal Server Error, Error processing request from the server."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "users": {
+            "type": "object",
+            "properties": {
+                "id":{
+                    "type":"string",
+                    "example":"42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                },
+                "firstName": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "lastName": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "test@gmail.com"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "myPassword2021"
+                }
+            }
+        }
+    }
+}
