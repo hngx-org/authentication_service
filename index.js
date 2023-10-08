@@ -1,7 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const passport = require("passport");
+
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const passport = require('passport');
+
+const defineRolesandPermissions = require('./helpers/populate');
+
 
 const app = express();
 
@@ -12,13 +16,17 @@ app.use('/auth', authRoutes);
 app.use(bodyParser.json());
 
 // Sync the model with the database
-const sequelize = require("./config/db");
 
-sequelize.authenticate();
+const sequelize = require('./config/db');
 
+sequelize.authenticate().then(async () => {
+  // populate roles and permissions if not already populated
+  await defineRolesandPermissions();
+});
 
-app.use(passport.initialize()); 
-require('./middleware/authEmail')(passport); 
+app.use(passport.initialize());
+require('./middleware/authEmail')(passport);
+
 
 // Routes
 require('./routes/userRoutes')(app);
