@@ -1,16 +1,18 @@
-const bcrypt = require("bcrypt"); 
+const bcrypt = require("bcrypt");
 const User = require("../models/Users");
 const JwtStartegy = require("passport-jwt").Strategy;
 const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/mailConfig")
-const validator = require("validator")
+const validator = require("validator");
+const Joi = require("joi");
 
 const enable2faSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
 const verify2faSchema = Joi.object({
-  token: Joi.string().required()
+  token: Joi.string().required(),
+  email: Joi.string().email().required(),
 });
 
 
@@ -39,6 +41,8 @@ async function createUser(req, res) {
       first_name: firstName,
       last_name: lastName,
       email: email,
+      username: "",
+      refresh_token: "",
       password: hashedPassword,
     });
 
@@ -100,29 +104,31 @@ const enable2fa = async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  const { email } = req.body;
   const user = await User.findOne(
     {
-      where: { email: data.email }
+      where: { email: email }
     }
   );
   if (!user) return res.status(400).json({ message: "User not found" });
 
-  user.two_factor_enabled = true;
+  user.two_factor_auth = true;
   user.save();
-  res.status(200).json({ message: '2fa enabled successfully ' });
+  res.status(200).json({ message: '2fa enabled successfully '});
 };
 
 
 
 const send2faCode = async (req, res) => {
   const { error } = enable2faSchema.validate(req.body);
+  const { email } = req.body;
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
   const user = await User.findOne(
     {
-      where: { email: data.email }
+      where: { email: email }
     }
   );
 
@@ -132,40 +138,36 @@ const send2faCode = async (req, res) => {
 
   if (!user) return res.status(400).json({ message: "User not found" });
 
-  user.token = verificationCode;
-  const mailOptions = {
-    from: 'testemail@gmail.com', // Your email address
-    to: email, // User's email address
-    subject: '2FA Verification',
-    text: `Your verification code is: ${verificationCode}`,
-  };
+  user.refresh_token = verificationCode;
+  // const mailOptions = {
+  //   from: 'testemail@gmail.com', // Your email address
+  //   to: email, // User's email address
+  //   subject: '2FA Verification',
+  //   text: `Your verification code is: ${verificationCode}`,
+  // };
 
   // Sending the email
-  await transporter.sendMail(mailOptions);
+  // await transporter.sendMail(mailOptions);
   user.save();
-  res.status(200).json({ message: 'You have been sent a code ' });
+  res.status(200).json({ message: 'You have been sent a code' });
 };
 
 
 const verify2fa = async (req, res) => {
   const { error } = verify2faSchema.validate(req.body);
-
+  const { email, token} = req.body;
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-
   const user = await User.findOne(
     {
-      where: { email: data.email }
+      where: { email: email }
     }
   );
-
   if (!user) return res.status(404).json({ message: "User not found" });
-
-  const { token } = req.body;
-  if (user.token !== token) return res.status(400).json({ message: "Code is incorrect" });
-
-
+  if (user.refresh_token !== token) return res.status(400).json({ message: "Code is incorrect" });
+  user.refresh_token = "";
+  user.save();
   res.status(200).json({
     data: user,
     message: '2fa verified successfully'
