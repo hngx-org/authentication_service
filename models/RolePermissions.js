@@ -5,7 +5,7 @@ const Role = require("./Roles");
 const Permission = require("./Permissions");
 
 const RolePermissions = sequelize.define(
-  "role_permissions",
+  "roles_permissions",
   {
     role_id: {
       type: DataTypes.INTEGER,
