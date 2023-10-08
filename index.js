@@ -8,7 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use('/auth', authRoutes);
+app.use(bodyParser.json());
 
 // Sync the model with the database
 const sequelize = require("./config/db");
