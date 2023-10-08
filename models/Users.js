@@ -46,9 +46,15 @@ const User = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    two_factor_enabled: {
+    two_factor_auth: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    location: {
+      type: DataTypes.STRING(255),
+    },
+    country: {
+      type: DataTypes.STRING(255),
     },
     created_at: {
       type: DataTypes.DATE,
@@ -62,9 +68,5 @@ const User = sequelize.define(
   }
 );
 
-async function run() {
-   await User.sync({ alter: true });
- }
- run();
 
 module.exports = User;
