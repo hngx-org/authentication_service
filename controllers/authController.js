@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const User = require("../models/User");
+const User = require("../models/Users");
 
 const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().required(),

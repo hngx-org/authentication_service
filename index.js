@@ -5,22 +5,24 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require('./swaggerUi');
 const sampleRoutes = require("./routes/demo");
 const passport = require("passport");
+const defineRolesandPermissions = require("./helpers/populate");
+const userRoute = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/auth', authRoutes);
-app.use(bodyParser.json());
 
-// Sync the model with the database
 const sequelize = require("./config/db");
 
-sequelize.authenticate();
+sequelize.authenticate().then(async () => {
+  // populate roles and permissions if not already populated
+  await defineRolesandPermissions();
+});
 
-
-app.use(passport.initialize()); 
-require('./middleware/authEmail')(passport); 
+app.use(passport.initialize());
+require("./middleware/authEmail")(passport);
 
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -29,7 +31,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', sampleRoutes);
 
 // Routes
-require('./routes/userRoutes')(app);
+app.use("/auth", userRoute);
+// require('./routes/userRoutes')(app);
+
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
