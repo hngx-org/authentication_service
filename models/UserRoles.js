@@ -21,7 +21,7 @@ const UserRoles = sequelize.define(
       },
     },
   },
-  { freezeTableName: true },
+  { freezeTableName: true, timestamps: false },
 );
 
 User.belongsToMany(Role, { through: UserRoles });

@@ -1,6 +1,6 @@
 const express = require('express');
 const {  forgotPassword, resetPassword, verifyEmail } = require('../controllers/authController');
-const { errorHandler } = require('../middlewares/ErrorMiddleware');
+const { errorHandler } = require('../middleware/ErrorMiddleware');
 
 const router = express.Router();
 

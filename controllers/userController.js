@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt"); 
-const User = require("../models/User");
+const User = require("../models/Users");
 const JwtStartegy = require("passport-jwt").Strategy;
 const jwt = require("jsonwebtoken"); 
 const transporter = require("../middleware/mailConfig")

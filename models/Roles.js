@@ -7,12 +7,14 @@ const Role = sequelize.define(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrementIdentity: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,
     },
   },
-  { freezeTableName: true },
+  { freezeTableName: true, timestamps: false },
 );
 
 module.exports = Role;

@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
 const User = require("./User");
-const Permission = require("./Permission");
+const Permission = require("./Permissions");
 
 const UserPermissions = sequelize.define(
   "user_permissions",
@@ -22,7 +22,7 @@ const UserPermissions = sequelize.define(
       },
     },
   },
-  { freezeTableName: true },
+  { freezeTableName: true, timestamps: false },
 );
 
 User.belongsToMany(Permission, { through: UserPermissions });
