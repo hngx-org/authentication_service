@@ -10,11 +10,27 @@ passport.use(
       passReqToCallback: true,
     },
     async (accessToken, refreshToken, profile, cb) => {
-      let user = await User.findOne({ email: user.email });
-      if (!user)
-        user = await User.create({
-          username: profile.displayName,
-        });
+      try {
+        let user = await User.findOne({ email: user.email });
+        if (!user)
+          user = await User.create({
+            username: profile.displayName,
+            first_name: profile.name.givenName,
+            last_name: profile.name.giveName,
+            email: profile.email,
+            refreshToken: "....",
+          });
+
+        if (!user) throw new Error("Errors");
+
+        cb(false, user);
+      } catch (err) {
+        cb(Error("Error"));
+      }
     }
   )
 );
+
+passport.serializeUser = (user, done) => {
+  done(false, user.dataValues());
+};
