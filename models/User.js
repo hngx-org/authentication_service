@@ -62,9 +62,9 @@ const User = sequelize.define(
   }
 );
 
-// async function run() {
-//   await User.sync({ alter: true });
-// }
-// run();
+async function run() {
+   await User.sync({ alter: true });
+ }
+ run();
 
 module.exports = User;

@@ -6,14 +6,14 @@ require("../services/passportService");
 const gauthRoutes = Router();
 
 gauthRoutes.get(
-  "/oauth/google/signup",
+  "/auth/google",
   passport.authenticate("google", {
     scope: ["email", "profile"],
   })
 );
 
 gauthRoutes.get(
-  "/oauth/google/redirect",
+  "/auth/google/redirect",
   passport.authenticate("google", {
     session: false,
   }),
