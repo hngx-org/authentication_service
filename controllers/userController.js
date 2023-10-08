@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-const User = require("../models/User");
+const bcrypt = require("bcrypt"); 
+const User = require("../models/Users");
 const JwtStartegy = require("passport-jwt").Strategy;
 const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/mailConfig")
@@ -260,8 +260,9 @@ const confirmVerificationCode = async (req, res) => {
 
 module.exports = {
   login,
-  enable2fa, send2faCode, verify2fa,
-
+  enable2fa,
+  send2faCode,
+  verify2fa,
   sendVerificationCode,
   confirmVerificationCode,
   createUser

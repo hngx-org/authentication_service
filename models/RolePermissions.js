@@ -2,10 +2,10 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
 const Role = require("./Roles");
-const Permission = require("./Permission");
+const Permission = require("./Permissions");
 
 const RolePermissions = sequelize.define(
-  "role_permissions",
+  "roles_permissions",
   {
     role_id: {
       type: DataTypes.INTEGER,
@@ -22,7 +22,7 @@ const RolePermissions = sequelize.define(
       },
     },
   },
-  { freezeTableName: true },
+  { freezeTableName: true, timestamps: false },
 );
 
 Role.belongsToMany(Permission, { through: RolePermissions });
