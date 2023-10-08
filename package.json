@@ -21,6 +21,7 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "joi": "^17.11.0",
+    "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",
