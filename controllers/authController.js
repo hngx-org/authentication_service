@@ -1,5 +1,5 @@
-const Joi = require("joi");
-const User = require("../models/User");
+const Joi = require('joi');
+const User = require('../models/User');
 
 const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -19,7 +19,7 @@ const forgotPassword = (req, res) => {
 
   const { email } = req.body;
   // ... Implement forgot password functionality here
-  res.status(200).json({ message: "Reset password link sent successfully." });
+  res.status(200).json({ message: 'Reset password link sent successfully.' });
 };
 
 const resetPassword = (req, res) => {
@@ -31,33 +31,33 @@ const resetPassword = (req, res) => {
 
   const { token, password } = req.body;
   // ... Implement reset password functionality here
-  res.status(200).json({ message: "Password reset successfully." });
+  res.status(200).json({ message: 'Password reset successfully.' });
 };
 
 const verifyEmail = async (req, res) => {
   try {
     const { token } = req.body;
 
-    const user = await User.findOne({ where: { verificationToken: token } });
+    const user = await User.findOne({ where: { token } });
 
     if (!user) {
       // 404 Error or custom error handling
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: 'User not found' });
     }
 
-    user.verificationStatus = "verified";
-    user.verificationToken = null;
+    user.is_verified = true;
+    user.token = null;
 
     await user.save();
 
     res
       .status(200)
-      .json({ success: true, message: "Email verified successfully" });
+      .json({ success: true, message: 'Email verified successfully' });
   } catch (error) {
     // Internal error or custom error handling
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    res.status(500).json({ success: false, message: 'Something went wrong' });
   }
 };
 
