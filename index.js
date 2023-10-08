@@ -1,35 +1,31 @@
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
-const { sequelize } = require('./configs/connectDb.js');
-const passport = require('./configs/passport.js');
-const defineRolesandPermissions = require('./helpers/populate.js');
-const authRouter = require('./routes/auth.js');
-const getAuthRouter = require('./routes/getAuth.js');
+const passport = require('passport');
+
+const defineRolesandPermissions = require('./helpers/populate');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/auth', authRoutes);
+app.use(bodyParser.json());
+
+// Sync the model with the database
+const sequelize = require('./config/db');
+
+sequelize.authenticate().then(async () => {
+  // populate roles and permissions if not already populated
+  await defineRolesandPermissions();
+});
+
 app.use(passport.initialize());
-
-// conncect db
-sequelize
-  .authenticate()
-  .then(async () => {
-    console.log('database connected');
-
-    // populate roles and permissions if not already populated
-    await defineRolesandPermissions();
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+require('./middleware/authEmail')(passport);
 
 // Routes
-app.use('/auth', authRouter);
-app.use('/get-auth', getAuthRouter);
+require('./routes/userRoutes')(app);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

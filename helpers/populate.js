@@ -1,7 +1,8 @@
 const {
   assignPermissionToRole,
 } = require('../controllers/helpers/rolesandpermissions');
-const { Role, Permission } = require('../models/models');
+const Role = require('../models/role');
+const Permission = require('../models/permission');
 
 const {
   permissions,
