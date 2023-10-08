@@ -58,7 +58,13 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  },
+    tableName: "users",
+  }
 );
+
+// async function run() {
+//   await User.sync({ alter: true });
+// }
+// run();
 
 module.exports = User;

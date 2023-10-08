@@ -9,23 +9,25 @@ passport.use(
       ...Options,
       passReqToCallback: true,
     },
-    async (accessToken, refreshToken, profile, cb) => {
+    async (request, accessToken, refreshToken, profile, cb) => {
       try {
-        let user = await User.findOne({ email: user.email });
+        let user = await User.findOne({
+          where: { email: profile.emails[0].value },
+        });
         if (!user)
           user = await User.create({
             username: profile.displayName,
             first_name: profile.name.givenName,
-            last_name: profile.name.giveName,
-            email: profile.email,
-            refreshToken: "....",
+            last_name: profile.name.familyName,
+            email: profile.emails[0].value,
+            refresh_token: "....",
           });
 
         if (!user) throw new Error("Errors");
-
+        request.user = user;
         cb(false, user);
       } catch (err) {
-        cb(Error("Error"));
+        cb(err);
       }
     }
   )
