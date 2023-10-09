@@ -8,7 +8,8 @@ const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userRoute = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
-const getAuthRoute = require('./routes/getAuth');
+
+const getAuthRoutes = require('./routes/getAuth');
 const app = express();
 
 app.use(cors());
@@ -36,8 +37,7 @@ app.use('/auth', userRoute);
 // require('./routes/userRoutes')(app);
 
 app.use('/api/auth', authRoutes);
-
-app.use('/api/get-auth', getAuthRoute);
+app.use('/api/get-auth', getAuthRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
