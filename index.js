@@ -6,18 +6,14 @@ const swaggerSpec = require('./swaggerUi');
 const sampleRoutes = require('./routes/demo');
 const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
-const userRoute = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
-
+const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
-const { gauthRoutes } = require("./routes/gauthRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
@@ -32,20 +28,16 @@ sequelize.authenticate().then(async () => {
 app.use(passport.initialize());
 require('./middleware/authEmail')(passport);
 
-app.use("/api", gauthRoutes);
-
-
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Use your API routes
 app.use('/api', sampleRoutes);
 
-// Routes
-app.use('/auth', userRoute);
-// require('./routes/userRoutes')(app);
+// PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
+app.use('/api/auth', userAuthRoutes);
 
-app.use('/api/auth', authRoutes);
+//communication with other microservices
 app.use('/api/get-auth', getAuthRoutes);
 
 const PORT = process.env.PORT || 4000;
