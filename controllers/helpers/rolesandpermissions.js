@@ -89,10 +89,10 @@ module.exports.getUserPermissions = async (userId) => {
       include: [
         {
           model: Role,
-          as: 'roles',
-          include: [{ model: Permission, as: 'permissions' }],
+          as: 'role',
+          include: [{ model: Permission, attributes: ['name'] }],
         },
-        { model: Permission, as: 'permissions' },
+        { model: Permission },
       ],
     });
 
@@ -101,17 +101,16 @@ module.exports.getUserPermissions = async (userId) => {
       return [];
     }
 
-    const rolePermissions = user.roles.flatMap((role) =>
-      role.permissions.map((permission) => permission.name)
+    const rolePermissions = user.role.permissions.map(
+      (permission) => permission.name
     );
+    console.log(rolePermissions);
 
     const directPermissions = user.permissions.map(
       (permission) => permission.name
     );
 
     const allPermissions = [...rolePermissions, ...directPermissions];
-
-    console.log(`All permissions for user ${user.username}:`, allPermissions);
     return allPermissions;
   } catch (error) {
     console.error('Error getting user permissions:', error);
@@ -122,19 +121,18 @@ module.exports.getUserPermissions = async (userId) => {
 module.exports.getUserRole = async (userId) => {
   try {
     const user = await User.findByPk(userId, {
-      include: [{ model: Role, as: 'roles' }],
+      include: [{ model: Role, as: 'role', attributes: ['name'] }],
     });
 
     if (!user) {
       console.error(`User with ID ${userId} not found.`);
       return [];
     }
+    return user.role.name;
 
-    const roles = user.roles.map((role) => role.name);
-    console.log(`Roles for user ${user.username}:`, roles);
-    return roles;
+    // return roles;
   } catch (error) {
-    console.error('Error getting user roles:', error);
-    return [];
+    console.error('Error getting user role:', error);
+    return null;
   }
 };

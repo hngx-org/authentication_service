@@ -3,29 +3,28 @@ const {
   getUserPermissions,
   getRoleByUserId,
   getUserRoles,
+  getUserRole,
 } = require('./helpers/rolesandpermissions');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const { log } = require('console');
+const { permissions, roles } = require('../helpers/users_roles_permissions');
 
 require('dotenv').config();
 
 module.exports.getAuth = async (req, res) => {
-  const { token } = req.body;
-  const { role, permission } = req.query;
+  const { token, role, permission } = req.body;
 
   let response = { status: 401, msg: 'Unauthorized' };
   let id;
   if (token) {
-    const verify = promisify(jwt.verify);
     try {
-      const decode = await verify(token, process.env.JWT_SECRET);
-      log(decode);
+      const decode = jwt.verify(token, process.env.JWT_SECRET);
       id = decode.id;
     } catch (error) {
+      console.log(error);
       return res.json(response);
     }
-
     if (permission) {
       const userPermissions = await getUserPermissions(id);
       if (userPermissions.includes(permission))
@@ -42,27 +41,32 @@ module.exports.getAuth = async (req, res) => {
           msg: 'authorized',
           id,
         };
-    }
-  } else response = { status: 200, id };
+    } else response = { status: 200, id };
+  }
 
   res.json(response);
 };
 
-module.exports.getAuthPermissions = async () => {
+module.exports.getAuthPermissions = async (req, res) => {
   const { token } = req.body;
   let response = { status: 401, msg: 'Unauthorized' };
   let id;
   if (token) {
     // validate token
-    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
-      if (!err) {
-        return res.json(response);
-      }
-      id = decoded.id;
-    });
+    try {
+      const decode = jwt.verify(token, process.env.JWT_SECRET);
+      id = decode.id;
+    } catch (error) {
+      return res.json(response);
+    }
+
     const userPermissions = await getUserPermissions(id);
     if (userPermissions && userPermissions[0])
-      response = { status: 200, userPermissions };
+      response = { status: 200, permissions: userPermissions };
   }
   res.json(response);
+};
+
+module.exports.sendPermissionsAndRows = (req, res) => {
+  res.json({ availableRoles: roles, availablePermissions: permissions });
 };

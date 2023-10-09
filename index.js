@@ -17,8 +17,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const sequelize = require('./config/db');
+const UserPermissions = require('./models/UserPermissions');
 
 sequelize.authenticate().then(async () => {
+  await sequelize.sync();
+  await UserPermissions.sync();
   // populate roles and permissions if not already populated
   await defineRolesandPermissions();
 });
