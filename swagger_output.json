@@ -19,8 +19,8 @@
             "description": "Authentication Endpoints"
         },
         {
-            "name":"Google-Auth",
-            "description":"google authentication endpoints"
+            "name": "Google-Auth",
+            "description": "google authentication endpoints"
         },
         {
             "name": "2FA",
@@ -29,6 +29,10 @@
         {
             "name": "Get-Auth",
             "description": "Get authentication Endpoints"
+        },
+        {
+            "name": "PASSWORD RESET AND EMAIL VERIFICATION",
+            "description": "password reset and email verification Endpoints"
         }
     ],
     "schemes": [
@@ -280,7 +284,7 @@
         "/api/auth/forgot-password": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "PASSWORD RESET AND EMAIL VERIFICATION"
                 ],
                 "description": "Handles the process of user's forgotten password.",
                 "parameters": [
@@ -318,7 +322,7 @@
         "/api/auth/reset-password": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "PASSWORD RESET AND EMAIL VERIFICATION"
                 ],
                 "description": "Handles the process of resetting a user's forgotten password.",
                 "parameters": [
@@ -358,7 +362,7 @@
                 }
             }
         },
-        "/api/2fa/enable": {
+        "/api/auth/2fa/enable": {
             "post": {
                 "tags": [
                     "2FA"
@@ -396,7 +400,7 @@
                 }
             }
         },
-        "/api/2fa/send-code": {
+        "/api/auth/2fa/send-code": {
             "post": {
                 "tags": [
                     "2FA"
@@ -434,7 +438,7 @@
                 }
             }
         },
-        "/api/2fa/verify-code": {
+        "/api/auth/2fa/verify-code": {
             "post": {
                 "tags": [
                     "2FA"
@@ -482,83 +486,201 @@
                 "tags": [
                     "Get-Auth"
                 ],
-                "description": "Handles the process of authorizing a user",
-                "parameters": [
-                    {
-                        "name": "role",
-                        "in": "query",
-                        "type": "string"
-                    },
-                    {
-                        "name": "permission",
-                        "in": "query",
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "token": {
-                                    "type": "string",
-                                    "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                "summary": "Checks if a token is valid or user is authenticated and gets a list of possible roles and users.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "description": "User authentication token"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "description": "User role for authorization (optional)"
+                                    },
+                                    "permission": {
+                                        "type": "string",
+                                        "description": "User permission for authorization (optional)"
+                                    }
+                                },
+                                "example": {
+                                    "token": "token_provided",
+                                    "role": "role_to_check",
+                                    "permission": "permission_to_check"
                                 }
                             }
                         }
                     }
-                ],
+                },
                 "responses": {
-                    "200": {
-                        "description": "Success, Successfully processed request."
+                    "authenticated": {
+                        "description": "Successful authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "Status of the action"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "description": "ID of user"
+                                        }
+                                    },
+                                    "example": {
+                                        "status": 200,
+                                        "id": "user_id"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "400": {
-                        "description": "Bad Request, The user sent an invalid request."
+                    "Authorised": {
+                        "description": "Successful authentication and authorization",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "Status of the action"
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "description": "Message of authorization"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "description": "ID of user"
+                                        }
+                                    },
+                                    "example": {
+                                        "status": 200,
+                                        "msg": "authorized",
+                                        "id": "user_id"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized Request, The user is not authorized for this request."
-                    },
-                    "500": {
-                        "description": "Internal Server Error, Error processing request from the server."
+                    "unauthorized": {
+                        "description": "Unauthorized or failed authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "Status of the action"
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "description": "Message of authorization"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "description": "ID of user"
+                                        }
+                                    },
+                                    "example": {
+                                        "status": 401,
+                                        "msg": "unauthorized"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "/api/get-auth/all-permission": {
+        "/api/get-auth/permissions": {
+            "tags": [
+                "Get-Auth"
+            ],
             "post": {
-                "tags": [
-                    "Get-Auth"
-                ],
-                "description": "Handles the process of getting authentication permission",
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "token": {
-                                    "type": "string",
-                                    "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                "summary": "Checks if a token is valid and returns all permissions of the user.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "description": "User authentication token"
+                                    }
                                 }
                             }
                         }
                     }
-                ],
+                },
                 "responses": {
-                    "200": {
-                        "description": "Success, Successfully processed request."
+                    "Success": {
+                        "description": "Successful authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "Status of the action"
+                                        },
+                                        "availablePermissions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "description": "List of user permissions"
+                                        }
+                                    },
+                                    "example": {
+                                        "status": 200,
+                                        "availablePermissions": [
+                                            "permission_1",
+                                            "permission_2"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "400": {
-                        "description": "Bad Request, The user sent an invalid request."
-                    },
-                    "401": {
-                        "description": "Unauthorized Request, The user is not authorized for this request."
-                    },
-                    "500": {
-                        "description": "Internal Server Error, Error processing request from the server."
+                    "not authenticated": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "Status of the action"
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "description": "Message of authorization"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "description": "ID of user"
+                                        }
+                                    },
+                                    "example": {
+                                        "status": 401,
+                                        "msg": "unauthorized"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -587,7 +709,9 @@
         },
         "/api/auth/google/redirect": {
             "post": {
-                "tags": ["Google-Auth"],
+                "tags": [
+                    "Google-Auth"
+                ],
                 "description": "Handle the process of creating a new user in the database using Google OAuth.",
                 "requestBody": {
                     "description": "User data for creating a new user",
@@ -614,7 +738,11 @@
                                         "description": "user's id"
                                     }
                                 },
-                                "required": ["idToken", "name", "email"]
+                                "required": [
+                                    "idToken",
+                                    "name",
+                                    "email"
+                                ]
                             }
                         }
                     }
@@ -635,7 +763,6 @@
                 }
             }
         }
-        
     },
     "definitions": {
         "users": {
