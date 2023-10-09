@@ -2,8 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swaggerUi');
-const sampleRoutes = require('./routes/demo');
+const swaggerSpec = require('./swagger_output.json');
 const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
@@ -31,8 +30,6 @@ require('./middleware/authEmail')(passport);
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Use your API routes
-app.use('/api', sampleRoutes);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
 app.use('/api/auth', userAuthRoutes);
