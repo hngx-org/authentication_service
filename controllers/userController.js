@@ -37,14 +37,28 @@ async function createUser(req, res) {
   
     const hashedPassword = bcrypt.hashSync(password, 10);
 
+    const verificationToken = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
       email: email,
       username: '',
+      token: verificationToken,
       refresh_token: '',
       password: hashedPassword,
     });
+
+    const mailOptions = {
+      from: process.env.NODEMAILER_USER,
+      to: email,
+      subject: 'Email Verification',
+      text: `Your verification code is: ${verificationToken}`,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res.status(201).json({
       success: true,
