@@ -16,25 +16,24 @@ const verify2faSchema = Joi.object({
 });
 
 async function createUser(req, res) {
-
   try {
     const { firstName, lastName, email, password } = req.body;
-  
+
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email format.",
+        message: 'Invalid email format.',
       });
     }
-  
+
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already exists.",
+        message: 'Email already exists.',
       });
     }
-  
+
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const verificationToken = Math.floor(
@@ -77,37 +76,31 @@ async function createUser(req, res) {
 async function login(req, res) {
   try {
     const data = req.body;
-    const user = await User.findOne(
-      {
-        where: { email: data.email }
-      }
-    );
+    const user = await User.findOne({
+      where: { email: data.email },
+    });
     if (user) {
       const checkPassword = bcrypt.compareSync(data.password, user.password);
       if (!checkPassword) {
-        return res.json("Incorrect passsword")
+        return res.json('Incorrect passsword');
       } else {
         const jwt_payload = {
-  
           id: user.id,
-        }
-        const token = jwt.sign(jwt_payload, process.env.jwtSecret);
-  
-        return res.json(
-          {
-            "token": token,
-            "data": user,
-            "statusCode": 200
-          }
-        )
+        };
+        const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
+        return res.json({
+          token: token,
+          data: user,
+          statusCode: 200,
+        });
       }
     } else {
-      return res.json("User not found ")
+      return res.json('User not found ');
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error logging in",
+      message: 'Error logging in',
       error: error.message,
     });
   }
@@ -272,6 +265,5 @@ module.exports = {
   verify2fa,
   sendVerificationCode,
   confirmVerificationCode,
-  createUser
-}
-
+  createUser,
+};
