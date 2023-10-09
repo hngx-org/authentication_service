@@ -26,6 +26,9 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    token: {
+      type: DataTypes.STRING(30),
+    },
     section_order: {
       type: DataTypes.TEXT,
     },
@@ -42,16 +45,19 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    token: {
-      type: DataTypes.STRING(30)
-    },
     is_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    two_factor_enabled: {
+    two_factor_auth: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    location: {
+      type: DataTypes.STRING(255),
+    },
+    country: {
+      type: DataTypes.STRING(255),
     },
     created_at: {
       type: DataTypes.DATE,
@@ -61,7 +67,9 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  },
+    tableName: "users",
+  }
 );
+
 
 module.exports = User;
