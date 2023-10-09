@@ -1,8 +1,8 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
 const Permission = sequelize.define(
-  "permissions",
+  'permissions',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,7 +14,7 @@ const Permission = sequelize.define(
       type: DataTypes.STRING,
     },
   },
-  { freezeTableName: true, timestamps: false },
+  { freezeTableName: true, timestamps: false }
 );
 
 module.exports = Permission;

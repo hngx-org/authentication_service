@@ -1,20 +1,21 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const swaggerUi = require("swagger-ui-express");
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swaggerUi');
-const sampleRoutes = require("./routes/demo");
-const passport = require("passport");
-const defineRolesandPermissions = require("./helpers/populate");
-const userRoute = require("./routes/userRoutes");
-const authRoutes = require("./routes/authRoutes");
+const sampleRoutes = require('./routes/demo');
+const passport = require('passport');
+const defineRolesandPermissions = require('./helpers/populate');
+const userRoute = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
+const getAuthRoute = require('./routes/getAuth');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const sequelize = require("./config/db");
+const sequelize = require('./config/db');
 
 sequelize.authenticate().then(async () => {
   // populate roles and permissions if not already populated
@@ -22,7 +23,7 @@ sequelize.authenticate().then(async () => {
 });
 
 app.use(passport.initialize());
-require("./middleware/authEmail")(passport);
+require('./middleware/authEmail')(passport);
 
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -31,10 +32,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', sampleRoutes);
 
 // Routes
-app.use("/auth", userRoute);
+app.use('/auth', userRoute);
 // require('./routes/userRoutes')(app);
 
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
+
+app.use('/api/get-auth', getAuthRoute);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

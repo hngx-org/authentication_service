@@ -2,8 +2,12 @@ const { response } = require('express');
 const {
   getUserPermissions,
   getRoleByUserId,
+  getUserRoles,
 } = require('./helpers/rolesandpermissions');
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const { log } = require('console');
+
 require('dotenv').config();
 
 module.exports.getAuth = async (req, res) => {
@@ -13,12 +17,14 @@ module.exports.getAuth = async (req, res) => {
   let response = { status: 401, msg: 'Unauthorized' };
   let id;
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
-      if (!err) {
-        return res.json(response);
-      }
-      id = decoded.id;
-    });
+    const verify = promisify(jwt.verify);
+    try {
+      const decode = await verify(token, process.env.JWT_SECRET);
+      log(decode);
+      id = decode.id;
+    } catch (error) {
+      return res.json(response);
+    }
 
     if (permission) {
       const userPermissions = await getUserPermissions(id);
@@ -29,7 +35,7 @@ module.exports.getAuth = async (req, res) => {
           id,
         };
     } else if (role) {
-      const userRole = await getRoleByUserId(id);
+      const userRole = await getUserRole(id);
       if (userRole && userRole === role)
         response = {
           status: 200,
@@ -37,7 +43,8 @@ module.exports.getAuth = async (req, res) => {
           id,
         };
     }
-  }
+  } else response = { status: 200, id };
+
   res.json(response);
 };
 
