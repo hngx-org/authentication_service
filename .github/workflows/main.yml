@@ -3,7 +3,7 @@ name: Authentication Service
 on:
   push:
     branches:
-      - dev
+      - dev  
 
 jobs:
   build:
@@ -20,4 +20,5 @@ jobs:
       run: |
         ssh hngx@104.248.143.148 'cd authentication_service && git pull origin dev && npm install && pm2 restart index.js'
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
