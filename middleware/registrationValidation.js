@@ -13,7 +13,7 @@ const regMiddleware = (req, res, next) => {
     check(password, "Password is required")
       .notEmpty()
       .isLength({ min: 8 })
-      .withMessage("Password must be at least 6 characters long") // checks if password is atleast must be at least 6 chars long
+      .withMessage("Password must be at least 6 characters long") //checks if password is atleast must be at least 6 chars long
       .matches(/[0-9]/).withMessage('Password must contain at least one number')
       .matches(/[!@#$%^&*]/).withMessage('Password must contain at least one special character');
 
