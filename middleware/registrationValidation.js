@@ -2,7 +2,7 @@ const { check, validationResult } = require("express-validator");
 const db = require("../models/Users");
 const User = db.user;
 
-const regMiddleware = (req, res, next) => {
+const registrationValidation = (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
@@ -49,5 +49,4 @@ const regMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = regMiddleware;
-
+module.exports = registrationValidation;
