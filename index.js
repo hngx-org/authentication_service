@@ -14,7 +14,7 @@ const {
 const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
 
 
-const app = express();
+const app = express(); 
 
 const corsOptions = {
   origin: '*',
@@ -32,7 +32,7 @@ const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
 
 sequelize.authenticate().then(async () => {
-  await sequelize.sync();
+  await sequelize.sync(); 
   await UserPermissions.sync();
   // populate roles and permissions if not already populated
   await defineRolesandPermissions();
