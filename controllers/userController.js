@@ -15,7 +15,7 @@ const verify2faSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
-async function createUser(req, res) {
+async function createUser(req, res, next) {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -50,28 +50,9 @@ async function createUser(req, res) {
       password: hashedPassword,
     });
 
-    const mailOptions = {
-      from: process.env.NODEMAILER_USER,
-      to: email,
-      subject: "Email Verification",
-      text: `
-Your verification code is: ${verificationToken}. Please enter this code to verify your email.
+    req.body.user = newUser.toJSON();
 
-If you're testing this api endpoint, send a POST request to https://auth.akuya.tech/api/auth/2fa/verify-code with the following body:
-{
-  "email": "${email}",
-  "token": "${verificationToken}"
-}
-`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    res.status(201).json({
-      success: true,
-      message: "User created successfully. Please check your email for a code.",
-      data: newUser,
-    });
+    next();
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -204,45 +185,33 @@ const verify2fa = async (req, res) => {
 };
 
 const sendVerificationCode = async (req, res) => {
-  const { first_name, last_name, username, email, password, refresh_token } =
-    req.body;
+  const { email, user } = req.body;
 
-  // Validate email format
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid email format.",
-    });
-  }
-
-  // Generating a random 6 digit verification code
-  const verificationCode = Math.floor(
-    100000 + Math.random() * 900000,
-  ).toString();
-
-  await User.create({
-    first_name,
-    last_name,
-    username,
-    email,
-    password,
-    refresh_token,
-    token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
-  });
-
-  // Send an email with the verification code
   const mailOptions = {
-    from: "testemail@gmail.com", // Your email address
-    to: email, // User's email address
+    from: process.env.NODEMAILER_USER,
+    to: email,
     subject: "Email Verification",
-    text: `Your verification code is: ${verificationCode}`,
+    text: `
+Your verification code is: ${user.token}. Please enter this code to verify your email.
+
+If you're testing this api endpoint, send a POST request to https://auth.akuya.tech/api/auth/2fa/verify-code with the following body:
+
+<code>
+{
+  "email": "${email}",
+  "token": "${user.token}"
+}
+</code>
+`,
   };
 
-  // Sending the email
   await transporter.sendMail(mailOptions);
 
   res.status(200).json({
-    message: "Verification code sent successfully",
+    status: 200,
+    success: true,
+    message: "User created successfully. Verification code sent to email.",
+    data: user,
   });
 };
 
