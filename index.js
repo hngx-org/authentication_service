@@ -26,7 +26,7 @@ sequelize.authenticate().then(async () => {
 
 app.use(passport.initialize());
 require('./middleware/authEmail')(passport);
-
+require('./middleware/authGithub')(passport);
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
