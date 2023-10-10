@@ -19,7 +19,7 @@ require("../services/passportService");
 const { errorHandler } = require("../middleware/ErrorMiddleware");
 const registrationValidation = require("../middleware/registrationValidation");
 const handleGithubAUth = require('../controllers/githubauthController');
-const {githubLogin} = require("../controllers/githubLoginController")
+const {githubLogin, githubRedirectUrl} = require("../controllers/githubLoginController")
 
 const router = express.Router();
 router.use(errorHandler);
@@ -78,7 +78,8 @@ router.get(
 );
 
 // Route to handle login with github. Does not register the user if they do not exist
-router.post("/github", githubLogin)
+router.get("/github/login", githubLogin)
+router.get("/github/login/redirect", githubRedirectUrl)
 
 
 module.exports = router;

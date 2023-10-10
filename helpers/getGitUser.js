@@ -1,7 +1,7 @@
 const axios = require("axios");
 const querystring = require("querystring");
-const clientId = process.env.GITHUB_CLIENT_ID;
-const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+const clientId = process.env.GITHUB_LCLIENT_ID;
+const clientSecret = process.env.GITHUB_LCLIENT_SECRET;
 
 const getGithubUser = async (code) => {
   try {
@@ -17,7 +17,7 @@ const getGithubUser = async (code) => {
     const accessToken = decoded.access_token;
 
     return axios
-      .get("https://api.github.com/user", {
+      .get("https://api.github.com/user/emails", {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((res) => res.data)
