@@ -219,7 +219,6 @@ const confirmVerificationCode = async (req, res) => {
   try {
     const { email, verificationCode } = req.body;
 
-    // Validate email and verification code
     if (!email || !verificationCode) {
       return res.status(400).json({
         success: false,
@@ -227,7 +226,6 @@ const confirmVerificationCode = async (req, res) => {
       });
     }
 
-    // Verifing the verification code against the stored code in your database
     const user = await User.findOne({
       where: { email, token: verificationCode },
     });
@@ -240,10 +238,8 @@ const confirmVerificationCode = async (req, res) => {
       });
     }
 
-    // Mark the email as verified
     user.is_verified = true;
-    user.token = null; // Optional, clear the verification code from the database or not
-    //  There is supposed to be a field where we set the state to be true once token is validated
+    user.token = null;
 
     await user.save();
 
