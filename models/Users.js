@@ -1,8 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+const Role = require('./Roles');
 
 const User = sequelize.define(
-  "user",
+  'user',
   {
     id: {
       type: DataTypes.UUID,
@@ -26,6 +27,9 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    token: {
+      type: DataTypes.STRING(30),
+    },
     section_order: {
       type: DataTypes.TEXT,
     },
@@ -42,16 +46,24 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    token: {
-      type: DataTypes.STRING(30)
+    role_id: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
+      allowNull: false,
     },
     is_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    two_factor_enabled: {
+    two_factor_auth: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    location: {
+      type: DataTypes.STRING(255),
+    },
+    country: {
+      type: DataTypes.STRING(255),
     },
     created_at: {
       type: DataTypes.DATE,
@@ -61,7 +73,8 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  },
+  }
 );
+
 
 module.exports = User;

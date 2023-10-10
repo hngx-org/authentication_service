@@ -38,7 +38,7 @@ const verifyEmail = async (req, res) => {
   try {
     const { token } = req.body;
 
-    const user = await User.findOne({ where: { verificationToken: token } });
+    const user = await User.findOne({ where: { token } });
 
     if (!user) {
       // 404 Error or custom error handling
@@ -47,8 +47,8 @@ const verifyEmail = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    user.verificationStatus = "verified";
-    user.verificationToken = null;
+    user.is_verified = true;
+    user.token = null;
 
     await user.save();
 
