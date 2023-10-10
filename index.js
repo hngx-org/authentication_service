@@ -7,6 +7,7 @@ const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
+const userUpdateRouter = require("./routes/updateUser")
 
 const app = express();
 
@@ -36,6 +37,9 @@ app.use('/api/auth', userAuthRoutes);
 
 //communication with other microservices
 app.use('/api/get-auth', getAuthRoutes);
+
+// THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
+app.use("/api/user/update", userUpdateRouter)
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
