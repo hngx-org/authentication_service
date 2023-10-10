@@ -8,7 +8,7 @@ const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
 
-const app = express();
+const app = express(); 
 
 app.use(cors());
 app.use(express.json());
@@ -18,7 +18,7 @@ const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
 
 sequelize.authenticate().then(async () => {
-  await sequelize.sync();
+  await sequelize.sync(); 
   await UserPermissions.sync();
   // populate roles and permissions if not already populated
   await defineRolesandPermissions();
@@ -26,7 +26,7 @@ sequelize.authenticate().then(async () => {
 
 app.use(passport.initialize());
 require('./middleware/authEmail')(passport);
-
+require('./middleware/authGithub')(passport);
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
