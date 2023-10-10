@@ -84,11 +84,22 @@ If you're testing this api endpoint, send a POST request to https://auth.akuya.t
 async function login(req, res) {
   try {
     const data = req.body;
+
     const user = await User.findOne({
       where: { email: data.email },
     });
+
     if (user) {
+      // Check if user has verified their Email
+      if (!user.is_verified) {
+        return res.status(400).json({
+          success: false,
+          message: "Please verify your email.",
+        });
+      }
+
       const checkPassword = bcrypt.compareSync(data.password, user.password);
+
       if (!checkPassword) {
         return res.json("Incorrect passsword");
       } else {
