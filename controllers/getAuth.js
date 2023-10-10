@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const { log } = require('console');
 const { permissions, roles } = require('../helpers/users_roles_permissions');
+const User = require('../models/Users');
 
 require('dotenv').config();
 
@@ -25,6 +26,13 @@ module.exports.getAuth = async (req, res) => {
       console.log(error);
       return res.json(response);
     }
+    const user = await User.findByPk(id);
+    if (user && !user.is_verified)
+      return res.json({
+        status: 401,
+        msg: 'Unauthorized',
+        unverifiedUser: true,
+      });
     if (permission) {
       const userPermissions = await getUserPermissions(id);
       if (userPermissions.includes(permission))
@@ -59,7 +67,13 @@ module.exports.getAuthPermissions = async (req, res) => {
     } catch (error) {
       return res.json(response);
     }
-
+    const user = await User.findByPk(id);
+    if (user && !user.is_verified)
+      return res.json({
+        status: 401,
+        msg: 'Unauthorized',
+        unverifiedUser: true,
+      });
     const userPermissions = await getUserPermissions(id);
     if (userPermissions && userPermissions[0])
       response = { status: 200, permissions: userPermissions };
