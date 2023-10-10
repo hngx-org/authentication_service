@@ -4,6 +4,7 @@ const User = require("../models/Users");
 const regMiddleware = (req, res, next) => {
   try {
     const { username, email, password } = req.body;
+    console.log(req.body);
 
     check(username, "Username is required").notEmpty();
     check(email, "Email is required")
