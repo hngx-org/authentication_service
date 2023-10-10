@@ -1,5 +1,5 @@
 const { getGithubUser } = require("../helpers/getGitUser");
-const User = require("../models/User");
+const User = require("../models/Users");
 const jwt = require("jsonwebtoken");
 
 const githubLogin = async (req, res, next) => {
