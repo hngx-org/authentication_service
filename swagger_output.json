@@ -5,10 +5,10 @@
         "title": "zuri portfolio authentication_service API",
         "description": "Documentation for zuri portfolio authentication_service API."
     },
-    "host": "https://auth.akuya.tech",
+    "host": "auth.akuya.tech",
     "servers": [
         {
-            "url": "https://auth.akuya.tech",
+            "url": "auth.akuya.tech",
             "description": "Confirmed working well"
         }
     ],
