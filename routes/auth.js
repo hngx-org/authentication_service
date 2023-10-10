@@ -17,6 +17,7 @@ const passport = require('passport');
 const { handleAuth } = require('../controllers/gauthControllers');
 require('../services/passportService');
 const { errorHandler } = require('../middleware/ErrorMiddleware');
+const { registrationValidation } = require('../middleware/registrationValidation');
 
 const router = express.Router();
 router.use(errorHandler);
@@ -44,7 +45,7 @@ router.get(
 // EMAIL AND 2FA
 router.post('/send-verification', sendVerificationCode);
 router.post('/confirm-verification', confirmVerificationCode);
-router.post('/signup', createUser);
+router.post('/signup', registrationValidation, createUser);
 router.post('/2fa/enable', enable2fa);
 router.post('/2fa/send-code', send2faCode);
 router.post('/2fa/verify-code', verify2fa);
