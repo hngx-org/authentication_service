@@ -1,10 +1,10 @@
-const bcrypt = require('bcrypt');
-const User = require('../models/Users');
-const JwtStartegy = require('passport-jwt').Strategy;
-const jwt = require('jsonwebtoken');
-const transporter = require('../middleware/mailConfig');
-const validator = require('validator');
-const Joi = require('joi');
+const bcrypt = require("bcrypt");
+const User = require("../models/Users");
+const JwtStartegy = require("passport-jwt").Strategy;
+const jwt = require("jsonwebtoken");
+const transporter = require("../middleware/mailConfig");
+const validator = require("validator");
+const Joi = require("joi");
 
 const enable2faSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -22,7 +22,7 @@ async function createUser(req, res) {
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid email format.',
+        message: "Invalid email format.",
       });
     }
 
@@ -30,44 +30,52 @@ async function createUser(req, res) {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email already exists.',
+        message: "Email already exists.",
       });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
 
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
       email: email,
-      username: '',
+      username: "",
       token: verificationToken,
-      refresh_token: '',
+      refresh_token: "",
       password: hashedPassword,
     });
 
     const mailOptions = {
       from: process.env.NODEMAILER_USER,
       to: email,
-      subject: 'Email Verification',
-      text: `Your verification code is: ${verificationToken}`,
+      subject: "Email Verification",
+      text: `
+Your verification code is: ${verificationToken}. Please enter this code to verify your email.
+
+If you're testing this api endpoint, send a POST request to https://auth.akuya.tech/api/auth/2fa/verify-code with the following body:
+{
+  "email": "${email}",
+  "token": "${verificationToken}"
+}
+`,
     };
 
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
       success: true,
-      message: 'User created successfully.',
+      message: "User created successfully. Please check your email for a code.",
       data: newUser,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating user.',
+      message: "Error creating user.",
       error: error.message,
     });
   }
@@ -82,7 +90,7 @@ async function login(req, res) {
     if (user) {
       const checkPassword = bcrypt.compareSync(data.password, user.password);
       if (!checkPassword) {
-        return res.json('Incorrect passsword');
+        return res.json("Incorrect passsword");
       } else {
         const jwt_payload = {
           id: user.id,
@@ -95,12 +103,12 @@ async function login(req, res) {
         });
       }
     } else {
-      return res.json('User not found ');
+      return res.json("User not found ");
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error logging in',
+      message: "Error logging in",
       error: error.message,
     });
   }
@@ -116,11 +124,11 @@ const enable2fa = async (req, res) => {
   const user = await User.findOne({
     where: { email: email },
   });
-  if (!user) return res.status(400).json({ message: 'User not found' });
+  if (!user) return res.status(400).json({ message: "User not found" });
 
   user.two_factor_auth = true;
   user.save();
-  res.status(200).json({ message: '2fa enabled successfully ' });
+  res.status(200).json({ message: "2fa enabled successfully " });
 };
 
 const send2faCode = async (req, res) => {
@@ -135,10 +143,10 @@ const send2faCode = async (req, res) => {
   });
 
   const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
+    100000 + Math.random() * 900000,
   ).toString();
 
-  if (!user) return res.status(400).json({ message: 'User not found' });
+  if (!user) return res.status(400).json({ message: "User not found" });
 
   user.refresh_token = verificationCode;
   // const mailOptions = {
@@ -151,26 +159,36 @@ const send2faCode = async (req, res) => {
   // Sending the email
   // await transporter.sendMail(mailOptions);
   user.save();
-  res.status(200).json({ message: 'You have been sent a code' });
+  res.status(200).json({ message: "You have been sent a code" });
 };
 
 const verify2fa = async (req, res) => {
   const { error } = verify2faSchema.validate(req.body);
+
   const { email, token } = req.body;
+
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+
   const user = await User.findOne({
     where: { email: email },
   });
-  if (!user) return res.status(404).json({ message: 'User not found' });
-  if (user.refresh_token !== token)
-    return res.status(400).json({ message: 'Code is incorrect' });
-  user.refresh_token = '';
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  if (user.token !== token) {
+    return res.status(400).json({ message: "Code is incorrect" });
+  }
+
+  user.token = "";
+  user.is_verified = true;
+
   user.save();
+
   res.status(200).json({
     data: user,
-    message: '2fa verified successfully',
+    message: "Token verified successfully",
   });
 };
 
@@ -182,13 +200,13 @@ const sendVerificationCode = async (req, res) => {
   if (!validator.isEmail(email)) {
     return res.status(400).json({
       success: false,
-      message: 'Invalid email format.',
+      message: "Invalid email format.",
     });
   }
 
   // Generating a random 6 digit verification code
   const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
+    100000 + Math.random() * 900000,
   ).toString();
 
   await User.create({
@@ -203,9 +221,9 @@ const sendVerificationCode = async (req, res) => {
 
   // Send an email with the verification code
   const mailOptions = {
-    from: 'testemail@gmail.com', // Your email address
+    from: "testemail@gmail.com", // Your email address
     to: email, // User's email address
-    subject: 'Email Verification',
+    subject: "Email Verification",
     text: `Your verification code is: ${verificationCode}`,
   };
 
@@ -213,7 +231,7 @@ const sendVerificationCode = async (req, res) => {
   await transporter.sendMail(mailOptions);
 
   res.status(200).json({
-    message: 'Verification code sent successfully',
+    message: "Verification code sent successfully",
   });
 };
 
@@ -225,7 +243,7 @@ const confirmVerificationCode = async (req, res) => {
     if (!email || !verificationCode) {
       return res.status(400).json({
         success: false,
-        message: 'Email and verification code are required.',
+        message: "Email and verification code are required.",
       });
     }
 
@@ -237,7 +255,7 @@ const confirmVerificationCode = async (req, res) => {
     if (!user || user.token !== verificationCode) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid email or verification code.',
+        message: "Invalid email or verification code.",
         data: null,
       });
     }
@@ -251,7 +269,7 @@ const confirmVerificationCode = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Token verified',
+      message: "Token verified",
     });
   } catch (error) {
     res.send(error.message);
