@@ -8,7 +8,7 @@ module.exports = (passport) => {
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: "/api/auth/github/redirect",
+        callbackURL: process.env.GITHUB_CALLBACK_URL
       },
       async function (_accessToken, _refreshToken, profile, done) {
         try {
