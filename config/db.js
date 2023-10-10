@@ -8,5 +8,5 @@ const sequelize = new Sequelize({
     host: "104.248.143.148",
     dialect: "postgres",
   });
-
+  
 module.exports = sequelize;

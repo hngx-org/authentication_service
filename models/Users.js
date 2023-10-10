@@ -56,6 +56,10 @@ const User = sequelize.define(
     country: {
       type: DataTypes.STRING(255),
     },
+    //  reset_token: {
+    //   type: DataTypes.STRING(255),
+    //   allowNull: true,
+    // },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
