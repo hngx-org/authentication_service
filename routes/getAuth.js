@@ -99,12 +99,24 @@ const router = express.Router();
  *                      msg:
  *                          type: string
  *                          description: meesage of authorisation
- *                      id:
+ *          'unverified user':
+ *              description: Unauthorized or failed authentication
+ *              schema:
+ *                  type: object
+ *                  properties:
+ *                      status:
+ *                          type: integer
+ *                          description: status of action
+ *                      msg:
  *                          type: string
- *                          description: id of user
+ *                          description: mesage of authorisation
+ *                      unverifiedUser:
+ *                          type: boolean
+ *                          description: information that user is available but not verified
  *                  example:
  *                      status: 401
  *                      msg: unauthorized
+ *                      unverifiedUser: true
  */
 
 /**
@@ -140,7 +152,7 @@ const router = express.Router();
  *                      availablePermissions:
  *                          - permission_1
  *                          - permission_2
- *          'not authenticated':
+ *          'not authorised':
  *              description: Unauthorized
  *              schema:
  *                  type: object
@@ -157,6 +169,24 @@ const router = express.Router();
  *                  example:
  *                      status: 401
  *                      msg: unauthorized
+ *          'unverified user':
+ *              description: Unauthorized or failed authentication
+ *              schema:
+ *                  type: object
+ *                  properties:
+ *                      status:
+ *                          type: integer
+ *                          description: status of action
+ *                      msg:
+ *                          type: string
+ *                          description: mesage of authorisation
+ *                      unverifiedUser:
+ *                          type: boolean
+ *                          description: information that user is available but not verified
+ *                  example:
+ *                      status: 401
+ *                      msg: unauthorized
+ *                      unverifiedUser: true
  */
 
 router.post('/', getAuth);
