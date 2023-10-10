@@ -1,31 +1,50 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-const User = require("./User");
-const Permission = require("./Permissions");
+const User = require('./Users');
+const Permission = require('./Permissions');
 
 const UserPermissions = sequelize.define(
-  "user_permissions",
+  'user_permissions',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrementIdentity: true,
+      autoIncrement: true,
+    },
     user_id: {
       type: DataTypes.UUID,
       references: {
         model: User,
-        key: "id",
+        key: 'id',
       },
     },
     permission_id: {
       type: DataTypes.INTEGER,
       references: {
         model: Permission,
-        key: "id",
+        key: 'id',
       },
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
-  { freezeTableName: true, timestamps: false },
+  { freezeTableName: true, timestamps: false }
 );
 
-User.belongsToMany(Permission, { through: UserPermissions });
-Permission.belongsToMany(User, { through: UserPermissions });
+User.belongsToMany(Permission, {
+  through: UserPermissions,
+  foreignKey: 'user_id',
+  otherKey: 'permission_id',
+});
+
+Permission.belongsToMany(User, {
+  through: UserPermissions,
+  foreignKey: 'permission_id',
+  otherKey: 'user_id',
+});
 
 module.exports = UserPermissions;
