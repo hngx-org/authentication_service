@@ -1,5 +1,5 @@
 const { check, validationResult } = require("express-validator");
-const db = require("../models/index");
+const db = require("../models/Users");
 const User = db.user;
 
 const regMiddleware = (req, res, next) => {
