@@ -34,6 +34,7 @@ router.get(
     scope: ["email", "profile"],
   }),
 );
+
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
@@ -42,10 +43,16 @@ router.get(
   handleAuth,
 );
 
-// EMAIL AND 2FA
+// EMAIL REGISTRATION
+router.post(
+  "/signup",
+  registrationValidation,
+  createUser,
+  sendVerificationCode,
+);
+
 router.post("/send-verification", sendVerificationCode);
 router.post("/confirm-verification", confirmVerificationCode);
-router.post("/signup", registrationValidation, createUser);
 router.post("/2fa/enable", enable2fa);
 router.post("/2fa/send-code", send2faCode);
 router.post("/2fa/verify-code", verify2fa);
