@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const User = require("../models/Users");
 const transporter = require('../middleware/mailConfig');
