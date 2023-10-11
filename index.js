@@ -9,7 +9,7 @@ const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
 const userUpdateRouter = require("./routes/updateUser")
 
-const app = express(); 
+const app = express();   
 
 app.use(cors());
 app.use(express.json());
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
-
+ 
 sequelize.authenticate().then(async () => {
   await sequelize.sync(); 
   await UserPermissions.sync();
