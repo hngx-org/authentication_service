@@ -1,7 +1,9 @@
+const bcrypt = require('bcrypt');
 const Joi = require("joi");
 const jwt = require('jsonwebtoken')
 const User = require("../models/Users");
-const transporter = require('../middleware/mailConfig')
+const transporter = require('../middleware/mailConfig');
+
 
 const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -33,7 +35,6 @@ const sendResetPasswordEmail = async (email, resetLink) => {
     subject: "Reset Password",
     html: emailTemplate,
   });
-  
 };
 /**
  *  Send forgot Password link
