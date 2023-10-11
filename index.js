@@ -7,12 +7,21 @@ const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
+const session = require('express-session');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// session middleware
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: process.env.SESSION_SECRET,
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 
 const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
