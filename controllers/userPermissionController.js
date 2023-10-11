@@ -20,11 +20,13 @@ module.exports.addPermission = async (req, res) => {
       return res.status(404).json({ error: "User or permission not found." });
     }
     // return res.json({user,permission})
-    // Create a new UserPermission record
-    await UserPermissions.create({
-      user_id: user.id,
-      permission_id: permission.id,
-    });
+          // Add the permission to the user
+      await user.addPermission(permission);
+    // // Create a new UserPermission record
+    // await UserPermissions.create({
+    //   user_id: user.id,
+    //   permission_id: permission.id,
+    // });
 
     res.status(200).json({ message: "Permission added successfully." });
   } catch (error) {
@@ -46,13 +48,15 @@ module.exports.removePermission = async (req, res) => {
       return res.status(404).json({ error: "User or permission not found." });
     }
 
+       // Remove the permission from the user
+    await user.removePermission(permission);
     // Remove the UserPermission record
-    await UserPermissions.destroy({
-      where: {
-        user_id: user.id,
-        permission_id: permission.id,
-      },
-    });
+    // await UserPermissions.destroy({
+    //   where: {
+    //     user_id: user.id,
+    //     permission_id: permission.id,
+    //   },
+    // });
 
     res.status(200).json({ message: "Permission removed successfully." });
   } catch (error) {
