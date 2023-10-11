@@ -64,9 +64,16 @@ const forgotPassword = async (req, res) => {
       });
     }
 
+    if (user.is_verified === false) {
+      return res.status(403).json({
+        message: "Email not verified.",
+        statusCode: 403,
+        error: "Forbidden",
+      });
+    }
+
     const resetLink = generateResetLink(user.id, user.email);
-    console.log(resetLink)
-    await sendResetPasswordEmail(user.email, resetLink);
+    // await sendResetPasswordEmail(user.email, resetLink);
 
     return res.status(200).json({
       message: "Reset password link sent successfully.",
@@ -77,8 +84,7 @@ const forgotPassword = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res.status(500).json({ success: false, message: "Something went wrong due to mail service keys not found" });
   }
 };
 
@@ -121,7 +127,6 @@ const resetPassword = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
@@ -133,7 +138,15 @@ const resetPassword = async (req, res) => {
  */
 const verifyEmail = async (req, res) => {
   try {
-  const findUser = await User.findOne({where: {reset_token: req.params.token }, attributes: ['id', 'email']});
+  const verifyToken = await jwt.verify(req.params.token, process.env.jwtSecret);
+    if(!verifyToken) {
+       return res.status(403).json({
+        message: "Unauthorized token.",
+        statusCode: 403,
+        error: "Forbidden"
+      });
+    }
+  const findUser = await User.findOne({where: {email: verifyToken.email }, attributes: ['id', 'email', 'is_verified']});
 
     if (!findUser) {
       return res
