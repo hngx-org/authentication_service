@@ -77,6 +77,7 @@ module.exports.authorize = async (req, res) => {
       {
         model: Role,
         as: "role",
+        attributes: ["name"],
         include: [{ model: Permission, attributes: ["name"] }],
       },
     ],
@@ -94,9 +95,11 @@ module.exports.authorize = async (req, res) => {
     response = {
       status: 200,
       authorized: true,
-      message: "user is authorized",
+      message: "user is authenticated",
       user: {
         id,
+        role: user.role.name,
+        permissions: user.permissions.map((permission) => permission.name),
       },
     };
     return res.status(200).json(response);
@@ -117,20 +120,12 @@ module.exports.authorize = async (req, res) => {
       user: {
         id,
         permissions,
-      },
-    };
-    return res.status(200).json(response);
-  } else if (!permission) {
-    response = {
-      status: 200,
-      authorized: true,
-      message: "user is authenticated",
-      user: {
-        id,
+        role: user.role.name,
       },
     };
     return res.status(200).json(response);
   }
+
   return res.status(401).json(response);
 };
 
