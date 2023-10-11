@@ -8,10 +8,25 @@ const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
 const session = require('express-session');
+const getAuthRoutes = require('./routes/authorize');
+const userUpdateRouter = require("./routes/updateUser")
+const {
+  errorLogger,
+  errorHandler,
+} = require("./middleware/errorHandlerMiddleware");
+const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
 
-const app = express();
+const app = express();   
 
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: true, // Enable preflight requests
+  optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
+};
+
+app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
+app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // session middleware
@@ -25,9 +40,9 @@ app.use(passport.session());
 
 const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
-
+ 
 sequelize.authenticate().then(async () => {
-  await sequelize.sync();
+  await sequelize.sync(); 
   await UserPermissions.sync();
   // populate roles and permissions if not already populated
   await defineRolesandPermissions();
@@ -35,7 +50,7 @@ sequelize.authenticate().then(async () => {
 
 app.use(passport.initialize());
 require('./middleware/authEmail')(passport);
-
+require('./middleware/authGithub')(passport);
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -44,7 +59,23 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', userAuthRoutes);
 
 //communication with other microservices
-app.use('/api/get-auth', getAuthRoutes);
+app.use('/api/authorize', getAuthRoutes);
+
+// THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
+app.use("/api/users", userUpdateRouter)
+
+
+// Serving Files
+http: app.use(errorLogger);
+app.use(errorHandler);
+
+// app.use("/auth", auth);
+
+// 404 Route handler
+http: app.use((req, res) => {
+  // use custom helper function
+  res.error(404, "Resource not found", UNKNOWN_ENDPOINT);
+});
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
