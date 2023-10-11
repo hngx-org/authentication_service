@@ -1,9 +1,8 @@
-const { DataTypes, HasMany } = require('sequelize');
-const sequelize = require('../config/db');
-const User = require('./Users');
+const { DataTypes, HasMany } = require("sequelize");
+const sequelize = require("../config/db");
 
 const Role = sequelize.define(
-  'role',
+  "role",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,7 +14,7 @@ const Role = sequelize.define(
       type: DataTypes.STRING,
     },
   },
-  { freezeTableName: true, timestamps: false }
+  { freezeTableName: true, timestamps: false },
 );
 
 module.exports = Role;

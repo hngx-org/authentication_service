@@ -1,9 +1,9 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
-const Role = require('./Roles');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+const Role = require("./Roles");
 
 const User = sequelize.define(
-  'user',
+  "user",
   {
     id: {
       type: DataTypes.UUID,
@@ -44,12 +44,15 @@ const User = sequelize.define(
     },
     refresh_token: {
       type: DataTypes.STRING(255),
-      allowNull: false,
     },
     role_id: {
       type: DataTypes.INTEGER,
       defaultValue: 2,
       allowNull: false,
+      references: {
+        model: Role,
+        key: "id",
+      },
     },
     is_verified: {
       type: DataTypes.BOOLEAN,
@@ -73,7 +76,9 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  }
+  },
 );
+
+User.belongsTo(Role, { foreignKey: "role_id" });
 
 module.exports = User;
