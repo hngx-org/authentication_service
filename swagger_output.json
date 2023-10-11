@@ -33,7 +33,7 @@
     {
       "name": "PASSWORD RESET AND EMAIL VERIFICATION",
       "description": "password reset and email verification Endpoints"
-    }
+    } 
   ],
   "schemes": ["https"],
   "securityDefinitions": {
@@ -55,6 +55,11 @@
           "200": {
             "description": "OK"
           }
+    "host": "auth.akuya.tech",
+    "servers": [
+        {
+            "url": "auth.akuya.tech",
+            "description": "Confirmed working well"
         }
       }
     },
@@ -599,6 +604,24 @@
                         "type": "string"
                       },
                       "description": "List of user permissions"
+        "/api/auth/google": {
+            "post": {
+                "tags": [
+                    "Google-Auth"
+                ],
+                "description": "Handles the process of signing up using google auth.",
+                "responses": {
+                    "200": {
+                        "description": "Success, Successfully processed request."
+                    },
+                    "400": {
+                        "description": "Bad Request, The user sent an invalid request."
+                    },
+                    "401": {
+                        "description": "Unauthorized Request, The user is not authorized for this request."
+                    },
+                    "500": {
+                        "description": "Internal Server Error, Error processing request from the server."
                     }
                   },
                   "example": {

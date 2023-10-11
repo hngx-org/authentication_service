@@ -15,9 +15,12 @@ router.use(errorHandler);
 router.put('/:id/role', setRoleValidator, setRole);
 
 // Endpoint to add a permission to a user
-router.post('/addPermission', addPermission);
+
+
+router.post('/permission',addPermission);
+
 
 // Endpoint to remove a permission from a user
-router.delete('/removePermission', removePermission);
+router.delete('/permission', removePermission);
 
 module.exports = router;
