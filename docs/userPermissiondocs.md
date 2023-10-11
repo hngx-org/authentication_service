@@ -44,4 +44,4 @@ API for managing user permissions.
 - `200 OK`: Permission removed successfully.
 - `400 Bad Request`: Check the request format.
 - `404 Not Found`: User or permission not found.
-- `500 Internal Server Error`.
+- `500 Internal Server Error`
