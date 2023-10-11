@@ -688,7 +688,7 @@
         "/api/auth/google": {
             "post": {
                 "tags": [
-                    "Get-Auth"
+                    "Google-Auth"
                 ],
                 "description": "Handles the process of signing up using google auth.",
                 "responses": {
