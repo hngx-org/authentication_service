@@ -443,203 +443,6 @@
         }
       }
     },
-    "/api/authorize": {
-      "post": {
-        "tags": ["Authorize"],
-        "summary": "Checks if a token is valid or user is authenticated and gets a list of possible roles and users.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "description": "User authentication token"
-                  },
-                  "role": {
-                    "type": "string",
-                    "description": "User role for authorization (optional)"
-                  },
-                  "permission": {
-                    "type": "string",
-                    "description": "User permission for authorization (optional)"
-                  }
-                },
-                "example": {
-                  "token": "token_provided",
-                  "role": "role_to_check",
-                  "permission": "permission_to_check"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "authenticated": {
-            "description": "Successful authentication",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "Status of the action"
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "ID of user"
-                    }
-                  },
-                  "example": {
-                    "status": 200,
-                    "id": "user_id"
-                  }
-                }
-              }
-            }
-          },
-          "Authorised": {
-            "description": "Successful authentication and authorization",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "Status of the action"
-                    },
-                    "msg": {
-                      "type": "string",
-                      "description": "Message of authorization"
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "ID of user"
-                    }
-                  },
-                  "example": {
-                    "status": 200,
-                    "msg": "authorized",
-                    "id": "user_id"
-                  }
-                }
-              }
-            }
-          },
-          "unauthorized": {
-            "description": "Unauthorized or failed authentication",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "Status of the action"
-                    },
-                    "msg": {
-                      "type": "string",
-                      "description": "Message of authorization"
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "ID of user"
-                    }
-                  },
-                  "example": {
-                    "status": 401,
-                    "msg": "unauthorized"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/get-auth/permissions": {
-      "tags": ["Get-Auth"],
-      "post": {
-        "summary": "Checks if a token is valid and returns all permissions of the user.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "description": "User authentication token"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "Success": {
-            "description": "Successful authentication",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "Status of the action"
-                    },
-                    "availablePermissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "List of user permissions"
-                    }
-                  },
-                  "example": {
-                    "status": 200,
-                    "availablePermissions": ["permission_1", "permission_2"]
-                  }
-                }
-              }
-            }
-          },
-          "not authenticated": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "Status of the action"
-                    },
-                    "msg": {
-                      "type": "string",
-                      "description": "Message of authorization"
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "ID of user"
-                    }
-                  },
-                  "example": {
-                    "status": 401,
-                    "msg": "unauthorized"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/auth/google": {
       "post": {
         "tags": ["Google-Auth"],
@@ -791,6 +594,253 @@
             "examples": {
               "application/json": {
                 "msg": "user not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authorize": {
+      "post": {
+        "summary": "Authorize user for a specific permission",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationRequest",
+            "description": "Authorization request",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "required": true,
+                  "description": "User authentication token",
+                  "example": "your_jwt_token_here"
+                },
+                "permission": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Permission to check authorization for (optional)",
+                  "example": "product.read"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200 without permission": {
+            "description": "User is authorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200
+                },
+                "authorized": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "User is authorized"
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "User ID",
+                      "example": "78e82738-9996-40ce-b142-7fc90dfb536c"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200 with permission": {
+            "description": "User is authorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200
+                },
+                "authorized": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "User is authorized for this permission"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "User ID",
+                      "example": "78e82738-9996-40ce-b142-7fc90dfb536c"
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": [
+                          "product.create",
+                          "order.create",
+                          "shop.read"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 400
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Invalid permission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 401
+                },
+                "authorized": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "example": "User is not authorized for this permission"
+                }
+              }
+            }
+          },
+          "401 not verified": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 401
+                },
+                "authorized": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "example": "user is not verified"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authorize/permissions": {
+      "post": {
+        "summary": "Get authorized permissions for a user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationRequest",
+            "description": "Authorization request",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "User authentication token",
+                  "example": "your_jwt_token_here"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": ["product.read", "order.create"]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          },
+          "401 unverified": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                },
+                "unverifiedUser": {
+                  "type": "boolean",
+                  "value": true
+                }
               }
             }
           }
