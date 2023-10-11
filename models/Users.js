@@ -48,7 +48,7 @@ const User = sequelize.define(
     },
     role_id: {
       type: DataTypes.INTEGER,
-      defaultValue: 5,
+      defaultValue: 2,
       allowNull: false,
     },
     is_verified: {
