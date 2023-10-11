@@ -3,7 +3,7 @@ const {
   getAuth,
   getAuthPermissions,
   sendPermissionsAndRows,
-} = require("../controllers/getAuth");
+} = require("../controllers/authorize");
 const router = express.Router();
 
 router.post("/", getAuth);
