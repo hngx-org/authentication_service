@@ -8,7 +8,7 @@ API for managing user permissions.
 
 ### Add Permission to User
 
-- **URL:** `/api/user/update/addPermission`
+- **URL:** `/api/users/addPermission`
 - **Method:** POST
 - **Description:** Add a permission to a user.
 
@@ -28,7 +28,7 @@ API for managing user permissions.
 
 ### Remove Permission from User
 
-- **URL:** `/api/user/update/removePermission`
+- **URL:** `/api/users/removePermission`
 - **Method:** POST
 - **Description:** Remove a permission from a user.
 

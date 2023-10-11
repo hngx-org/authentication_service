@@ -39,7 +39,7 @@ app.use('/api/auth', userAuthRoutes);
 app.use('/api/authorize', getAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
-app.use("/api/user/update", userUpdateRouter)
+app.use("/api/users", userUpdateRouter)
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
