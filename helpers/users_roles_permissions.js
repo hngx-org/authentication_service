@@ -1,153 +1,135 @@
-/**
- * 1. create the roles
- * 2. Create permissions
- *
- */
+const roles = ["guest", "user", "admin"];
 
-//defining roles
-const roles = ['Guest User', 'Registered User', 'Super Admin'];
+const product_permissions = [
+  "product.create",
+  "product.read",
+  "product.update.own",
+  "product.update.all",
+  "product.delete.own",
+  "product.delete.all",
+];
 
-//defining permissions
-const permissions = [
-  // products (shop and market place)
-  'create product',
-  'view product',
-  'edit product',
-  'delete own product',
-  'delete any product',
-  'view own products',
-  'view all products',
-  'use coupon',
-  'access checkout',
-  'purchase product',
+const order_permissions = [
+  "order.create",
+  "order.read",
+  "order.update.own",
+  "order.update.all",
+  "order.delete.own",
+  "order.delete.all",
+];
 
-  // working with orders
-  'view own orders',
-  'view all orders',
-  'delete order',
-  'create sales report',
+const coupon_permissions = [
+  "coupon.create",
+  "coupon.read",
+  "coupon.update.own",
+  "coupon.update.all",
+  "coupon.delete.own",
+  "coupon.delete.all",
+];
 
-  // coupons
-  'create coupons',
-  'delete coupons',
-  'update own coupon',
-  'update any coupon',
-  'view own coupons',
-  'view all coupons',
-  'validate coupons',
+const shop_permissions = [
+  "shop.create",
+  "shop.read",
+  "shop.update.own",
+  "shop.update.all",
+  "shop.delete.own",
+  "shop.delete.all",
+];
 
-  // shops
-  'create shop',
-  'update shop',
-  'edit own shop',
-  'edit all shops',
-  'delete own shop',
-  'delete any shop',
-  'view all shops',
-  'view own shop',
+const review_permissions = [
+  "review.create",
+  "review.read",
+  "review.update.own",
+  "review.update.all",
+  "review.delete.own",
+  "review.delete.all",
+];
 
-  // reviews and ratings
-  'add review',
-  'view all reviews',
-  'delete own review',
-  'delete all reviews',
+const portfolio_permissions = [
+  "portfolio.create",
+  "portfolio.read",
+  "portfolio.update.own",
+  "portfolio.update.all",
+  "portfolio.delete.own",
+  "portfolio.delete.all",
+];
 
-  // portfolio
-  'create portfolio',
-  'update own portfolio',
-  'update all portfolios',
-  'view own portfolio',
-  'view all portfolios',
-  'delete own portfolio',
-  'delete all portfolios',
+const assessment_permissions = [
+  "assessment.create",
+  "assessment.read",
+  "assessment.update.own",
+  "assessment.update.all",
+  "assessment.delete.own",
+  "assessment.delete.all",
+];
 
-  //assessment
-  'create assessment',
-  'view assessments',
-  'edit assessments',
-  'delete assessments',
-  'take assessment',
-  'view own results',
-  'view all results',
+const badge_permissions = [
+  "badge.create",
+  "badge.read",
+  "badge.update.own",
+  "badge.update.all",
+  "badge.delete.own",
+  "badge.delete.all",
+];
 
-  // badges
-  'create badge',
-  'edit badge',
-  'delete badge',
-  'view badge',
-  'add badge to user',
-  'remove badge from user',
-  'assign badge to assessment',
-
-  // events
-  'create event',
-  'delete own event',
-  'delete all events',
-  'edit event',
-  'edit all events',
-  'view events',
-
-  // admin only
-  'access vendor logs',
-  'notify vendors',
-  'add vendors',
-  'delete vendors',
-  'ban vendors',
-  'unban vendors',
-  'permanently delete products',
-  'access products logs',
-  'restore deleted products',
-  'restore deleted vendors',
-  'permanently delete vendors',
-
-  // admin 2
-  'generate reports',
-  'handle complaints',
-  'customer feedback',
-
-  // authentication permissions
-  'assign role',
-  'assign permissions',
+const event_permissions = [
+  "event.create",
+  "event.read",
+  "event.update.own",
+  "event.update.all",
+  "event.delete.own",
+  "event.delete.all",
 ];
 
 const guest_permissions = [
-  'view product',
-  'view all products',
-  'use coupon',
-  'view all shops',
-  'view all portfolios',
-  'view all reviews',
+  "product.read",
+  "coupon.read",
+  "shop.read",
+  "review.read",
+  "portfolio.read",
+  "assessment.read",
+  "badge.read",
+  "event.read",
 ];
 
 const user_permissions = [
-  'create product',
-  'view product',
-  'edit product',
-  'delete own product',
-  'view own products',
-  'view all products',
-  'use coupon',
-  'access checkout',
-  'purchase product',
-  'take assessment',
-  'view own results',
-
-  'view own orders',
-  'delete order',
-  'create sales report',
-  'view all shops',
-
-  'create portfolio',
-  'update own portfolio',
-  'view own portfolio',
-  'view all portfolios',
-  'delete own portfolio',
-  'create event',
-  'delete own event',
-  'delete all events',
-  'edit event',
-  'edit all events',
-  'view events',
+  ...[
+    ...product_permissions,
+    ...order_permissions,
+    ...coupon_permissions,
+    ...shop_permissions,
+    ...review_permissions,
+    ...portfolio_permissions,
+    ...assessment_permissions,
+    ...badge_permissions,
+    ...event_permissions,
+  ].filter((permission) => !permission.includes("all")),
 ];
 
-module.exports = { permissions, roles, user_permissions, guest_permissions };
+const all_permissions = [
+  ...product_permissions,
+  ...order_permissions,
+  ...coupon_permissions,
+  ...shop_permissions,
+  ...review_permissions,
+  ...portfolio_permissions,
+  ...assessment_permissions,
+  ...badge_permissions,
+  ...event_permissions,
+];
+
+module.exports = {
+  roles,
+  product_permissions,
+  order_permissions,
+  coupon_permissions,
+  shop_permissions,
+  review_permissions,
+  portfolio_permissions,
+  assessment_permissions,
+  badge_permissions,
+  event_permissions,
+  guest_permissions,
+  user_permissions,
+  all_permissions,
+};
