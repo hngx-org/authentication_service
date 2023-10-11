@@ -535,7 +535,7 @@
               "type": "object",
               "properties": {
                 "roleId": {
-                  "type": "string",
+                  "type": "integer",
                   "description": "ID of the role",
                   "required": false
                 },
