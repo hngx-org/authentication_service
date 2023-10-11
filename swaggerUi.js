@@ -8,11 +8,10 @@ const options = {
       description: 'Documentation for your API',
     },
   },
-  apis: ['./swaggerUi.js'], // Specify the path to your API route files
+  apis: ['./swaggerUi.js', './routes/getAuth.js'], // Specify the path to your API route files
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-
 
 /**
  * @swagger

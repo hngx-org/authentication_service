@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
-const User = require("./User");
+const User = require("./Users");
 const Permission = require("./Permissions");
 
 const UserPermissions = sequelize.define(
@@ -38,11 +38,13 @@ const UserPermissions = sequelize.define(
 User.belongsToMany(Permission, {
   through: UserPermissions,
   foreignKey: "user_id",
+  otherKey: "permission_id",
 });
 
 Permission.belongsToMany(User, {
   through: UserPermissions,
   foreignKey: "permission_id",
+  otherKey: "user_id",
 });
 
 module.exports = UserPermissions;
