@@ -20,13 +20,19 @@ const createEntities = async () => {
   const createdPermissions = [];
   const createdRoles = [];
 
+  let id = 1;
+
   for (const permission of all_permissions) {
-    const createdPerm = await Permission.create({ name: permission });
+    const createdPerm = await Permission.create({
+      name: permission,
+	  id: id++,
+    });
     createdPermissions.push(createdPerm);
   }
 
+  let id2 = 1;
   for (const role of roles) {
-    const createRole = await Role.create({ name: role });
+    const createRole = await Role.create({ name: role, id: id2++ });
     createdRoles.push(createRole);
   }
 
