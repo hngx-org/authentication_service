@@ -12,10 +12,10 @@ router.put('/role', setRole);
 
 
 // Endpoint to add a permission to a user
-router.post('/addPermission',addPermission);
+router.post('/permission',addPermission);
 
 // Endpoint to remove a permission from a user
-router.delete('/removePermission', removePermission);
+router.delete('/permission', removePermission);
 
 
 
