@@ -5,10 +5,10 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host": "https://auth.akuya.tech",
+  "host": "auth.akuya.tech",
   "servers": [
     {
-      "url": "https://auth.akuya.tech",
+      "url": "auth.akuya.tech",
       "description": "Confirmed working well"
     }
   ],
@@ -33,7 +33,7 @@
     {
       "name": "PASSWORD RESET AND EMAIL VERIFICATION",
       "description": "password reset and email verification Endpoints"
-    } 
+    }
   ],
   "schemes": ["https"],
   "securityDefinitions": {
@@ -55,11 +55,6 @@
           "200": {
             "description": "OK"
           }
-    "host": "auth.akuya.tech",
-    "servers": [
-        {
-            "url": "auth.akuya.tech",
-            "description": "Confirmed working well"
         }
       }
     },
@@ -604,24 +599,6 @@
                         "type": "string"
                       },
                       "description": "List of user permissions"
-        "/api/auth/google": {
-            "post": {
-                "tags": [
-                    "Google-Auth"
-                ],
-                "description": "Handles the process of signing up using google auth.",
-                "responses": {
-                    "200": {
-                        "description": "Success, Successfully processed request."
-                    },
-                    "400": {
-                        "description": "Bad Request, The user sent an invalid request."
-                    },
-                    "401": {
-                        "description": "Unauthorized Request, The user is not authorized for this request."
-                    },
-                    "500": {
-                        "description": "Internal Server Error, Error processing request from the server."
                     }
                   },
                   "example": {
@@ -665,7 +642,7 @@
     },
     "/api/auth/google": {
       "post": {
-        "tags": ["Get-Auth"],
+        "tags": ["Google-Auth"],
         "description": "Handles the process of signing up using google auth.",
         "responses": {
           "200": {
@@ -817,6 +794,37 @@
               }
             }
           }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "users": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "John"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "John"
+        },
+        "email": {
+          "type": "string",
+          "example": "test@gmail.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "johndoe"
+        },
+        "password": {
+          "type": "string",
+          "example": "myPassword2021"
         }
       }
     }
