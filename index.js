@@ -6,7 +6,7 @@ const swaggerSpec = require('./swagger_output.json');
 const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
-const getAuthRoutes = require('./routes/getAuth');
+const getAuthRoutes = require('./routes/authorize');
 const userUpdateRouter = require("./routes/updateUser")
 
 const app = express();   
@@ -36,7 +36,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', userAuthRoutes);
 
 //communication with other microservices
-app.use('/api/get-auth', getAuthRoutes);
+app.use('/api/authorize', getAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
 app.use("/api/user/update", userUpdateRouter)

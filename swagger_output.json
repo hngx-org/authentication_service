@@ -481,10 +481,10 @@
                 }
             }
         },
-        "/api/get-auth": {
+        "/api/authorize": {
             "post": {
                 "tags": [
-                    "Get-Auth"
+                    "Authorize"
                 ],
                 "summary": "Checks if a token is valid or user is authenticated and gets a list of possible roles and users.",
                 "requestBody": {
