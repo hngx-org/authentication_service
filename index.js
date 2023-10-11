@@ -9,7 +9,7 @@ const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/authorize');
 const userUpdateRouter = require("./routes/updateUser")
 
-const app = express(); 
+const app = express();   
 
 app.use(cors());
 app.use(express.json());
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const sequelize = require('./config/db');
 const UserPermissions = require('./models/UserPermissions');
-
+ 
 sequelize.authenticate().then(async () => {
   await sequelize.sync(); 
   await UserPermissions.sync();
@@ -39,7 +39,7 @@ app.use('/api/auth', userAuthRoutes);
 app.use('/api/authorize', getAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
-app.use("/api/user/update", userUpdateRouter)
+app.use("/api/users", userUpdateRouter)
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
