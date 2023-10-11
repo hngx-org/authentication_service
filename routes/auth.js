@@ -18,6 +18,8 @@ const { handleAuth } = require("../controllers/gauthControllers");
 require("../services/passportService");
 const { errorHandler } = require("../middleware/ErrorMiddleware");
 const registrationValidation = require("../middleware/registrationValidation");
+require("../services/passportServiceFb");
+const { authFacebook } = require("../controllers/authFacebook");
 
 const router = express.Router();
 router.use(errorHandler);
@@ -42,6 +44,10 @@ router.get(
   }),
   handleAuth,
 );
+
+// FACEBOOK AUTH
+router.get('auth/facebook', passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
+router.get('auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), authFacebook );
 
 // EMAIL REGISTRATION
 router.post(
