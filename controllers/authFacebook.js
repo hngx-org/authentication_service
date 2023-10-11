@@ -1,5 +1,6 @@
 const User = require('../models/Users');
 const session = require('express-session');
+const errorHandler = require('../middleware/ErrorMiddleware');
 
 // handling facebook auth callback
 const authFacebook = (req, res) => {
@@ -12,7 +13,7 @@ const authFacebook = (req, res) => {
 
         res.status(200).json({ message: 'User logged in successfully', user });
     } catch (err) {
-        res.status(500).json({ message: 'Something went wrong' });
+        errorHandler(err, req, res);
     }
 };
 

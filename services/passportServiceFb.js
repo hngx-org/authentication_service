@@ -2,6 +2,7 @@ const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const dotenv = require('dotenv');
 const User = require('../models/Users');
+const errorHandler = require('../middleware/ErrorMiddleware');
 
 dotenv.config();
 // Facebook Strategy
@@ -27,7 +28,7 @@ passport.use(new FacebookStrategy({
                 });
             }
          } catch {
-            res.status(500).json({ message: 'Something went wrong' });
+            errorHandler(err, req, res);
         }
 }));
 
