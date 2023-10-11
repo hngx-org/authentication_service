@@ -16,12 +16,12 @@ const resetPasswordSchema = Joi.object({
 const sendResetPasswordEmail = async (email, resetLink, username, res) => {
   try {
     const response = await axios.post('https://team-titan.mrprotocoll.me/api/v1/user/password-reset', {
-      "recipient": email,
-      "name": username,
-      "reset_link": resetLink
+      recipient: email,
+      name: username,
+      reset_link: resetLink
     });
 
-    if (response.status === 200) {
+    if (response.status === 200 || res.status === 201) {
       return res.status(200).json({ success: true, message: "Email sent successfully" });
     } else {
       return res.status(response.status).json({ success: false, message: "Failed to send email" });
