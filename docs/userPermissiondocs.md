@@ -29,7 +29,7 @@ API for managing user permissions.
 ### Remove Permission from User
 
 - **URL:** `/api/users/removePermission`
-- **Method:** POST
+- **Method:** DELETE
 - **Description:** Remove a permission from a user.
 
 #### Request Body
