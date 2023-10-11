@@ -65,7 +65,7 @@ const User = sequelize.define(
     country: {
       type: DataTypes.STRING(255),
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },

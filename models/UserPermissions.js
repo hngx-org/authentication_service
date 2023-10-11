@@ -27,10 +27,6 @@ const UserPermissions = sequelize.define(
         key: "id",
       },
     },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
   },
   { freezeTableName: true, timestamps: false },
 );
