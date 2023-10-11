@@ -6,6 +6,7 @@ const {
 } = require("../controllers/authController");
 const {
   login,
+  checkEmail,
   sendVerificationCode,
   confirmVerificationCode,
   createUser,
@@ -61,6 +62,9 @@ router.post("/2fa/verify-code", verify2fa);
 
 // EMAIL LOGIN
 router.post("/login", login);
+
+//CHECK EMAIL
+router.post("/check-email", checkEmail);
 
 // Github Auth
 

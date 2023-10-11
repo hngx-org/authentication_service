@@ -13,7 +13,7 @@ const {
   errorHandler,
 } = require("./middleware/errorHandlerMiddleware");
 const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
-
+const {notFound} = require("./middleware/notFound")
 
 const app = express();   
 
@@ -63,10 +63,7 @@ app.use(errorHandler);
 // app.use("/auth", auth);
 
 // 404 Route handler
-http: app.use((req, res) => {
-  // use custom helper function
-  res.error(404, "Resource not found", UNKNOWN_ENDPOINT);
-});
+http: app.use(notFound);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
