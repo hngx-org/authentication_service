@@ -21,7 +21,7 @@ const sendResetPasswordEmail = async (email, resetLink, username, res) => {
       reset_link: resetLink
     });
 
-    if (response.status === 200 || res.status === 201) {
+    if (response.status === 200 || response.status === 201) {
       return res.status(200).json({ success: true, message: "Email sent successfully" });
     } else {
       return res.status(response.status).json({ success: false, message: "Failed to send email" });
