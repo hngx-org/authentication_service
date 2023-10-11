@@ -1,12 +1,12 @@
 const express = require("express");
 const {
-  getAuth,
+  authorize,
   getAuthPermissions,
   sendPermissionsAndRows,
 } = require("../controllers/authorize");
 const router = express.Router();
 
-router.post("/", getAuth);
+router.post("/", authorize);
 router.post("/permissions", getAuthPermissions);
 router.get("/roles-and-permissions", sendPermissionsAndRows);
 
