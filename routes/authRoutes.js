@@ -4,9 +4,10 @@ const { errorHandler } = require('../middleware/ErrorMiddleware');
 
 const router = express.Router();
 
-router.post('/verify-email', verifyEmail);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
+
+router.post('/verify-email/:token', verifyEmail);
+router.post('/reset-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 router.use(errorHandler);
 
