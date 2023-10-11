@@ -114,15 +114,23 @@ module.exports.authorize = async (req, res) => {
       status: 200,
       authorized: true,
       message: "user is authorized for this permission",
-      data: {
+      user: {
         id,
         permissions,
       },
     };
     return res.status(200).json(response);
   } else if (!permission) {
+    response = {
+      status: 200,
+      authorized: true,
+      message: "user is authenticated",
+      user: {
+        id,
+      },
+    };
+    return res.status(200).json(response);
   }
-
   return res.status(401).json(response);
 };
 
