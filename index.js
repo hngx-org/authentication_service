@@ -7,6 +7,7 @@ const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
 const userAuthRoutes = require('./routes/auth');
 const getAuthRoutes = require('./routes/getAuth');
+const userUpdateRouter = require("./routes/updateUser")
 const {
   errorLogger,
   errorHandler,
@@ -51,12 +52,10 @@ app.use('/api/auth', userAuthRoutes);
 //communication with other microservices
 app.use('/api/get-auth', getAuthRoutes);
 
-
 // Serving Files
 http: app.use(errorLogger);
 app.use(errorHandler);
 
-// app.use("/auth", auth);
 
 // 404 Route handler
 http: app.use((req, res) => {
