@@ -106,6 +106,42 @@ async function login(req, res) {
   }
 }
 
+async function checkEmail(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (user) {
+      if (user.is_verified) {
+        return res.status(200).json({
+          success: true,
+          message: "Email exists and is verified.",
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: "Email exists but is not verified.",
+        });
+      }
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: "Email does not exist.",
+      });
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error checking email",
+      error: error.message,
+    });
+  }
+}
+
+
 const enable2fa = async (req, res) => {
   const { error } = enable2faSchema.validate(req.body);
 
@@ -260,4 +296,5 @@ module.exports = {
   sendVerificationCode,
   confirmVerificationCode,
   createUser,
+  checkEmail,
 };
