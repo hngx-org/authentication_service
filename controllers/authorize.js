@@ -91,6 +91,13 @@ module.exports.authorize = async (req, res) => {
     });
   }
 
+  const userPermissions = user.permissions.map((permission) => permission.name);
+  const rolePermissions = user.role.permissions.map(
+    (permission) => permission.name,
+  );
+
+  const permissions = [...new Set([...userPermissions, ...rolePermissions])];
+
   if (user && !permission) {
     response = {
       status: 200,
@@ -99,18 +106,12 @@ module.exports.authorize = async (req, res) => {
       user: {
         id,
         role: user.role.name,
-        permissions: user.permissions.map((permission) => permission.name),
+		permissions,
       },
     };
     return res.status(200).json(response);
   }
 
-  const userPermissions = user.permissions.map((permission) => permission.name);
-  const rolePermissions = user.role.permissions.map(
-    (permission) => permission.name,
-  );
-
-  const permissions = [...new Set([...userPermissions, ...rolePermissions])];
 
   if (permission && permissions.includes(permission)) {
     response = {
