@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swaggerUi');
+const swaggerDocument = require('./swagger.json'); // Load your Swagger JSON file
 const sampleRoutes = require('./routes/demo');
 const passport = require('passport');
 const defineRolesandPermissions = require('./helpers/populate');
@@ -26,7 +27,7 @@ app.use(passport.initialize());
 require('./middleware/authEmail')(passport);
 
 // Serve Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Use your API routes
 app.use('/api', sampleRoutes);
