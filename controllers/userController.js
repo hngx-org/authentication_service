@@ -30,12 +30,12 @@ const {
   USER_NOT_VERIFIED,
 } = require("../errors/httpErrorCodes");
 
-const enable2faSchema = Joi.object({
-  email: Joi.string().email().required(),
-});
+
 
 const verify2faSchema = Joi.object({
   token: Joi.string().required(),
+});
+const send2faSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
@@ -143,7 +143,7 @@ async function login(req, res, next) {
 
 const enable2fa = async (req, res, next) => {
   try {
-    const { error } = enable2faSchema.validate(req.body);
+    const { error } = send2faSchema.validate(req.body);
 
     if (error) {
       throw new BadRequest(error.details[0].message, INVALID_INPUT_PARAMETERS);
@@ -168,7 +168,7 @@ const enable2fa = async (req, res, next) => {
 
 const send2faCode = async (req, res, next) => {
   try {
-    const { error } = enable2faSchema.validate(req.body);
+    const { error } = send2faSchema.validate(req.body);
     const { email } = req.body;
 
     if (error) {
@@ -185,60 +185,55 @@ const send2faCode = async (req, res, next) => {
 
     if (!user) {
       throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
-      // return res.status(400).json({ message: "User not found" });
     }
 
-    user.refresh_token = verificationCode;
-    // const mailOptions = {
-    //   from: 'testemail@gmail.com', // Your email address
-    //   to: email, // User's email address
-    //   subject: '2FA Verification',
-    //   text: `Your verification code is: ${verificationCode}`,
-    // };
+    const jwt_payload = {
+      id: user.id,
+      code: verificationCode
+    };
+    const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    // Sending the email
-    // await transporter.sendMail(mailOptions);
-    user.save();
-    res.status(200).json({ message: "You have been sent a code" });
+    // Send verification link email to user
+    await sendVerificationEmail(user.first_name, email, verificationToken);
+    res.status(200).json({ message: "You have been sent a code", token: verificationToken });
   } catch (error) {
     next(error);
   }
 };
 
 const verify2fa = async (req, res, next) => {
+  const { error } = verify2faSchema.validate(req.body);
+  const { token } = req.body;
+
+
   try {
-    const { error } = verify2faSchema.validate(req.body);
-
-    const { email, token } = req.body;
-
     if (error) {
-      throw new BadRequest(error.details[0].message, INVALID_INPUT_PARAMETERS);
-      // return res.status(400).json({ message: error.details[0].message });
+      throw new BadRequest(error.details[0].message, 400);
     }
+    const bearer = req.headers['authorization'];
+    if (!bearer) throw new BadRequest("INVALID TOKEN", 400);
+
+    const bearerToken = bearer.split(' ')[1];
+    const payload = jwt.decode(bearerToken);
+    console.log(payload);
+    if (!payload) throw new BadRequest("INVALID TOKEN HEADER", 403);
 
     const user = await User.findOne({
-      where: { email: email },
+      where: { id: payload.id },
     });
 
-    if (!user) {
-      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
-      // return res.status(400).json({ message: "User not found" });
+    if (token === payload.code) {
+      res.status(200).json({
+        data: user,
+        message: "Token verified successfully",
+      });
+    } else {
+      throw new BadRequest("INVALID TOKEN", 400);
     }
 
-    if (user.token !== token) {
-      throw new Unauthorized("Code is incorrect", INVALID_TOKEN);
-      // return res.status(400).json({ message: "Code is incorrect" });
-    }
 
-    user.token = "";
-    user.is_verified = true;
-
-    user.save();
-
-    res.status(200).json({
-      data: user,
-      message: "Token verified successfully",
-    });
   } catch (error) {
     next(error);
   }
@@ -292,35 +287,6 @@ const sendVerificationCode = async (req, res, next) => {
       throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
       // return res.json("User not found ");
     }
-    // Generating a random 6 digit verification code
-    // const verificationCode = Math.floor(
-    //   100000 + Math.random() * 900000
-    // ).toString();
-
-    // await User.create({
-    //   first_name,
-    //   last_name,
-    //   username,
-    //   email,
-    //   password,
-    //   refresh_token,
-    //   token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
-    // });
-
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: "Verification code has been resent to email.",
-      data: {
-        ...user,
-        token: undefined,
-        password: undefined,
-        refresh_token: undefined,
-        two_factor_auth: undefined,
-      },
-    });
   } catch (error) {
     next(error);
   }
