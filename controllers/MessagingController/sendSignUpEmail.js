@@ -3,6 +3,11 @@ const axios = require("axios");
 
 const sendSignUpEmail = async (req, res) => {
   const { id, firstName, email } = req.user;
+  const {
+    EMAIL_SERVICE_VERIFY_EMAIL_URL,
+    VERIFY_EMAIL_ENDPOINT_LIVE,
+    VERIFY_EMAIL_ENDPOINT_DEV,
+  } = process.env;
 
   const jwt_payload = {
     id,
@@ -11,11 +16,11 @@ const sendSignUpEmail = async (req, res) => {
   };
 
   const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
-  const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`;
+  const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL;
   const verificationLink =
     process.env.NODE_ENV === "production"
-      ? `${process.env.AUTH_FRONTEND_URL_LIVE}api/auth/verify/${token}`
-      : `${process.env.AUTH_FRONTEND_URL_LOCAL}api/auth/verify/${token}`;
+      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}/${token}`
+      : `${VERIFY_EMAIL_ENDPOINT_DEV}/${token}`;
 
   try {
     const response = await axios.post(emailServiceUrl, {

@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const verifyUser = async (req, res) => {
   const { token } = req.params;
-  const { JWT_SECRET, AUTH_FRONTEND_URL } = process.env;
+  const { JWT_SECRET, VERIFICATION_SUCCESS_URL } = process.env;
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
@@ -26,7 +26,7 @@ const verifyUser = async (req, res) => {
   // redirect user to frontend, not permanent
   return res
     .status(301)
-    .redirect(`//${process.env.AUTH_FRONTEND_URL_LIVE}/login`);
+    .redirect(`//${VERIFICATION_SUCCESS_URL}`);
 };
 
 module.exports = verifyUser;
