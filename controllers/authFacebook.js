@@ -9,6 +9,7 @@ const authFacebook = (req, res) => {
             return res.status(401).json({ message: 'User not found' });
         }
         req.session.userId = user.id;
+        // generate token and send it to client
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
             expiresIn: '1d',
         });
