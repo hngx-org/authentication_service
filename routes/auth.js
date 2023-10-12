@@ -24,6 +24,8 @@ const {
   githubLogin,
   githubRedirectUrl,
 } = require('../controllers/githubLoginController');
+const { authFacebook } = require('../controllers/authFacebook');
+require('../services/passportServiceFb');
 
 const router = express.Router();
 router.use(errorHandler);
