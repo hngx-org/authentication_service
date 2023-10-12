@@ -14,7 +14,7 @@ router.post(
   AuthorizationController.authorize,
 );
 
-router.post("/permissions", AuthorizationController.permissions);
-router.post("/roles", AuthorizationController.roles);
+router.get("/permissions", AuthorizationController.permissions);
+router.get("/roles", AuthorizationController.roles);
 
 module.exports = router;
