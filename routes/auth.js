@@ -3,6 +3,7 @@ const {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  resendVerificationCode,
 } = require("../controllers/authController");
 const {
   login,
@@ -31,6 +32,7 @@ router.use(errorHandler);
 
 // PASSWORD RESET AND EMAIL VERIFICATION
 router.get("/verify/:token", verifyEmail);
+router.post("/resend-verification", resendVerificationCode);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
 
@@ -64,6 +66,7 @@ router.get(
 // EMAIL REGISTRATION
 router.post("/signup", registrationValidation, createUser);
 
+router.post("/resend-verification", sendVerificationCode);
 router.post("/send-verification", sendVerificationCode);
 router.post("/confirm-verification", confirmVerificationCode);
 router.post("/2fa/enable", enable2fa);
