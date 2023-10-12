@@ -21,5 +21,24 @@ async function sendVerificationEmail(name, recipient, token) {
     console.error("Error sending email:", error);
   }
 }
+async function send2FaEmail(name, recipient, token) {
+  try {
+    const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/v1/user/two-factor-auth`;
+
+    const response = await axios.post(emailServiceUrl, {
+      name,
+      recipient,
+      token,
+    });
+
+    if (response.status === 200) {
+      console.log("Verification email sent successfully.");
+    } else {
+      console.error("Failed to send verification email.");
+    }
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
 
 module.exports = { sendVerificationEmail };

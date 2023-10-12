@@ -233,7 +233,7 @@ const send2faCode = async (req, res, next) => {
     });
 
     // Send verification link email to user
-    await sendVerificationEmail(user.first_name, email, verificationToken);
+    await send2FaEmail(user.first_name, email, verificationCode);
     res.status(200).json({ message: "You have been sent a code", token: verificationToken });
   } catch (error) {
     next(error);
