@@ -25,6 +25,7 @@ const {
   githubLogin,
   githubRedirectUrl,
 } = require("../controllers/githubLoginController");
+const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
 
 const router = express.Router();
 router.use(errorHandler);
