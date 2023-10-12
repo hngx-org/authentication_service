@@ -8,6 +8,7 @@ function checkIfUserIsAdmin(user) {
   return user.role_id === 3;
 }
 
+
 async function getAllUsers(req, res) {
   try {
     // Extract the JWT token from the Authorization header
@@ -16,7 +17,10 @@ async function getAllUsers(req, res) {
     // Verify and decode the JWT token using the secret key
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
-        return res.status(401).json({ message: "Unauthorized. Invalid token." });
+        return res.status(401).json({ 
+          success: false,
+          message: "Unauthorized. Invalid token."
+         });
       }
 
       // The 'decoded' object hopefully contains the data from the JWT
@@ -26,7 +30,10 @@ async function getAllUsers(req, res) {
       User.findOne({ where: { id: userId } })
         .then(user => {
           if (!user) {
-            return res.status(404).json({ message: "Authenticated User not found." });
+            return res.status(404).json({ 
+              success: false,
+              message: "Authenticated User not found."
+             });
           }
 
           
@@ -37,15 +44,29 @@ async function getAllUsers(req, res) {
             User.findAll().then(users => {
               res.status(200).json({
                 success: true,
-                data: users,
+                data: {
+                  count:{
+                    admin: users.reduce((count, obj) => (obj.role_id === 3 ? count + 1 : count), 0),
+                    registered_users: users.reduce((count, obj) => (obj.role_id === 2 ? count + 1 : count), 0),
+                    total: users.length
+                  },
+                  users: users
+                }
               });
             });
           } else {
-            res.status(403).json({ message: "Access denied. Admin privilege required." });
+            res.status(403).json({ 
+              success: false,
+              message: "Access denied. Admin privilege required."
+             });
           }
         })
         .catch(error => {
-          res.status(500).json({ message: "Error fetching users", error: error.message });
+          res.status(500).json({ 
+            success: false,
+            message: "Error fetching users",
+            error: error.message
+           });
         });
     });
   } catch (error) {
