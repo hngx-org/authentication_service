@@ -1,4 +1,6 @@
 const { Router } = require("express");
+const passwordRoute = require("./passwordRoute");
+
 const AuthController = require("../controllers/AuthController");
 const MessagingController = require("../controllers/MessagingController");
 const registrationValidation = require("../middleware/registrationValidation");
@@ -23,5 +25,7 @@ router.post(
 );
 
 router.get("/verify/:token", AuthController.verifyUser);
+
+router.use("/reset-password", passwordRoute);
 
 module.exports = router;
