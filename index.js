@@ -6,10 +6,9 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./swagger_output.json");
 
 // routes imports
+const indexRouter = require("./routes/index");
 const userAuthRoutes = require("./routes/auth");
 const getAuthRoutes = require("./routes/authorize");
 const userUpdateRouter = require("./routes/updateUser");
@@ -20,9 +19,6 @@ const {
   errorHandler,
 } = require("./middleware/errorHandlerMiddleware");
 const { notFound } = require("./middleware/notFound");
-
-// database imports
-const sequelize = require("./config/db");
 
 const app = express();
 
@@ -52,6 +48,9 @@ app.use(passport.initialize());
 require("./middleware/authEmail")(passport);
 require("./middleware/authGithub")(passport);
 
+// route
+app.use("/api", indexRouter);
+
 // Serve Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -69,7 +68,7 @@ app.use(errorLogger);
 app.use(errorHandler);
 
 // 404 Route handler
-http: app.use(notFound);
+app.use(notFound);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
