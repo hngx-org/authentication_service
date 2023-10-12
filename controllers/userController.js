@@ -39,6 +39,10 @@ const verify2faSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
+const changeEmailSchema = Joi.object({
+  newEmail: Joi.string().email().required(),
+});
+
 async function createUser(req, res, next) {
   try {
     const { firstName, lastName, email, password } = req.body;
@@ -351,6 +355,73 @@ const confirmVerificationCode = async (req, res, next) => {
   }
 };
 
+const changeEmail = async (req, res, next) => {
+  try {
+    const { error } = changeEmailSchema.validate(req.body);
+
+    if (error) {
+      throw new BadRequest(error.details[0].message, INVALID_INPUT_PARAMETERS);
+    }
+
+    const { newEmail } = req.body;
+    const user = await User.findOne({
+      where: { id: req.user.id }, // Use user authentication middleware to get the user's ID
+    });
+
+    if (!user) {
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+    }
+
+    // Generate a new verification token for the user
+    const newVerificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Update the user's email, token, and verification status
+    user.email = newEmail;
+    user.token = newVerificationToken;
+    user.is_verified = false; // Mark the user as not verified
+
+    await user.save();
+
+    // Trigger the existing "sendVerificationCode" endpoint with the new email and verification code
+    req.body = {
+      email: newEmail,
+      verificationCode: newVerificationToken,
+      user: user, // Pass the user object to the existing function
+    };
+
+    // Send the verification code to the new email address
+    await sendVerificationCode(req, res, next);
+
+    // Return a success response to the client
+    res.status(200).json({
+      success: true,
+      message: "Email change request successful. Verification code sent to the new email address.",
+    });
+  } catch (error) {
+    // Handle errors and return appropriate responses
+    if (error instanceof BadRequest) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errorCode: error.code,
+      });
+    } else if (error instanceof ResourceNotFound) {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+        errorCode: error.code,
+      });
+    } else {
+      // Handle other unexpected errors
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your request.",
+        errorCode: SERVER_ERROR,
+      });
+    }
+  }
+};
+
 module.exports = {
   login,
   enable2fa,
@@ -359,4 +430,5 @@ module.exports = {
   sendVerificationCode,
   confirmVerificationCode,
   createUser,
+  changeEmail,
 };

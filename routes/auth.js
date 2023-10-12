@@ -12,6 +12,7 @@ const {
   enable2fa,
   send2faCode,
   verify2fa,
+  changeEmail,
 } = require("../controllers/userController");
 const passport = require("passport");
 const { handleAuth } = require("../controllers/gauthControllers");
@@ -25,6 +26,7 @@ const {
   githubLogin,
   githubRedirectUrl,
 } = require("../controllers/githubLoginController");
+const { authEmail } = require("../middleware/authEmail");
 
 const router = express.Router();
 router.use(errorHandler);
@@ -72,5 +74,8 @@ router.post("/2fa/verify-code", verify2fa);
 
 // EMAIL LOGIN
 router.post("/login", login);
+
+// CHANGE EMAIL
+router.patch("/change-email", authEmail, changeEmail);
 
 module.exports = router;
