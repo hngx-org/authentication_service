@@ -4,6 +4,7 @@ const Joi = require("joi");
 const User = require("../models/Users");
 const transporter = require("../middleware/mailConfig");
 const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
+const { sendResetEmail } = require("../helpers/sendResetPasswordEmail");
 const {
   ResourceNotFound,
   Unauthorized,
@@ -60,25 +61,16 @@ async function forgotPassword(req, res, next) {
       //   .status(404)
       //   .json({ success: false, message: "User not found" });
     }
-    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    user.token = resetCode;
-    await user.save();
-
-    // Send an email with the verification code
-    const mailOptions = {
-      from: process.env.NODEMAILER_USER,
-      to: email,
-      subject: "Password Reset",
-      text: `Your password reset code is: ${resetCode}`,
+    const jwt_payload = {
+      id: user.id,
     };
-    await transporter.sendMail(mailOptions);
+    const resetToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    await sendResetEmail(user.first_name, user.email, resetToken);
 
     res.status(200).json({ message: "Reset password link sent successfully." });
   } catch (error) {
-    // Internal error or custom error handling
-    // res.status(500).json({ success: false, message: "Something went wrong" });
-    console.log(error);
     next(error);
   }
 }
@@ -92,25 +84,28 @@ const resetPassword = async (req, res, next) => {
         error.details[0].message,
         INVALID_REQUEST_PARAMETERS
       );
-      // return res
-      //   .status(400)
-      //   .json({ success: false, message: error.details[0].message });
     }
-    const { token, password } = req.body;
-    // ... Implement reset password functionality here
-    const user = await User.findOne({ where: { token } });
 
+    const { token, password } = req.body;
+
+    // Verify JWT token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      throw new Unauthorized("Invalid token", INVALID_TOKEN);
+    }
+
+    // FInd the User by ID
+    const user = await User.findByPk(decoded.id);
+
+    // ... Implement reset password functionality here
     if (!user) {
-      // 404 Error or custom error handling
       throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
-      // return res
-      //   .status(404)
-      //   .json({ success: false, message: "User not found" });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
     user.password = hashedPassword;
-    user.token = null;
 
     await user.save();
 
@@ -119,8 +114,6 @@ const resetPassword = async (req, res, next) => {
       .json({ success: true, message: "Password reset successfully." });
   } catch (error) {
     next(error);
-    // Internal error or custom error handling
-    // res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
