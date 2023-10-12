@@ -4,16 +4,14 @@ const MessagingController = require("../controllers/MessagingController");
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.status(200).json({
-    message: "Password route",
-  });
-});
+router.get("/:token", PasswordController.verifyPasswwordResetToken);
 
 router.post(
   "/",
   PasswordController.send,
   MessagingController.sendPasswordResetEmail,
 );
+
+router.patch("/", PasswordController.reset);
 
 module.exports = router;
