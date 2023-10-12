@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const { HttpError } = require("../errors/httpErrorCodes");
+const { HttpError } = require("../errors/httpErrors");
 
 function errorLogger(err, req, res, next) {
   if (err instanceof HttpError === false) console.log(err.message);
@@ -13,14 +13,15 @@ function errorHandler(err, req, res, next) {
     err.message.toLowerCase().includes("json");
 
   if (isInvalidJSON) {
-    return res.error(400, err.message, "INVALID_JSON_FORMAT");
+    return res.status(400).json({ error: err.message, errorCode: "INVALID_JSON_FORMAT" });
   }
 
   if (err instanceof HttpError) {
-    return res.error(err.statusCode, err.message, err.errorCode);
+    return res.status(err.statusCode).json({ status:"Error",code:err.errorCode,message:err.message});
   }
 
-  res.error(500, "An unexpected error occured.", "UNEXPECTED_ERROR");
+  res.status(500).json({ error: "An unexpected error occurred", errorCode: "UNEXPECTED_ERROR" });
 }
+
 
 module.exports = { errorHandler, errorLogger };
