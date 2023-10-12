@@ -18,13 +18,13 @@ router.post(
   MessagingController.sendSignUpEmail,
 );
 
+router.get("/verify/:token", AuthController.verifyUser);
+
 router.post(
   "/verify/resend",
   AuthController.resendVerification,
   MessagingController.resendVerificationEmail,
 );
-
-router.get("/verify/:token", AuthController.verifyUser);
 
 router.use("/reset-password", passwordRoute);
 
