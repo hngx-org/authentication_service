@@ -14,6 +14,7 @@ const authFacebook = (req, res) => {
             expiresIn: '1d',
         });
 
+        // send token and user details to client
         res.status(200).json({
             message: 'User logged in successfully', 
             token,
