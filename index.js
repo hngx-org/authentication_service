@@ -30,6 +30,7 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 app.options("*", cors(corsOptions)); // Set up a global OPTIONS handler
+
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
 
 app.use(express.json());
@@ -52,13 +53,13 @@ require("./middleware/authGithub")(passport);
 app.use("/api", indexRouter);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
-app.use("/api/auth", userAuthRoutes);
+app.use('/api/auth', userAuthRoutes);
 
 //communication with other microservices
-app.use("/api/authorize", getAuthRoutes);
+app.use('/api/authorize', getAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
-app.use("/api/users", userUpdateRouter);
+app.use('/api/users', userUpdateRouter);
 
 // Serving Files
 app.use(errorLogger);
