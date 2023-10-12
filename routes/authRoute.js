@@ -16,6 +16,12 @@ router.post(
   MessagingController.sendSignUpEmail,
 );
 
+router.post(
+  "/verify/resend",
+  AuthController.resendVerification,
+  MessagingController.resendVerificationEmail,
+);
+
 router.get("/verify/:token", AuthController.verifyUser);
 
 module.exports = router;
