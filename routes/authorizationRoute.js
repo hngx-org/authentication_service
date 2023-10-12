@@ -1,8 +1,4 @@
 const express = require("express");
-const {
-  getAuthPermissions,
-  sendPermissionsAndRows,
-} = require("../controllers/authorize");
 const AuthorizationController = require("../controllers/AuthorizationController");
 const AuthorizationValidator = require("../validators/AuthorizationValidator/index");
 

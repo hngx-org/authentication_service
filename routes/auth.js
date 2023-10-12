@@ -1,15 +1,5 @@
 const express = require('express');
 const {
-  forgotPassword,
-  resetPassword,
-  verifyEmail,
-  resendVerificationCode,
-} = require("../controllers/authController");
-const {
-  login,
-  sendVerificationCode,
-  confirmVerificationCode,
-  createUser,
   enable2fa,
   send2faCode,
   verify2fa,
@@ -26,17 +16,10 @@ const {
   githubLogin,
   githubRedirectUrl,
 } = require("../controllers/githubLoginController");
-const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
 
 
 const router = express.Router();
 router.use(errorHandler);
-
-// PASSWORD RESET AND EMAIL VERIFICATION
-router.get("/verify/:token", verifyEmail);
-router.post("/resend-verification", resendVerificationCode);
-router.post("/forgot-password", forgotPassword);
-router.patch("/reset-password", resetPassword);
 
 // GOOGLE OAUTH
 router.get(
@@ -76,16 +59,8 @@ router.get(
   handleGithubAUth
 );
 
-// EMAIL REGISTRATION
-router.post('/signup', registrationValidation, createUser);
-
-router.post("/send-verification", sendVerificationCode);
-router.post("/confirm-verification", confirmVerificationCode);
 router.post("/2fa/enable", enable2fa);
 router.post("/2fa/send-code", send2faCode);
 router.post("/2fa/verify-code", verify2fa);
-
-// EMAIL LOGIN
-router.post('/login', login);
 
 module.exports = router;

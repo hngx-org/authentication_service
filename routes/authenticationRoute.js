@@ -4,7 +4,7 @@ const passwordRoute = require("./passwordRoute");
 const AuthenticationController = require("../controllers/AuthenticationController");
 const MessagingController = require("../controllers/MessagingController");
 const registrationValidation = require("../middleware/registrationValidation");
-const AuthValidators = require("../validators/AuthValidators");
+const AuthenticationValidator = require("../validators/AuthenticationValidator");
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.post("/check-email", AuthenticationController.checkEmail);
 router.post(
   "/signup",
   registrationValidation,
-  AuthValidators.signup,
+  AuthenticationValidator.signup,
   AuthenticationController.createUser,
   MessagingController.sendSignUpEmail,
 );
@@ -27,5 +27,7 @@ router.post(
 );
 
 router.use("/reset-password", passwordRoute);
+
+router.post("/login", AuthenticationValidator.login, AuthenticationController.login);
 
 module.exports = router;
