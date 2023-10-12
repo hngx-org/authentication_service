@@ -26,6 +26,24 @@ const corsOptions = {
   optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
 };
 
+
+const handlePreflight = (req, res, next) => {
+  // Set the CORS headers for the preflight request
+  res.setHeader("Access-Control-Allow-Origin", ["http://localhost:3000", "http://localhost:3002", "https://zuriportfolio-frontend-pw1h.vercel.app"]);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+
+  // Respond to the OPTIONS request with a 204 No Content status
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
+  // Pass the request to the next middleware
+  next();
+};
+
+app.use(handlePreflight)
+
 app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
 app.use(express.json());
