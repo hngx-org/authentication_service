@@ -48,7 +48,7 @@ app.use(passport.initialize());
 require("./middleware/authEmail")(passport);
 require("./middleware/authGithub")(passport);
 
-// route
+// index route
 app.use("/api", indexRouter);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE

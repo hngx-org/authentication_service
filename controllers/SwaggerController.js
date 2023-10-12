@@ -4,9 +4,9 @@ const swaggerSpec = require("../swagger_output.json");
 const serve = swaggerUi.serve;
 const setup = swaggerUi.setup(swaggerSpec);
 
-const swaggerController = {
+const SwaggerController = {
   serve,
   setup,
 };
 
-module.exports = swaggerController;
+module.exports = SwaggerController;

@@ -1,8 +1,10 @@
 const { Router } = require("express");
-const swaggerController = require("../controllers/SwaggerController");
+const SwaggerController = require("../controllers/SwaggerController");
+const authRoute = require("./authRoute");
 
 const router = Router();
 
-router.use("/docs", swaggerController.serve, swaggerController.setup);
+router.use("/docs", SwaggerController.serve, SwaggerController.setup);
+router.use("/auth", authRoute);
 
 module.exports = router;
