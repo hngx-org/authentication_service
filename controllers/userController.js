@@ -152,21 +152,18 @@ async function checkEmail(req, res) {
       if (user.is_verified) {
         return res.status(200).json({
           success: true,
-          isRegistered: true,
-          isVerified: true,
+          message: "Email exists and is verified.",
         });
       } else {
         return res.status(200).json({
           success: true,
-          isRegistered: true,
-          isVerified: false,
+          message: "Email exists but is not verified.",
         });
       }
     } else {
       return res.status(200).json({
         success: true,
-        isRegistered: false,
-        isVerified: false,
+        message: "Email does not exist.",
       });
     }
   } catch (error) {
