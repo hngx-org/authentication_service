@@ -1,15 +1,15 @@
 const {
   assignPermissionToRole,
-} = require('../controllers/helpers/rolesandpermissions');
-const Role = require('../models/Roles');
-const Permission = require('../models/Permissions');
+} = require("../controllers/helpers/rolesandpermissions");
+const Role = require("../models/Roles");
+const Permission = require("../models/Permissions");
 
 const {
-  permissions,
+  all_permissions,
   user_permissions,
   guest_permissions,
   roles,
-} = require('./users_roles_permissions');
+} = require("./users_roles_permissions");
 
 const createEntities = async () => {
   try {
@@ -20,37 +20,43 @@ const createEntities = async () => {
   const createdPermissions = [];
   const createdRoles = [];
 
-  for (const permission of permissions) {
-    const createdPerm = await Permission.create({ name: permission });
+  let id = 1;
+
+  for (const permission of all_permissions) {
+    const createdPerm = await Permission.create({
+      name: permission,
+	  id: id++,
+    });
     createdPermissions.push(createdPerm);
   }
 
+  let id2 = 1;
   for (const role of roles) {
-    const createRole = await Role.create({ name: role });
+    const createRole = await Role.create({ name: role, id: id2++ });
     createdRoles.push(createRole);
   }
 
-  for (const permission of permissions) {
+  for (const permission of all_permissions) {
     const createdPerm = createdPermissions.find(
-      (perm) => perm.name == permission
+      (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === 'Super Admin');
+    const role = createdRoles.find((rol) => rol.name === "admin");
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 
   for (const permission of user_permissions) {
     const createdPerm = createdPermissions.find(
-      (perm) => perm.name == permission
+      (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === 'Registered User');
+    const role = createdRoles.find((rol) => rol.name === "user");
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 
   for (const permission of guest_permissions) {
     const createdPerm = createdPermissions.find(
-      (perm) => perm.name == permission
+      (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === 'Guest User');
+    const role = createdRoles.find((rol) => rol.name === "guest");
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 };
