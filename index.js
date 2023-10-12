@@ -10,7 +10,6 @@ const passport = require("passport");
 // routes imports
 const indexRouter = require("./routes/index");
 const userAuthRoutes = require("./routes/auth");
-const getAuthRoutes = require("./routes/authorize");
 const userUpdateRouter = require("./routes/updateUser");
 
 // middleware imports
@@ -72,9 +71,6 @@ app.use("/api", indexRouter);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
 app.use('/api/auth', userAuthRoutes);
-
-//communication with other microservices
-app.use('/api/authorize', getAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
 app.use('/api/users', userUpdateRouter);
