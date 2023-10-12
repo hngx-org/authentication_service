@@ -7,6 +7,7 @@ const AuthValidators = require("../validators/AuthValidators");
 const router = Router();
 
 router.post("/check-email", AuthController.checkEmail);
+
 router.post(
   "/signup",
   registrationValidation,
@@ -14,5 +15,7 @@ router.post(
   AuthController.createUser,
   MessagingController.sendSignUpEmail,
 );
+
+router.get("/verify/:token", AuthController.verifyUser);
 
 module.exports = router;

@@ -12,7 +12,10 @@ const sendSignUpEmail = async (req, res) => {
 
   const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
   const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`;
-  const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete/?token=${token}`;
+  const verificationLink =
+    process.env.NODE_ENV === "production"
+      ? `${process.env.AUTH_FRONTEND_URL_LIVE}api/auth/verify/${token}`
+      : `${process.env.AUTH_FRONTEND_URL_LOCAL}api/auth/verify/${token}`;
 
   try {
     const response = await axios.post(emailServiceUrl, {
