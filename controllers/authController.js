@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const User = require("../models/Users");
 const transporter = require("../middleware/mailConfig");
+const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
 const {
   ResourceNotFound,
   Unauthorized,
@@ -37,13 +38,17 @@ const verifyEmailSchema = Joi.object({
   token: Joi.string().required(),
 });
 
-const forgotPassword = async (req, res,next) => {
-  try {
-  const { error } = forgotPasswordSchema.validate(req.body);
+const resendVerificationCodeSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
 
-  if (error) {
-    throw new BadRequest(error.message,INVALID_REQUEST_PARAMETERS);
-  }
+async function forgotPassword(req, res, next) {
+  try {
+    const { error } = forgotPasswordSchema.validate(req.body);
+
+    if (error) {
+      throw new BadRequest(error.message, INVALID_REQUEST_PARAMETERS);
+    }
 
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
@@ -63,7 +68,7 @@ const forgotPassword = async (req, res,next) => {
     // Send an email with the verification code
     const mailOptions = {
       from: process.env.NODEMAILER_USER,
-      to: email, // User's email address
+      to: email,
       subject: "Password Reset",
       text: `Your password reset code is: ${resetCode}`,
     };
@@ -76,18 +81,21 @@ const forgotPassword = async (req, res,next) => {
     console.log(error);
     next(error);
   }
-};
+}
 
 const resetPassword = async (req, res, next) => {
   try {
-  const { error } = resetPasswordSchema.validate(req.body);
+    const { error } = resetPasswordSchema.validate(req.body);
 
-  if (error) {
-    throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
-    // return res
-    //   .status(400)
-    //   .json({ success: false, message: error.details[0].message });
-  }
+    if (error) {
+      throw new BadRequest(
+        error.details[0].message,
+        INVALID_REQUEST_PARAMETERS
+      );
+      // return res
+      //   .status(400)
+      //   .json({ success: false, message: error.details[0].message });
+    }
     const { token, password } = req.body;
     // ... Implement reset password functionality here
     const user = await User.findOne({ where: { token } });
@@ -110,7 +118,7 @@ const resetPassword = async (req, res, next) => {
       .status(200)
       .json({ success: true, message: "Password reset successfully." });
   } catch (error) {
-    next(error)
+    next(error);
     // Internal error or custom error handling
     // res.status(500).json({ success: false, message: "Something went wrong" });
   }
@@ -121,7 +129,10 @@ const verifyEmail = async (req, res, next) => {
     const { error } = verifyEmailSchema.validate(req.params);
 
     if (error) {
-      throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
+      throw new BadRequest(
+        error.details[0].message,
+        INVALID_REQUEST_PARAMETERS
+      );
       // return res
       //   .status(400)
       //   .json({ success: false, message: error.details[0].message });
@@ -142,7 +153,7 @@ const verifyEmail = async (req, res, next) => {
     const user = await User.findByPk(decoded.id);
     if (!user) {
       // 404 Error or custom error handling
-      throw new ResourceNotFound("User not found",RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
       // return res
       //   .status(404)
       //   .json({ success: false, message: "User not found" });
@@ -151,7 +162,10 @@ const verifyEmail = async (req, res, next) => {
     // CHeck if the user is already verified
     if (user.is_verified) {
       // 404 Error or custom error handling
-      throw new BadRequest("Email already verified. please login",EMAIL_ALREADY_VERIFIED);
+      throw new BadRequest(
+        "Email already verified. please login",
+        EMAIL_ALREADY_VERIFIED
+      );
       // return res.status(404).json({
       //   success: false,
       //   message: "Email already verified. Please login",
@@ -172,4 +186,65 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
-module.exports = { forgotPassword, resetPassword, verifyEmail };
+const resendVerificationCode = async (req, res, next) => {
+  try {
+    // Validate email format
+    const { error } = resendVerificationCodeSchema.validate(req.body);
+    if (error) {
+      throw new BadRequest(
+        error.details[0].message,
+        INVALID_REQUEST_PARAMETERS
+      );
+    }
+
+    const { email } = req.body;
+
+    const user = await User.findOne({
+      where: { email },
+    });
+
+    if (user) {
+      // Check if user has already verified their Email
+      if (user.is_verified) {
+        throw new BadRequest(
+          "Email already verified. please login",
+          EMAIL_ALREADY_VERIFIED
+        );
+      }
+
+      // Encrypt user id in JWT and send
+      const jwt_payload = {
+        id: user.id,
+      };
+      const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+
+      // Send verification link email to user
+      await sendVerificationEmail(
+        user.first_name,
+        user.email,
+        verificationToken
+      );
+
+      res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Verification code has been resent to email.",
+      });
+    } else {
+      throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
+      // return res.json("User not found ");
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = {
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  resendVerificationCode,
+};

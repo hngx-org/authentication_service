@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/mailConfig");
 const validator = require("validator");
 const Joi = require("joi");
-
+const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
 // error handler middleware:
 
 const {
@@ -66,30 +66,34 @@ async function createUser(req, res, next) {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
       email: email,
       username: "",
-      token: verificationToken,
       refresh_token: "",
       password: hashedPassword,
     });
 
-    req.body.user = newUser.toJSON();
+    // Encrypt user id in JWT and send
+    const jwt_payload = {
+      id: newUser.id,
+    };
+    const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    next();
+    // Send verification link email to user
+    await sendVerificationEmail(firstName, email, verificationToken);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "User created successfully. Verification code sent to email.",
+      data: newUser.toJSON(),
+    });
   } catch (error) {
     next(error);
-    // res.status(500).json({
-    //   success: false,
-    //   message: "Error creating user.",
-    //   error: error.message,
-    // });
   }
 }
 
@@ -138,6 +142,43 @@ async function login(req, res, next) {
     //   message: "Error logging in",
     //   error: error.message,
     // });
+  }
+}
+
+async function checkEmail(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (user) {
+      if (user.is_verified) {
+        return res.status(200).json({
+          success: true,
+          isRegistered: true,
+          isVerified: true,
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          isRegistered: true,
+          isVerified: false,
+        });
+      }
+    } else {
+      return res.status(200).json({
+        success: true,
+        isRegistered: false,
+        isVerified: false,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error checking email",
+      error: error.message,
+    });
   }
 }
 
@@ -249,17 +290,49 @@ const sendVerificationCode = async (req, res, next) => {
     // const { first_name, last_name, username, email, password, refresh_token } =
     //   req.body;
 
-    const { user } = req.body;
+    const { email } = req.body;
 
     // Validate email format
-    // if (!validator.isEmail(email)) {
-    //   throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
-    // return res.status(400).json({
-    //   success: false,
-    //   message: "Invalid email format.",
-    // });
-    // }
+    if (!validator.isEmail(email)) {
+      throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
+      // return res.status(400).json({
+      //   success: false,
+      //   message: "Invalid email format.",
+      // });
+    }
 
+    const user = await User.findOne({
+      where: { email },
+    });
+
+    if (user) {
+      // Check if user has already verified their Email
+      if (user.is_verified) {
+        // 404 Error or custom error handling
+        throw new BadRequest(
+          "Email already verified. please login",
+          EMAIL_ALREADY_VERIFIED
+        );
+      }
+
+      if (!checkPassword) {
+        throw new Forbidden("Incorrect password.", ACCESS_DENIED);
+        // return res.json("Incorrect passsword");
+      } else {
+        const jwt_payload = {
+          id: user.id,
+        };
+        const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
+        return res.json({
+          token: token,
+          data: user,
+          statusCode: 200,
+        });
+      }
+    } else {
+      throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
+      // return res.json("User not found ");
+    }
     // Generating a random 6 digit verification code
     // const verificationCode = Math.floor(
     //   100000 + Math.random() * 900000
@@ -275,30 +348,12 @@ const sendVerificationCode = async (req, res, next) => {
     //   token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
     // });
 
-    const mailOptions = {
-      from: process.env.NODEMAILER_USER,
-      to: user.email,
-      subject: "Email Verification",
-      text: `
-Your verification code is: ${user.token}. Please enter this code to verify your email.
-
-If you're testing this api endpoint, send a POST request to https://auth.akuya.tech/api/auth/2fa/verify-code with the following body:
-
-<code>
-{
-  "email": "${user.email}",
-  "token": "${user.token}"
-}
-</code>
-`,
-    };
-
     await transporter.sendMail(mailOptions);
 
     res.status(200).json({
       status: 200,
       success: true,
-      message: "User created successfully. Verification code sent to email.",
+      message: "Verification code has been resent to email.",
       data: {
         ...user,
         token: undefined,
@@ -439,4 +494,5 @@ module.exports = {
   confirmVerificationCode,
   createUser,
   changeEmail,
+  checkEmail,
 };
