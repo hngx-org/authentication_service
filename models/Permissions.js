@@ -1,8 +1,8 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
 const Permission = sequelize.define(
-  "permission",
+  'permission',
   {
     id: {
       type: DataTypes.INTEGER,

@@ -32,7 +32,7 @@ const RolePermissions = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
   },
-  { freezeTableName: true, timestamps: false }
+  { freezeTableName: true, timestamps: false },
 );
 
 Role.belongsToMany(Permission, {

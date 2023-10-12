@@ -1,5 +1,5 @@
-const User = require("../../models/Users");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
+const User = require('../../models/Users');
 
 const createUser = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -9,11 +9,11 @@ const createUser = async (req, res, next) => {
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
-      email: email,
+      email,
       password: hashedPassword,
-      username: "",
-      token: "",
-      refresh_token: "",
+      username: '',
+      token: '',
+      refresh_token: '',
     });
 
     req.user = {
@@ -25,8 +25,8 @@ const createUser = async (req, res, next) => {
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      message: "Error creating user",
-	  error: error,
+      message: 'Error creating user',
+      error,
     });
   }
 

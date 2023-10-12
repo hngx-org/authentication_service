@@ -3,9 +3,9 @@ const permissions = require('./permissions');
 const roles = require('./roles');
 
 const AuthorizationController = {
-	authorize,
-	permissions,
-	roles
+  authorize,
+  permissions,
+  roles,
 };
 
-module.exports = AuthorizationController
+module.exports = AuthorizationController;

@@ -1,8 +1,7 @@
-const User = require("../../models/Users");
-const Permission = require("../../models/Permissions");
-const Role = require("../../models/Roles");
-
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const User = require('../../models/Users');
+const Permission = require('../../models/Permissions');
+const Role = require('../../models/Roles');
 
 /**
  * @desc Check if user is authorized to perform permission
@@ -14,7 +13,7 @@ const authorize = (req, res) => {
     if (err) {
       return res.status(401).json({
         status: 401,
-        error: "Invalid token",
+        error: 'Invalid token',
       });
     }
     const { id } = decoded;
@@ -23,14 +22,14 @@ const authorize = (req, res) => {
       include: [
         {
           model: Permission,
-          as: "permissions",
-          attributes: ["name"],
+          as: 'permissions',
+          attributes: ['name'],
         },
         {
           model: Role,
-          as: "role",
-          attributes: ["name"],
-          include: [{ model: Permission, attributes: ["name"] }],
+          as: 'role',
+          attributes: ['name'],
+          include: [{ model: Permission, attributes: ['name'] }],
         },
       ],
     });
@@ -39,7 +38,7 @@ const authorize = (req, res) => {
       return res.status(404).json({
         status: 404,
         authorized: false,
-        message: "No user found",
+        message: 'No user found',
       });
     }
 
@@ -47,7 +46,7 @@ const authorize = (req, res) => {
       return res.status(401).json({
         status: 401,
         authorized: false,
-        message: "user is not verified",
+        message: 'user is not verified',
       });
     }
 
@@ -64,7 +63,7 @@ const authorize = (req, res) => {
       response = {
         status: 200,
         authorized: true,
-        message: "user is authenticated",
+        message: 'user is authenticated',
         user: {
           id,
           role: user.role.name,
@@ -78,7 +77,7 @@ const authorize = (req, res) => {
       response = {
         status: 200,
         authorized: true,
-        message: "user is authorized for this permission",
+        message: 'user is authorized for this permission',
         user: {
           id,
           permissions,
@@ -91,7 +90,7 @@ const authorize = (req, res) => {
     return res.status(401).json({
       status: 401,
       authorized: false,
-      message: "user is not authorized for this permission",
+      message: 'user is not authorized for this permission',
     });
   });
 };

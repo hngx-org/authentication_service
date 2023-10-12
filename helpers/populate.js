@@ -1,15 +1,15 @@
 const {
   assignPermissionToRole,
-} = require("../controllers/helpers/rolesandpermissions");
-const Role = require("../models/Roles");
-const Permission = require("../models/Permissions");
+} = require('../controllers/helpers/rolesandpermissions');
+const Role = require('../models/Roles');
+const Permission = require('../models/Permissions');
 
 const {
   all_permissions,
   user_permissions,
   guest_permissions,
   roles,
-} = require("./users_roles_permissions");
+} = require('./users_roles_permissions');
 
 const createEntities = async () => {
   try {
@@ -25,7 +25,7 @@ const createEntities = async () => {
   for (const permission of all_permissions) {
     const createdPerm = await Permission.create({
       name: permission,
-	  id: id++,
+      id: id++,
     });
     createdPermissions.push(createdPerm);
   }
@@ -40,7 +40,7 @@ const createEntities = async () => {
     const createdPerm = createdPermissions.find(
       (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === "admin");
+    const role = createdRoles.find((rol) => rol.name === 'admin');
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 
@@ -48,7 +48,7 @@ const createEntities = async () => {
     const createdPerm = createdPermissions.find(
       (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === "user");
+    const role = createdRoles.find((rol) => rol.name === 'user');
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 
@@ -56,7 +56,7 @@ const createEntities = async () => {
     const createdPerm = createdPermissions.find(
       (perm) => perm.name == permission,
     );
-    const role = createdRoles.find((rol) => rol.name === "guest");
+    const role = createdRoles.find((rol) => rol.name === 'guest');
     await assignPermissionToRole(role.id, createdPerm.id);
   }
 };
