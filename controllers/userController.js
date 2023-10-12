@@ -27,7 +27,7 @@ const {
   CONFLICT_ERROR_CODE,
   THIRD_PARTY_API_FAILURE,
   INVALID_INPUT_PARAMETERS,
-  USER_NOT_VERIFIED
+  USER_NOT_VERIFIED,
 } = require("../errors/httpErrorCodes");
 
 const enable2faSchema = Joi.object({
@@ -63,7 +63,7 @@ async function createUser(req, res, next) {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const verificationToken = Math.floor(
-      100000 + Math.random() * 900000,
+      100000 + Math.random() * 900000
     ).toString();
 
     const newUser = await User.create({
@@ -176,7 +176,7 @@ const send2faCode = async (req, res, next) => {
     });
 
     const verificationCode = Math.floor(
-      100000 + Math.random() * 900000,
+      100000 + Math.random() * 900000
     ).toString();
 
     if (!user) {
@@ -242,36 +242,38 @@ const verify2fa = async (req, res, next) => {
 
 const sendVerificationCode = async (req, res, next) => {
   try {
-    const { first_name, last_name, username, email, password, refresh_token } =
-      req.body;
+    // const { first_name, last_name, username, email, password, refresh_token } =
+    //   req.body;
+
+    const { user } = req.body;
 
     // Validate email format
-    if (!validator.isEmail(email)) {
-      throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
-      // return res.status(400).json({
-      //   success: false,
-      //   message: "Invalid email format.",
-      // });
-    }
+    // if (!validator.isEmail(email)) {
+    //   throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
+    // return res.status(400).json({
+    //   success: false,
+    //   message: "Invalid email format.",
+    // });
+    // }
 
     // Generating a random 6 digit verification code
-    const verificationCode = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
+    // const verificationCode = Math.floor(
+    //   100000 + Math.random() * 900000
+    // ).toString();
 
-    await User.create({
-      first_name,
-      last_name,
-      username,
-      email,
-      password,
-      refresh_token,
-      token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
-    });
+    // await User.create({
+    //   first_name,
+    //   last_name,
+    //   username,
+    //   email,
+    //   password,
+    //   refresh_token,
+    //   token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
+    // });
 
     const mailOptions = {
       from: process.env.NODEMAILER_USER,
-      to: email,
+      to: user.email,
       subject: "Email Verification",
       text: `
 Your verification code is: ${user.token}. Please enter this code to verify your email.
@@ -280,7 +282,7 @@ If you're testing this api endpoint, send a POST request to https://auth.akuya.t
 
 <code>
 {
-  "email": "${email}",
+  "email": "${user.email}",
   "token": "${user.token}"
 }
 </code>
@@ -293,7 +295,13 @@ If you're testing this api endpoint, send a POST request to https://auth.akuya.t
       status: 200,
       success: true,
       message: "User created successfully. Verification code sent to email.",
-      data: user,
+      data: {
+        ...user,
+        token: undefined,
+        password: undefined,
+        refresh_token: undefined,
+        two_factor_auth: undefined,
+      },
     });
   } catch (error) {
     next(error);
@@ -305,7 +313,10 @@ const confirmVerificationCode = async (req, res, next) => {
     const { email, verificationCode } = req.body;
 
     if (!email || !verificationCode) {
-      throw new BadRequest("Email and verification code are required", MISSING_REQUIRED_FIELD);
+      throw new BadRequest(
+        "Email and verification code are required",
+        MISSING_REQUIRED_FIELD
+      );
       // return res.status(400).json({
       //   success: false,
       //   message: "Email and verification code are required.",
