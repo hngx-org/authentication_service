@@ -30,7 +30,7 @@ const router = express.Router();
 router.use(errorHandler);
 
 // PASSWORD RESET AND EMAIL VERIFICATION
-router.post("/verify-email", verifyEmail);
+router.get("/verify/:token", verifyEmail);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
 
@@ -62,12 +62,7 @@ router.get(
 );
 
 // EMAIL REGISTRATION
-router.post(
-  "/signup",
-  registrationValidation,
-  createUser,
-  sendVerificationCode
-);
+router.post("/signup", registrationValidation, createUser);
 
 router.post("/send-verification", sendVerificationCode);
 router.post("/confirm-verification", confirmVerificationCode);
