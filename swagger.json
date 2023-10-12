@@ -417,7 +417,37 @@
         }
       }
     },
+      "/roles-and-permissions": {
+      "get": {
+        "description": "Get all permissions and roles",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/": {
+      "get": {
+        "description": "Get Authentication",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+      "/auth/google": {
+      "get": {
+        "description": "Get Authentication",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+      "/auth/google/redirect": {
       "get": {
         "description": "Get Authentication",
         "responses": {
