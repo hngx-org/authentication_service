@@ -51,9 +51,6 @@ require("./middleware/authGithub")(passport);
 // route
 app.use("/api", indexRouter);
 
-// Serve Swagger UI
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
 app.use("/api/auth", userAuthRoutes);
 
