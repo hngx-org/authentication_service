@@ -1,93 +1,160 @@
-const express = require('express');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const Joi = require("joi");
+const User = require("../models/Users");
+const axios = require('axios')
+
 const {
-  forgotPassword,
-  resetPassword,
-  verifyEmail,
-  resendVerificationCode,
-} = require("../controllers/authController");
+  ResourceNotFound,
+  Unauthorized,
+  BadRequest,
+  Conflict,
+  Forbidden,
+  ServerError,
+} = require("../errors/httpErrors");
 const {
-  login,
-  sendVerificationCode,
-  confirmVerificationCode,
-  createUser,
-  enable2fa,
-  send2faCode,
-  verify2fa,
-  checkEmail,
-} = require('../controllers/userController');
-const passport = require('passport');
-const { handleAuth } = require('../controllers/gauthControllers');
-require('../services/passportService');
-const { errorHandler } = require('../middleware/ErrorMiddleware');
-const registrationValidation = require('../middleware/registrationValidation');
-require('../services/passportServiceFb');
-const { authFacebook } = require('../controllers/authFacebook');
-const handleGithubAUth = require('../controllers/githubauthController');
-const {
-  githubLogin,
-  githubRedirectUrl,
-} = require('../controllers/githubLoginController');
+  RESOURCE_NOT_FOUND,
+  ACCESS_DENIED,
+  INVALID_TOKEN,
+  MISSING_REQUIRED_FIELD,
+  INVALID_REQUEST_PARAMETERS,
+  EXISTING_USER_EMAIL,
+  EXPIRED_TOKEN,
+  CONFLICT_ERROR_CODE,
+  THIRD_PARTY_API_FAILURE,
+  EMAIL_ALREADY_VERIFIED,
+} = require("../errors/httpErrorCodes");
 
-const router = express.Router();
-router.use(errorHandler);
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
 
-// PASSWORD RESET AND EMAIL VERIFICATION
-router.get("/verify/:token", verifyEmail);
-router.post("/resend-verification", resendVerificationCode);
-router.post("/forgot-password", forgotPassword);
-router.patch("/reset-password/:token", resetPassword);
+const resetPasswordSchema = Joi.object({
+  newPassword: Joi.string().required(),
+  confirmPassword: Joi.string().required().equal(Joi.ref("newPassword")),
+});
 
-// GOOGLE OAUTH
-router.get(
-  '/google',
-  passport.authenticate('google', {
-    scope: ['email', 'profile'],
-  })
-);
+const verifyEmailSchema = Joi.object({
+  token: Joi.string().required(),
+});
 
-router.get(
-  '/google/redirect',
-  passport.authenticate('google', {
-    session: false,
-  }),
-  handleAuth
-);
+const sendResetPasswordEmail = async (email, resetLink, username) => {
+  try {
+    const response = await axios.post('https://team-titan.mrprotocoll.me/api/v1/user/password-reset', {
+      "recipient": email,
+      "name": username,
+      "reset_link": resetLink
+    });
 
-// FACEBOOK AUTH
-router.get(
-  '/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
-);
-router.get(
-  '/facebook/redirect',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  authFacebook
-);
+    if (response.data.status === 200 && response.data.message === "Successful") {
+     return "Successful"
+    } 
+      throw new Forbidden("Unable to send email", INVALID_REQUEST_PARAMETERS)
+  } catch (error) {
+    throw new ServerError("Unable to send email", INVALID_REQUEST_PARAMETERS)
+  }
+};
 
-// GITHUB OAUTH
-router.get(
-  '/github',
-  passport.authenticate('github', { scope: ['profile', 'user:email'] })
-);
-router.get(
-  '/github/redirect',
-  passport.authenticate('github', { session: false }),
-  handleGithubAUth
-);
 
-// EMAIL REGISTRATION
-router.post('/signup', registrationValidation, createUser);
 
-router.post("/send-verification", sendVerificationCode);
-router.post("/confirm-verification", confirmVerificationCode);
-router.post("/2fa/enable", enable2fa);
-router.post("/2fa/send-code", send2faCode);
-router.post("/2fa/verify-code", verify2fa);
+const forgotPassword = async (req, res,next) => {
+  try {
+  const { error } = forgotPasswordSchema.validate(req.body);
 
-// EMAIL LOGIN
-router.post('/login', login);
+  if (error) {
+    throw new BadRequest(error.message, INVALID_REQUEST_PARAMETERS);
+  }
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
 
-//CHECK EMAIL
-router.post('/check-email', checkEmail);
+    if (!user) {
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+    }
 
-module.exports = router;
+   if (user.is_verified === false) {
+       throw new ResourceNotFound("User not verified", RESOURCE_NOT_FOUND);
+    }
+  
+  const payload = { id: user.id, email: user.email };
+  const resetToken = await jwt.sign(payload, process.env.JWT_SECRET);
+
+    const url = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
+     user.token = resetToken;
+    await user.save();
+      // Send emails
+    await sendResetPasswordEmail(user.email, url, user.username);
+  return res.status(200).json({ success: true, message: "Password reset link successfully.", user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+  const { error } = resetPasswordSchema.validate(req.body);
+
+  if (error) {
+    throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
+  }
+    const { password } = req.body;
+
+    const user = await User.findOne({ where: { token: req.params.token } });
+
+    if (!user) {
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+    }
+
+    const hashedPassword = await bcrypt.hashSync(password, 10);
+    user.password = hashedPassword;
+    user.token = null;
+    await user.save();
+    res.status(200).json({ success: true, message: "Password reset successfully." });
+  } catch (error) {
+    next(error)
+  }
+};
+
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { error } = verifyEmailSchema.validate(req.params);
+
+    if (error) {
+      throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
+    }
+
+    const { token } = req.params;
+
+    // Verify JWT token
+    let decoded;
+    try {
+      decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      throw new Unauthorized("Invalid token", INVALID_TOKEN);
+    }
+
+    // FInd the User by ID
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      // 404 Error or custom error handling
+      throw new ResourceNotFound("User not found",RESOURCE_NOT_FOUND);
+    }
+
+    // CHeck if the user is already verified
+    if (user.is_verified) {
+      // 404 Error or custom error handling
+      throw new BadRequest("Email already verified. please login",EMAIL_ALREADY_VERIFIED);
+    }
+
+    // Mark user as verified
+    user.is_verified = true;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { forgotPassword, resetPassword, verifyEmail };

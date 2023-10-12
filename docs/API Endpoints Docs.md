@@ -58,6 +58,7 @@ The user object will have the following attributes
 | 9 | Forgot Password | PATCH | https://zuriportfoloio.com/api/auth/forgot-password | Handles the process of resetting a user's forgotten password. |
 | 10 | LogOut | POST | https://zuriportfoloio.com/api/auth/logout | Allows users to log out or terminate their current session. |
 | 11 | Update User Role | PUT | https://zuriportfoloio.com/api/user/update/role | Allows for update of user role|
+| 12 | Get All users (Admin Only) | GET | https://zuriportfoloio.com/api/user/ | Allows an admin to retrieve a list of users|
 
 
 ### User Signup

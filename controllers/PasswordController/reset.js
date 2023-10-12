@@ -1,0 +1,38 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const User = require("../../models/Users");
+
+const reset = (req, res) => {
+  const { token, password } = req.body;
+  const { JWT_SECRET } = process.env;
+
+  jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+    if (err) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid token",
+      });
+    }
+
+    const { email } = decoded;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(400).json({
+        status: 400,
+        message: "User not found",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await user.update({ password: hashedPassword });
+
+    return res.status(200).json({
+      status: 200,
+      message: "Password reset successful",
+    });
+  });
+};
+
+module.exports = reset;
