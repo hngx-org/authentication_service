@@ -35,6 +35,7 @@ module.exports = (passport) => {
               username: profile.username,
               profile_pic: profile._json.avatar_url,
               is_verified: true,
+              token: "nonefornow",
               first_name: profile.displayName.split(' ')[0],
               last_name: profile.displayName.split(' ')[1],
               refresh_token: '',
