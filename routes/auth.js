@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const {
   forgotPassword,
   resetPassword,
   verifyEmail,
-} = require("../controllers/authController");
+} = require('../controllers/authController');
 const {
   login,
   sendVerificationCode,
@@ -32,21 +32,21 @@ const router = express.Router();
 router.use(errorHandler);
 
 // PASSWORD RESET AND EMAIL VERIFICATION
-router.get("/verify/:token", verifyEmail);
-router.post("/forgot-password", forgotPassword);
-router.patch("/reset-password", resetPassword);
+router.get('/verify/:token', verifyEmail);
+router.post('/forgot-password', forgotPassword);
+router.patch('/reset-password', resetPassword);
 
 // GOOGLE OAUTH
 router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["email", "profile"],
+  '/google',
+  passport.authenticate('google', {
+    scope: ['email', 'profile'],
   })
 );
 
 router.get(
-  "/google/redirect",
-  passport.authenticate("google", {
+  '/google/redirect',
+  passport.authenticate('google', {
     session: false,
   }),
   handleAuth
@@ -54,26 +54,37 @@ router.get(
 
 // FACEBOOK AUTH
 router.get(
-  "/facebook",
-  passport.authenticate("facebook", { scope: ["email", "public_profile"] })
+  '/facebook',
+  passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
 );
 router.get(
-  "/facebook/redirect",
-  passport.authenticate("facebook", { failureRedirect: "/login" }),
+  '/facebook/redirect',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
   authFacebook
 );
 
-// EMAIL REGISTRATION
-router.post("/signup", registrationValidation, createUser);
+// GITHUB OAUTH
+router.get(
+  '/github',
+  passport.authenticate('github', { scope: ['profile', 'user:email'] })
+);
+router.get(
+  '/github/redirect',
+  passport.authenticate('github', { session: false }),
+  handleGithubAUth
+);
 
-router.post("/send-verification", sendVerificationCode);
-router.post("/confirm-verification", confirmVerificationCode);
-router.post("/2fa/enable", enable2fa);
-router.post("/2fa/send-code", send2faCode);
-router.post("/2fa/verify-code", verify2fa);
+// EMAIL REGISTRATION
+router.post('/signup', registrationValidation, createUser);
+
+router.post('/send-verification', sendVerificationCode);
+router.post('/confirm-verification', confirmVerificationCode);
+router.post('/2fa/enable', enable2fa);
+router.post('/2fa/send-code', send2faCode);
+router.post('/2fa/verify-code', verify2fa);
 
 // EMAIL LOGIN
-router.post("/login", login);
+router.post('/login', login);
 
 // CHANGE EMAIL
 router.patch("/change-email", authEmail, changeEmail);
