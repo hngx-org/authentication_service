@@ -1,14 +1,22 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
 const handleAuth = (req, res) => {
   const { user } = req;
   const payload = {
     id: user.id,
   };
-  const accessToken = jwt.sign(payload, process.env.JWT_SECRET);
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: 24 * 60 * 60,
+  });
   return res.json({
     token: accessToken,
-    data: user,
+    data: {
+      ...user.dataValues,
+      token: undefined,
+      password: undefined,
+      refresh_token: undefined,
+      two_factor_auth: undefined,
+    },
     statusCode: 200,
   });
 };

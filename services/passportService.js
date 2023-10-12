@@ -20,7 +20,9 @@ passport.use(
             first_name: profile.name.givenName,
             last_name: profile.name.familyName,
             email: profile.emails[0].value,
-            refresh_token: "....",
+            refresh_token: "",
+            is_verified: true,
+            provider: "google",
           });
 
         if (!user) throw new Error("Errors");
@@ -33,6 +35,6 @@ passport.use(
   )
 );
 
-passport.serializeUser = (user, done) => {
-  done(false, user.dataValues());
-};
+passport.serializeUser((user, done) => {
+  done(false, user.dataValues);
+});
