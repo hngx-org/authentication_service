@@ -42,7 +42,7 @@ const handlePreflight = (req, res, next) => {
   next();
 };
 
-app.use(handlePreflight)
+app.use(handlePreflight) 
 
 app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
