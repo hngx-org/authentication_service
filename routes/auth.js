@@ -1,8 +1,9 @@
-const express = require("express");
+const express = require('express');
 const {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  resendVerificationCode,
 } = require("../controllers/authController");
 const {
   login,
@@ -12,46 +13,70 @@ const {
   enable2fa,
   send2faCode,
   verify2fa,
-} = require("../controllers/userController");
-const passport = require("passport");
-const { handleAuth } = require("../controllers/gauthControllers");
-require("../services/passportService");
-const { errorHandler } = require("../middleware/ErrorMiddleware");
-const registrationValidation = require("../middleware/registrationValidation");
+  checkEmail,
+} = require('../controllers/userController');
+const passport = require('passport');
+const { handleAuth } = require('../controllers/gauthControllers');
+require('../services/passportService');
+const { errorHandler } = require('../middleware/ErrorMiddleware');
+const registrationValidation = require('../middleware/registrationValidation');
+require('../services/passportServiceFb');
+const { authFacebook } = require('../controllers/authFacebook');
 const handleGithubAUth = require('../controllers/githubauthController');
-const {githubLogin, githubRedirectUrl} = require("../controllers/githubLoginController")
+const {
+  githubLogin,
+  githubRedirectUrl,
+} = require('../controllers/githubLoginController');
 
 const router = express.Router();
 router.use(errorHandler);
 
 // PASSWORD RESET AND EMAIL VERIFICATION
-router.post("/verify-email", verifyEmail);
+router.get("/verify/:token", verifyEmail);
+router.post("/resend-verification", resendVerificationCode);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
 
 // GOOGLE OAUTH
 router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["email", "profile"],
-  }),
+  '/google',
+  passport.authenticate('google', {
+    scope: ['email', 'profile'],
+  })
 );
 
 router.get(
-  "/google/redirect",
-  passport.authenticate("google", {
+  '/google/redirect',
+  passport.authenticate('google', {
     session: false,
   }),
-  handleAuth,
+  handleAuth
+);
+
+// FACEBOOK AUTH
+router.get(
+  '/facebook',
+  passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
+);
+router.get(
+  '/facebook/redirect',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  authFacebook
+);
+
+// GITHUB OAUTH
+router.get(
+  '/github',
+  passport.authenticate('github', { scope: ['profile', 'user:email'] })
+);
+router.get(
+  '/github/redirect',
+  passport.authenticate('github', { session: false }),
+  handleGithubAUth
 );
 
 // EMAIL REGISTRATION
-router.post(
-  "/signup",
-  registrationValidation,
-  createUser,
-  sendVerificationCode,
-);
+router.post('/signup', registrationValidation, createUser);
 
 router.post("/send-verification", sendVerificationCode);
 router.post("/confirm-verification", confirmVerificationCode);
@@ -60,26 +85,9 @@ router.post("/2fa/send-code", send2faCode);
 router.post("/2fa/verify-code", verify2fa);
 
 // EMAIL LOGIN
-router.post("/login", login);
+router.post('/login', login);
 
-// Github Auth
-
-// Define a route to initiate GitHub authentication
-router.get(
-  "/github",
-  passport.authenticate("github", { scope: ["profile", "user:email"] })
-);
-
-// Define a route to handle the GitHub callback and JWT token generation
-router.get(
-  "/github/redirect",
-  passport.authenticate("github", { session: false }), // Disable session handling
-  handleGithubAUth,
-);
-
-// Route to handle login with github. Does not register the user if they do not exist
-router.get("/github/login", githubLogin)
-router.get("/github/login/redirect", githubRedirectUrl)
-
+//CHECK EMAIL
+router.post('/check-email', checkEmail);
 
 module.exports = router;

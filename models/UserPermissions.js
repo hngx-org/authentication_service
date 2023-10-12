@@ -5,7 +5,7 @@ const User = require("./Users");
 const Permission = require("./Permissions");
 
 const UserPermissions = sequelize.define(
-  "user_permissions",
+  "user_permission",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -27,10 +27,6 @@ const UserPermissions = sequelize.define(
         key: "id",
       },
     },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
   },
   { freezeTableName: true, timestamps: false },
 );
@@ -38,13 +34,11 @@ const UserPermissions = sequelize.define(
 User.belongsToMany(Permission, {
   through: UserPermissions,
   foreignKey: "user_id",
-  otherKey: "permission_id",
 });
 
 Permission.belongsToMany(User, {
   through: UserPermissions,
   foreignKey: "permission_id",
-  otherKey: "user_id",
 });
 
 module.exports = UserPermissions;
