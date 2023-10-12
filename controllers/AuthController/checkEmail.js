@@ -6,13 +6,13 @@ const User = require("../../models/Users");
 const checkEmail = async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findAll({
+  const user = await User.findOne({
     where: {
       email,
     },
   });
 
-  if (user.length > 0) {
+  if (user) {
     return res.status(409).json({
       status: 409,
       message: "Email already in use",
