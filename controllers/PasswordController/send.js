@@ -11,7 +11,7 @@ const send = async (req, res, next) => {
 
   req.user = {
     id: user.id,
-    firstName: user.firstName,
+    firstName: user.first_name,
     email: user.email,
   };
 

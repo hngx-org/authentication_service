@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 
 const sendPasswordResetEmail = async (req, res) => {
   const {
@@ -7,6 +8,7 @@ const sendPasswordResetEmail = async (req, res) => {
     PASSWORD_RESET_ENDPOINT_DEV,
     NODE_ENV,
   } = process.env;
+
   const user = req.user;
 
   const jwt_payload = {
@@ -21,9 +23,10 @@ const sendPasswordResetEmail = async (req, res) => {
     NODE_ENV === "production"
       ? `${PASSWORD_RESET_ENDPOINT_LIVE}/${token}`
       : `${PASSWORD_RESET_ENDPOINT_DEV}/${token}`;
+
   try {
     const response = await axios.post(emailServiceUrl, {
-      recipent: user.email,
+      recipient: user.email,
       name: user.firstName,
       reset_link: passwordResetLink,
     });
@@ -32,6 +35,14 @@ const sendPasswordResetEmail = async (req, res) => {
       return res.status(200).json({
         status: 200,
         message: "Password reset link sent successfully",
+      });
+    }
+
+    if (response.status == 422) {
+      return res.status(500).json({
+        status: 500,
+        message: "Email not sent",
+        error: response,
       });
     }
   } catch (error) {

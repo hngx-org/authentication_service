@@ -4,8 +4,14 @@ const MessagingController = require("../controllers/MessagingController");
 
 const router = Router();
 
+router.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Password route",
+  });
+});
+
 router.post(
-  "/password",
+  "/",
   PasswordController.send,
   MessagingController.sendPasswordResetEmail,
 );
