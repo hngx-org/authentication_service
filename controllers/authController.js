@@ -33,7 +33,7 @@ const resendVerificationCodeSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
-const forgotPassword = async (req, res, next) => {
+async function forgotPassword(req, res, next) {
   try {
     const { error } = forgotPasswordSchema.validate(req.body);
 
@@ -59,7 +59,7 @@ const forgotPassword = async (req, res, next) => {
     // Send an email with the verification code
     const mailOptions = {
       from: process.env.NODEMAILER_USER,
-      to: email, // User's email address
+      to: email,
       subject: "Password Reset",
       text: `Your password reset code is: ${resetCode}`,
     };
@@ -72,7 +72,7 @@ const forgotPassword = async (req, res, next) => {
     console.log(error);
     next(error);
   }
-};
+}
 
 const resetPassword = async (req, res, next) => {
   try {

@@ -25,29 +25,29 @@ const app = express();
 const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: true,
-  optionsSuccessStatus: 204,
+  preflightContinue: true, // Enable preflight requests
+  credentials: true,
+  optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
 };
+
+//const handlePreflight = (req, res, next) => {
+// Set the CORS headers for the preflight request
+//  res.setHeader("Access-Control-Allow-Origin", ["http://localhost:3000", "http://localhost:3002", "https://zuriportfolio-frontend-pw1h.vercel.app"]);
+//res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH");
+//res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+
+// Respond to the OPTIONS request with a 204 No Content status
+//if (req.method === "OPTIONS") {
+//return res.status(204).end();
+//}
+
+// Pass the request to the next middleware
+//next();
+//};
+
+// app.use(handlePreflight)
+
 app.options("*", cors(corsOptions)); // Set up a global OPTIONS handler
-
-const handlePreflight = (req, res, next) => {
-  // Set the CORS headers for the preflight request
-  res.setHeader("Access-Control-Allow-Origin", ["http://localhost:3000", "http://localhost:3002", "https://zuriportfolio-frontend-pw1h.vercel.app"]);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-
-  // Respond to the OPTIONS request with a 204 No Content status
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  // Pass the request to the next middleware
-  next();
-};
-
-app.use(handlePreflight)
-
-app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
 
 app.use(express.json());
@@ -70,10 +70,10 @@ require("./middleware/authGithub")(passport);
 app.use("/api", indexRouter);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
-app.use('/api/auth', userAuthRoutes);
+app.use("/api/auth", userAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
-app.use('/api/users', userUpdateRouter);
+app.use("/api/users", userUpdateRouter);
 
 // Serving Files
 app.use(errorLogger);
