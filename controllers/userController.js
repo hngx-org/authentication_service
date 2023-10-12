@@ -5,6 +5,26 @@ const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/mailConfig");
 const validator = require("validator");
 const Joi = require("joi");
+const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
+const {
+  ResourceNotFound,
+  Unauthorized,
+  BadRequest,
+  Conflict,
+  Forbidden,
+  ServerError,
+} = require("../errors/httpErrors");
+const {
+  RESOURCE_NOT_FOUND,
+  ACCESS_DENIED,
+  INVALID_TOKEN,
+  MISSING_REQUIRED_FIELD,
+  INVALID_REQUEST_PARAMETERS,
+  EXISTING_USER_EMAIL,
+  EXPIRED_TOKEN,
+  CONFLICT_ERROR_CODE,
+  THIRD_PARTY_API_FAILURE,
+} = require("../errors/httpErrorCodes");
 
 const enable2faSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -36,23 +56,32 @@ async function createUser(req, res, next) {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
-
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
       email: email,
       username: "",
-      token: verificationToken,
       refresh_token: "",
       password: hashedPassword,
     });
 
-    req.body.user = newUser.toJSON();
+    // Encrypt user id in JWT and send
+    const jwt_payload = {
+      id: newUser.id,
+    };
+    const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    next();
+    // Send verification link email to user
+    await sendVerificationEmail(firstName, email, verificationToken);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "User created successfully. Verification code sent to email.",
+      data: newUser.toJSON(),
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -106,6 +135,40 @@ async function login(req, res) {
   }
 }
 
+async function checkEmail(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (user) {
+      if (user.is_verified) {
+        return res.status(200).json({
+          success: true,
+          message: "Email exists and is verified.",
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: "Email exists but is not verified.",
+        });
+      }
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: "Email does not exist.",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error checking email",
+      error: error.message,
+    });
+  }
+}
+
 const enable2fa = async (req, res) => {
   const { error } = enable2faSchema.validate(req.body);
 
@@ -135,7 +198,7 @@ const send2faCode = async (req, res) => {
   });
 
   const verificationCode = Math.floor(
-    100000 + Math.random() * 900000,
+    100000 + Math.random() * 900000
   ).toString();
 
   if (!user) return res.status(400).json({ message: "User not found" });
@@ -260,4 +323,5 @@ module.exports = {
   sendVerificationCode,
   confirmVerificationCode,
   createUser,
+  checkEmail,
 };
