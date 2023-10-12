@@ -16,6 +16,7 @@ const {
 } = require("./middleware/errorHandlerMiddleware");
 const { notFound } = require("./middleware/notFound");
 const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
+const { notFound } = require("./middleware/notFound");
 
 const app = express();
 
