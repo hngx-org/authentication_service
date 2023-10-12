@@ -372,8 +372,15 @@ const changeEmail = async (req, res, next) => {
       throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
     }
 
-    // Generate a new verification token for the user
-    const newVerificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate a JWT verification token for the user
+    const jwt_payload = {
+      id: user.id,
+      email: newEmail, // Add the new email to the payload for reference
+      action: 'change_email',
+    };
+    const newVerificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
 
     // Update the user's email, token, and verification status
     user.email = newEmail;
@@ -392,10 +399,11 @@ const changeEmail = async (req, res, next) => {
     // Send the verification code to the new email address
     await sendVerificationCode(req, res, next);
 
-    // Return a success response to the client
+    // Return the new JWT verification token
     res.status(200).json({
       success: true,
-      message: "Email change request successful. Verification code sent to the new email address.",
+      message: "Email change request successful. JWT verification token sent to the user.",
+      verificationToken: newVerificationToken,
     });
   } catch (error) {
     // Handle errors and return appropriate responses
