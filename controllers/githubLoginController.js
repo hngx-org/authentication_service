@@ -28,7 +28,7 @@ try {
 } catch (error) {
   throw new Error(error)
 }
-};
+}; 
 
 const githubRedirectUrl = async(req,res)=>{
   try {
