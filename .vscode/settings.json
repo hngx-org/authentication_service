@@ -1,0 +1,13 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "104.248.143.148",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "hngxdev",
+      "database": "hngxdev",
+      "username": "hngx"
+    }
+  ]
+}
