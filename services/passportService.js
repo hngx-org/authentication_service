@@ -35,5 +35,5 @@ passport.use(
 );
 
 passport.serializeUser = (user, done) => {
-  done(false, user.dataValues());
+  // done(false, user.dataValues());
 };
