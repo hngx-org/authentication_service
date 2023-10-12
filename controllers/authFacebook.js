@@ -1,5 +1,4 @@
-const User = require('../models/Users');
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
 const errorHandler = require('../middleware/ErrorMiddleware');
 
 // handling facebook auth callback
@@ -11,7 +10,13 @@ const authFacebook = (req, res) => {
         }
         req.session.userId = user.id;
 
-        res.status(200).json({ message: 'User logged in successfully', user });
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
+        res.status(200).json({
+            message: 'User logged in successfully',
+            token,
+            user });
     } catch (err) {
         errorHandler(err, req, res);
     }

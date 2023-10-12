@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
 
 module.exports = (passport) => {
+  
   passport.use(
     new GitHubStrategy(
       {
@@ -12,10 +13,17 @@ module.exports = (passport) => {
       },
       async function (_accessToken, _refreshToken, profile, done) {
         try {
+          if (!profile._json.email) {
+            return done(null, false, 'Please set your email to public on GitHub');
+          }
+          if (!profile.displayName) {
+            return done(null, false, 'Please set your display name on GitHub');
+          }
+
           let user = await User.findOne({
             where: { email: profile._json.email },
           });
-          // console.log({profile});
+
           if (user) {
             // User already exists, generate a JWT token for them.
             const token = jwt.sign(
@@ -25,11 +33,9 @@ module.exports = (passport) => {
                 expiresIn: '1d', // Set token expiration as needed
               }
             );
-            return done(null, token);
-            // return done(null, {user,token});
+            return done(null, {token, data: user});
           } else {
             // User doesn't exist, create a new user and generate a JWT token.
-            console.log(profile);
             const newUser = await User.create({
               email: profile._json.email,
               username: profile.username,
@@ -39,7 +45,6 @@ module.exports = (passport) => {
               last_name: profile.displayName.split(' ')[1],
               refresh_token: '',
             });
-            // console.log({newUser})
             const token = jwt.sign(
               { userId: newUser._id },
               process.env.JWT_SECRET,
@@ -47,8 +52,7 @@ module.exports = (passport) => {
                 expiresIn: '1d', // Set token expiration as needed
               }
             );
-            return done(null, token);
-            // return done(null, {newUser, token})
+            return done(null, {token, data: user});
           }
         } catch (error) {
           return done(error);
