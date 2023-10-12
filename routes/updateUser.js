@@ -9,18 +9,19 @@ const {
   removePermission,
 } = require('../controllers/userPermissionController');
 const { setRoleValidator } = require('../middleware/setRolesValidator');
+const { verifyJwt, checkRole } = require('../middleware/roleAccess');
 
 router.use(errorHandler);
 
-router.put('/:id/role', setRoleValidator, setRole);
+router.put('/:id/role',verifyJwt, checkRole([3]),  setRoleValidator, setRole);
 
 // Endpoint to add a permission to a user
 
 
-router.post('/permission',addPermission);
+router.post('/permission',verifyJwt, checkRole([3]), addPermission);
 
 
 // Endpoint to remove a permission from a user
-router.delete('/permission', removePermission);
+router.delete('/permission', verifyJwt, checkRole([3]),  removePermission);
 
 module.exports = router;

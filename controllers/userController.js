@@ -111,13 +111,16 @@ async function login(req, res, next) {
 
       if (!checkPassword) {
         throw new Forbidden("Incorrect password.", ACCESS_DENIED);
-        // return res.json("Incorrect passsword");
+        //return res.status(400).json({
+        //  success: false,
+        //  message: "Incorrect passsword.",
+        // });
       } else {
         const jwt_payload = {
           id: user.id,
         };
         const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
-        return res.json({
+        return res.status(200).json({
           token: token,
           data: user,
           statusCode: 200,
@@ -125,7 +128,10 @@ async function login(req, res, next) {
       }
     } else {
       throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
-      // return res.json("User not found ");
+      //return res.status(400).json({
+       // success: false,
+      //  message: "User not found.",
+      //});
     }
   } catch (error) {
     next(error);
