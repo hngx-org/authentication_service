@@ -1,55 +1,57 @@
+// dotenv config
 require("dotenv").config();
+
+// library imports
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
+const passport = require("passport");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger_output.json");
-const passport = require("passport");
-const defineRolesandPermissions = require("./helpers/populate");
+
+// routes imports
 const userAuthRoutes = require("./routes/auth");
-// const getAuthRoutes = require('./routes/getAuth');
-const session = require("express-session");
 const getAuthRoutes = require("./routes/authorize");
 const userUpdateRouter = require("./routes/updateUser");
+
+// middleware imports
 const {
   errorLogger,
   errorHandler,
 } = require("./middleware/errorHandlerMiddleware");
-const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
 const { notFound } = require("./middleware/notFound");
+
+// database imports
+const sequelize = require("./config/db");
 
 const app = express();
 
+// CORS configuration
 const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: true, // Enable preflight requests
-  optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
+  preflightContinue: true,
+  optionsSuccessStatus: 204,
 };
-
 app.options("*", cors(corsOptions)); // Set up a global OPTIONS handler
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// session middleware
 app.use(
   session({
     resave: false,
     saveUninitialized: true,
     secret: process.env.SESSION_SECRET,
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-const sequelize = require("./config/db");
-
-// sequelize.authenticate().then(async () => {
-//   await defineRolesandPermissions();
-// });
-
 app.use(passport.initialize());
+
 require("./middleware/authEmail")(passport);
 require("./middleware/authGithub")(passport);
+
 // Serve Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -63,10 +65,8 @@ app.use("/api/authorize", getAuthRoutes);
 app.use("/api/users", userUpdateRouter);
 
 // Serving Files
-http: app.use(errorLogger);
+app.use(errorLogger);
 app.use(errorHandler);
-
-// app.use("/auth", auth);
 
 // 404 Route handler
 http: app.use(notFound);
