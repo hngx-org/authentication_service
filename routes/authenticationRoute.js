@@ -1,30 +1,30 @@
 const { Router } = require("express");
 const passwordRoute = require("./passwordRoute");
 
-const AuthController = require("../controllers/AuthController");
+const AuthenticationController = require("../controllers/AuthenticationController");
 const MessagingController = require("../controllers/MessagingController");
 const registrationValidation = require("../middleware/registrationValidation");
 const AuthValidators = require("../validators/AuthValidators");
 
 const router = Router();
 
-router.post("/check-email", AuthController.checkEmail);
+router.post("/check-email", AuthenticationController.checkEmail);
 
 router.post(
   "/signup",
   registrationValidation,
   AuthValidators.signup,
-  AuthController.createUser,
+  AuthenticationController.createUser,
   MessagingController.sendSignUpEmail,
 );
 
+router.get("/verify/:token", AuthenticationController.verifyUser);
+
 router.post(
   "/verify/resend",
-  AuthController.resendVerification,
+  AuthenticationController.resendVerification,
   MessagingController.resendVerificationEmail,
 );
-
-router.get("/verify/:token", AuthController.verifyUser);
 
 router.use("/reset-password", passwordRoute);
 
