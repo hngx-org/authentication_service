@@ -1,9 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
-const Role = require("./Roles");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+const Role = require('./Roles');
 
 const User = sequelize.define(
-  "user",
+  'user',
   {
     id: {
       type: DataTypes.UUID,
@@ -27,9 +27,6 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    token: {
-      type: DataTypes.STRING(30),
-    },
     section_order: {
       type: DataTypes.TEXT,
     },
@@ -51,7 +48,7 @@ const User = sequelize.define(
       allowNull: false,
       references: {
         model: Role,
-        key: "id",
+        key: 'id',
       },
     },
     is_verified: {
@@ -76,9 +73,9 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  },
+  }
 );
 
-User.belongsTo(Role, { foreignKey: "role_id" });
+User.belongsTo(Role, { foreignKey: 'role_id' });
 
 module.exports = User;
