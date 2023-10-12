@@ -23,6 +23,7 @@ const corsOptions = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: true, // Enable preflight requests
+  credentials:true,
   optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
 };
 
