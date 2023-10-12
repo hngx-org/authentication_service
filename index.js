@@ -40,9 +40,9 @@ app.use(passport.session());
 
 const sequelize = require("./config/db");
 
-sequelize.authenticate().then(async () => {
-  await defineRolesandPermissions();
-});
+// sequelize.authenticate().then(async () => {
+//   await defineRolesandPermissions();
+// });
 
 app.use(passport.initialize());
 require("./middleware/authEmail")(passport);
