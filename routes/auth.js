@@ -26,6 +26,19 @@ const {
 } = require('../controllers/githubLoginController');
 const { authFacebook } = require('../controllers/authFacebook');
 require('../services/passportServiceFb');
+=======
+} = require("../controllers/userController");
+const passport = require("passport");
+const { handleAuth } = require("../controllers/gauthControllers");
+require("../services/passportService");
+const { errorHandler } = require("../middleware/ErrorMiddleware");
+const registrationValidation = require("../middleware/registrationValidation");
+require("../services/passportServiceFb");
+const { authFacebook } = require("../controllers/authFacebook");
+=======
+const handleGithubAUth = require('../controllers/githubauthController');
+const {githubLogin, githubRedirectUrl} = require("../controllers/githubLoginController")
+>>>>>>> b5df036ce95023c9dcaa19996027d1d55752f097
 
 const router = express.Router();
 router.use(errorHandler);
