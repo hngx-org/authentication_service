@@ -23,7 +23,9 @@ const corsOptions = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: true, // Enable preflight requests
-  credentials: true,
+
+  credentials:true,
+
   optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
 };
 
@@ -42,7 +44,11 @@ const corsOptions = {
 //next();
 //};
 
+
 // app.use(handlePreflight)
+
+
+
 
 app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
 app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
