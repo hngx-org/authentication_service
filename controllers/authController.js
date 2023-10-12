@@ -21,6 +21,7 @@ const {
   EXPIRED_TOKEN,
   CONFLICT_ERROR_CODE,
   THIRD_PARTY_API_FAILURE,
+  EMAIL_ALREADY_VERIFIED,
 } = require("../errors/httpErrorCodes");
 
 const forgotPasswordSchema = Joi.object({
@@ -36,22 +37,23 @@ const verifyEmailSchema = Joi.object({
   token: Joi.string().required(),
 });
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res,next) => {
+  try {
   const { error } = forgotPasswordSchema.validate(req.body);
 
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    throw new BadRequest(error.message,INVALID_REQUEST_PARAMETERS);
   }
 
-  try {
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
       // 404 Error or custom error handling
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      // return res
+      //   .status(404)
+      //   .json({ success: false, message: "User not found" });
     }
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -70,28 +72,32 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({ message: "Reset password link sent successfully." });
   } catch (error) {
     // Internal error or custom error handling
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    // res.status(500).json({ success: false, message: "Something went wrong" });
+    console.log(error);
+    next(error);
   }
 };
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
+  try {
   const { error } = resetPasswordSchema.validate(req.body);
 
   if (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: error.details[0].message });
+    throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
+    // return res
+    //   .status(400)
+    //   .json({ success: false, message: error.details[0].message });
   }
-  try {
     const { token, password } = req.body;
     // ... Implement reset password functionality here
     const user = await User.findOne({ where: { token } });
 
     if (!user) {
       // 404 Error or custom error handling
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      // return res
+      //   .status(404)
+      //   .json({ success: false, message: "User not found" });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -104,19 +110,21 @@ const resetPassword = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password reset successfully." });
   } catch (error) {
+    next(error)
     // Internal error or custom error handling
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    // res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
-const verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res, next) => {
   try {
     const { error } = verifyEmailSchema.validate(req.params);
 
     if (error) {
-      return res
-        .status(400)
-        .json({ success: false, message: error.details[0].message });
+      throw new BadRequest(error.details[0].message, INVALID_REQUEST_PARAMETERS);
+      // return res
+      //   .status(400)
+      //   .json({ success: false, message: error.details[0].message });
     }
 
     const { token } = req.params;
@@ -126,25 +134,28 @@ const verifyEmail = async (req, res) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (jwtError) {
-      return res.status(404).json({ success: false, message: "Invalid token" });
+      throw new Unauthorized("Invalid token", INVALID_TOKEN);
+      // return res.status(404).json({ success: false, message: "Invalid token" });
     }
 
     // FInd the User by ID
     const user = await User.findByPk(decoded.id);
     if (!user) {
       // 404 Error or custom error handling
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      throw new ResourceNotFound("User not found",RESOURCE_NOT_FOUND);
+      // return res
+      //   .status(404)
+      //   .json({ success: false, message: "User not found" });
     }
 
     // CHeck if the user is already verified
     if (user.is_verified) {
       // 404 Error or custom error handling
-      return res.status(404).json({
-        success: false,
-        message: "Email already verified. Please login",
-      });
+      throw new BadRequest("Email already verified. please login",EMAIL_ALREADY_VERIFIED);
+      // return res.status(404).json({
+      //   success: false,
+      //   message: "Email already verified. Please login",
+      // });
     }
 
     // Mark user as verified
@@ -155,8 +166,9 @@ const verifyEmail = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Email verified successfully" });
   } catch (error) {
+    next(error);
     // Internal error or custom error handling
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    // res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
