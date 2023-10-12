@@ -254,16 +254,27 @@ const verify2fa = async (req, res, next) => {
 
     const bearerToken = bearer.split(' ')[1];
     const payload = jwt.decode(bearerToken);
-    console.log(payload);
     if (!payload) throw new BadRequest("INVALID TOKEN HEADER", 403);
 
     const user = await User.findOne({
       where: { id: payload.id },
     });
 
+
+
     if (token === payload.code) {
+
+      const jwt_payload = {
+        id: user.id,
+        data: user
+      };
+      const tokenSend = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+        expiresIn: "5d",
+      });
+
+
       res.status(200).json({
-        data: user,
+        data: tokenSend,
         message: "Token verified successfully",
       });
     } else {
