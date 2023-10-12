@@ -57,6 +57,7 @@ The user object will have the following attributes
 | 8 | Confirm 2FA Authentication | POST | https://zuriportfoloio.com/api/auth/confirm-2fa | Confirms the Two-Factor Authentication (2FA) sent to the user |
 | 9 | Forgot Password | PATCH | https://zuriportfoloio.com/api/auth/forgot-password | Handles the process of resetting a user's forgotten password. |
 | 10 | LogOut | POST | https://zuriportfoloio.com/api/auth/logout | Allows users to log out or terminate their current session. |
+| 11 | Update User Role | PUT | https://zuriportfoloio.com/api/user/update/role | Allows for update of user role|
 
 
 ### User Signup
@@ -157,3 +158,102 @@ curl -X `POST` 'https://api.example.com/github-signin' \
 -H 'Content-Type: application/json' \
 -d "$request_body"
 ```
+
+
+### Update User Role
+#### valid request
+
+```
+
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleId": 3
+}
+```
+#### valid response
+
+```
+{
+    "msg": "user's role was changed successfully"
+}
+
+```
+#### other valid requests
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleName": "Super Admin"
+}
+```
+##### if both valid roleName and roleId, roleId will be set
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleName": "Super Admin",
+"roleId": 2
+}
+```
+
+#### invalid entries
+
+##### Ambiguous roleName
+
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleName": "Super Admir"
+}
+````
+###### response
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleName": "Super Admir"
+}
+```
+
+##### invalid roleId
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d00",
+    "roleId": 5
+}
+```
+###### response
+```
+{
+    "msg": "roleId is invalid"
+}
+```
+##### user is not registered
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d01",
+    "roleId": 3
+}
+```
+###### response
+```
+{
+    "msg": "user not found"
+}
+```
+##### id supplied but no role or user
+```
+{
+    "id": "53ebaafb-e8ea-41dd-b637-1fc772205d01"
+}
+```
+###### response
+```
+{
+    "msg": "please specify either 'roleId' or 'roleName'"
+}
+```
+##### response for no id supplied
+```
+{
+    "msg": "there must be a 'userId' and either 'roleId' or 'roleName'"
+}
+```
+

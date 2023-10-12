@@ -85,18 +85,14 @@ module.exports.getPermissionsForRole = async (roleName) => {
 
 module.exports.getUserPermissions = async (userId) => {
   try {
-    // Find the user by ID
     const user = await User.findByPk(userId, {
       include: [
         {
           model: Role,
-          include: Permission,
+          as: "role",
+          include: [{ model: Permission, attributes: ["name"] }],
         },
-        {
-          model: Permission,
-          through: user_permissions,
-          as: "UserPermissions",
-        },
+        { model: Permission },
       ],
     });
 
@@ -105,41 +101,39 @@ module.exports.getUserPermissions = async (userId) => {
       return [];
     }
 
-    // Extract permissions from roles and user_permissions
-    const rolePermissions = user.Roles.flatMap((role) => role.Permissions);
-    const userPermissions = user.UserPermissions;
+    const rolePermissions = user.role.permissions.map(
+      (permission) => permission.name,
+    );
 
-    console.log(`Permissions of user ${user.username}:`, [
-      ...rolePermissions.map((permission) => permission.name),
-      ...userPermissions.map((permission) => permission.name),
-    ]);
+    console.log(rolePermissions);
 
-    return [
-      ...rolePermissions.map((permission) => permission.name),
-      ...userPermissions.map((permission) => permission.name),
-    ];
+    const directPermissions = user.permissions.map(
+      (permission) => permission.name,
+    );
+
+    const allPermissions = [...rolePermissions, ...directPermissions];
+    return allPermissions;
   } catch (error) {
     console.error("Error getting user permissions:", error);
     return [];
   }
 };
 
-module.exports.getRoleByUserId = async (userId) => {
+module.exports.getUserRole = async (userId) => {
   try {
     const user = await User.findByPk(userId, {
-      include: Role,
+      include: [{ model: Role, as: "role", attributes: ["name"] }],
     });
 
     if (!user) {
       console.error(`User with ID ${userId} not found.`);
-      return null;
+      return [];
     }
+    return user.role.name;
 
-    const role = user.Roles[0].name;
-
-    return role;
+    // return roles;
   } catch (error) {
-    console.error("Error getting roles by user ID:", error);
+    console.error("Error getting user role:", error);
     return null;
   }
 };

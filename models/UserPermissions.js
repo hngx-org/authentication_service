@@ -1,11 +1,11 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
-const User = require("./User");
+const User = require("./Users");
 const Permission = require("./Permissions");
 
 const UserPermissions = sequelize.define(
-  "user_permissions",
+  "user_permission",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -26,10 +26,6 @@ const UserPermissions = sequelize.define(
         model: Permission,
         key: "id",
       },
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
     },
   },
   { freezeTableName: true, timestamps: false },
