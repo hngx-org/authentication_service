@@ -8,7 +8,13 @@ const handleAuth = (req, res) => {
   const accessToken = jwt.sign(payload, process.env.JWT_SECRET);
   return res.json({
     token: accessToken,
-    data: user,
+    data: {
+      ...user.dataValues,
+      token: undefined,
+      password: undefined,
+      refresh_token: undefined,
+      two_factor_auth: undefined,
+    },
     statusCode: 200,
   });
 };

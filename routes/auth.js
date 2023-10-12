@@ -12,7 +12,7 @@ const {
   enable2fa,
   send2faCode,
   verify2fa,
-  } = require("../controllers/userController");
+} = require("../controllers/userController");
 const passport = require("passport");
 const { handleAuth } = require("../controllers/gauthControllers");
 require("../services/passportService");
@@ -20,8 +20,11 @@ const { errorHandler } = require("../middleware/ErrorMiddleware");
 const registrationValidation = require("../middleware/registrationValidation");
 require("../services/passportServiceFb");
 const { authFacebook } = require("../controllers/authFacebook");
-const handleGithubAUth = require('../controllers/githubauthController');
-const {githubLogin, githubRedirectUrl} = require("../controllers/githubLoginController")
+const handleGithubAUth = require("../controllers/githubauthController");
+const {
+  githubLogin,
+  githubRedirectUrl,
+} = require("../controllers/githubLoginController");
 
 const router = express.Router();
 router.use(errorHandler);
@@ -36,7 +39,7 @@ router.get(
   "/google",
   passport.authenticate("google", {
     scope: ["email", "profile"],
-  }),
+  })
 );
 
 router.get(
@@ -44,19 +47,26 @@ router.get(
   passport.authenticate("google", {
     session: false,
   }),
-  handleAuth,
+  handleAuth
 );
 
 // FACEBOOK AUTH
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
-router.get('/facebook/redirect', passport.authenticate('facebook', { failureRedirect: '/login' }), authFacebook );
+router.get(
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email", "public_profile"] })
+);
+router.get(
+  "/facebook/redirect",
+  passport.authenticate("facebook", { failureRedirect: "/login" }),
+  authFacebook
+);
 
 // EMAIL REGISTRATION
 router.post(
   "/signup",
   registrationValidation,
   createUser,
-  sendVerificationCode,
+  sendVerificationCode
 );
 
 router.post("/send-verification", sendVerificationCode);
