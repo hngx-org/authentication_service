@@ -7,9 +7,9 @@ const errorHandler = require('../middleware/ErrorMiddleware');
 dotenv.config();
 // Facebook Strategy
 passport.use(new FacebookStrategy({
-    clientID: process.env.APP_ID,
-    clientSecret: process.env.APP_SECRET,
-    callbackURL: process.env.CALLBACK_URL,
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
     enableProof: true
 }, 
     async (req, res, accessToken, refreshToken, profile, cb) => {
