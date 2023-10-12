@@ -1,19 +1,20 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swagger_output.json');
-const passport = require('passport');
-const defineRolesandPermissions = require('./helpers/populate');
-const userAuthRoutes = require('./routes/auth');
-const getAuthRoutes = require('./routes/getAuth');
-const session = require('express-session');
-const getAuthRoutes = require('./routes/authorize');
-const userUpdateRouter = require("./routes/updateUser")
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger_output.json");
+const passport = require("passport");
+const defineRolesandPermissions = require("./helpers/populate");
+const userAuthRoutes = require("./routes/auth");
+// const getAuthRoutes = require('./routes/getAuth');
+const session = require("express-session");
+const getAuthRoutes = require("./routes/authorize");
+const userUpdateRouter = require("./routes/updateUser");
 const {
   errorLogger,
   errorHandler,
 } = require("./middleware/errorHandlerMiddleware");
+const { notFound } = require("./middleware/notFound");
 const { UNKNOWN_ENDPOINT } = require("./errors/httpErrorCodes");
 
 const app = express();
@@ -30,11 +31,13 @@ app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // session middleware
-app.use(session({
-  resave: false,
-  saveUninitialized: true,
-  secret: process.env.SESSION_SECRET,
-}))
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
