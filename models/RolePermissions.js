@@ -27,7 +27,7 @@ const RolePermissions = sequelize.define(
         key: 'id',
       },
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
@@ -38,12 +38,11 @@ const RolePermissions = sequelize.define(
 Role.belongsToMany(Permission, {
   through: RolePermissions,
   foreignKey: 'role_id',
-  otherKey: 'permission_id',
 });
+
 Permission.belongsToMany(Role, {
   through: RolePermissions,
   foreignKey: 'permission_id',
-  otherKey: 'role_id',
 });
 
 module.exports = RolePermissions;

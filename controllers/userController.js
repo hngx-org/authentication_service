@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/mailConfig");
 const validator = require("validator");
 const Joi = require("joi");
+
+// error handler middleware:
+
 const {
   ResourceNotFound,
   Unauthorized,
@@ -204,7 +207,31 @@ const verify2fa = async (req, res) => {
 };
 
 const sendVerificationCode = async (req, res) => {
-  const { email, user } = req.body;
+  const { first_name, last_name, username, email, password, refresh_token } =
+    req.body;
+
+  // Validate email format
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format.",
+    });
+  }
+
+  // Generating a random 6 digit verification code
+  const verificationCode = Math.floor(
+    100000 + Math.random() * 900000,
+  ).toString();
+
+  await User.create({
+    first_name,
+    last_name,
+    username,
+    email,
+    password,
+    refresh_token,
+    token: verificationCode, // There is meant to be a place Store the verification code in the database so it can be verified later
+  });
 
   const mailOptions = {
     from: process.env.NODEMAILER_USER,
