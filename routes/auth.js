@@ -13,11 +13,6 @@ const {
   send2faCode,
   verify2fa,
   } = require("../controllers/userController");
-const handleGithubAUth = require('../controllers/githubauthController');
-const {
-  githubLogin,
-  githubRedirectUrl,
-} = require('../controllers/githubLoginController');
 const passport = require("passport");
 const { handleAuth } = require("../controllers/gauthControllers");
 require("../services/passportService");
