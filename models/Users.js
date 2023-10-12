@@ -1,8 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+const Role = require('./Roles');
 
 const User = sequelize.define(
-  "user",
+  'user',
   {
     id: {
       type: DataTypes.UUID,
@@ -26,6 +27,9 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    token: {
+      type: DataTypes.STRING(30),
+    },
     section_order: {
       type: DataTypes.TEXT,
     },
@@ -40,6 +44,11 @@ const User = sequelize.define(
     },
     refresh_token: {
       type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    role_id: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
       allowNull: false,
     },
     is_verified: {
@@ -64,7 +73,8 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  },
+  }
 );
+
 
 module.exports = User;
