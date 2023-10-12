@@ -434,7 +434,7 @@ const changeEmail = async (req, res, next) => {
       action: 'change_email',
     };
     const newVerificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '1d',
     });
 
     // Update the user's email, token, and verification status
