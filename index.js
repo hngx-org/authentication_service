@@ -20,6 +20,7 @@ const {
 const { notFound } = require('./middleware/notFound');
 
 const app = express();
+app.use('proxy', true);
 
 // CORS configuration
 const corsOptions = {
