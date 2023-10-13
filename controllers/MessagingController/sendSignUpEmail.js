@@ -19,8 +19,8 @@ const sendSignUpEmail = async (req, res) => {
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL;
   const verificationLink =
     process.env.NODE_ENV === 'production'
-      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}/${token}`
-      : `${VERIFY_EMAIL_ENDPOINT_DEV}/${token}`;
+      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
+      : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
 
   try {
     const response = await axios.post(emailServiceUrl, {
