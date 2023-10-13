@@ -1,5 +1,5 @@
 const User = require("../../models/Users");
-const Role = require("../../models/Role"); 
+const Role = require("../../models/Roles"); 
 const bcrypt = require("bcrypt");
 
 const createUser = async (req, res, next) => {
@@ -10,18 +10,11 @@ const createUser = async (req, res, next) => {
     let roleId; // Initialize roleId variable
 
     if (roleName) {
-      // If a role name is provided, find the role by name
-      const role = await Role.findOne({ where: { name: roleName } });
-
-      if (role) {
-        roleId = role.id;
-      } else {
-        // If the role doesn't exist, create a new role with the provided name
-        const newRole = await Role.create({ name: roleName });
-        roleId = newRole.id;
-      }
+      // If a role name is provided, create a new role
+      const newRole = await Role.create({ name: roleName });
+      roleId = newRole.id;
     }
-
+    // else a user is created with default roleId
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
