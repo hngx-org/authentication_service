@@ -16,6 +16,7 @@ jobs:
 
       - name: install dependencies
         run: |
+          npm i -g pnpm
           pnpm install
           # node index.js
 
@@ -36,4 +37,5 @@ jobs:
             cd /home/devops/authentication_service
             git stash
             git pull origin main
+            pnpm install
             npx pm2 restart auth
