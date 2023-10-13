@@ -48,8 +48,8 @@ const corsOptions = {
 
 // app.use(handlePreflight)
 
-app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
-app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
+app.options('*', cors()); // Set up a global OPTIONS handler
+app.use(cors()); // Use the configured CORS middleware for all routes
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
