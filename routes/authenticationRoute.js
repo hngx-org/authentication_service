@@ -34,4 +34,9 @@ router.post(
   AuthenticationController.login,
 );
 
+// 2fa routes
+router.post('/2fa/enable', AuthenticationController.enable2fa);
+router.post('/2fa/send-code', AuthenticationController.send2faCode);
+router.post('/2fa/verify-code', AuthenticationController.verify2fa);
+
 module.exports = router;
