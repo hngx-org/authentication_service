@@ -16,8 +16,8 @@ const handleGithubAUth = require('../controllers/githubauthController');
 const {
   githubLogin,
   githubRedirectUrl,
-} = require("../controllers/githubLoginController");
-const authEmail = require('../middleware/authEmail')
+} = require('../controllers/githubLoginController');
+const authEmail = require('../middleware/authEmail');
 
 const router = express.Router();
 router.use(errorHandler);
@@ -65,6 +65,6 @@ router.post('/2fa/send-code', send2faCode);
 router.post('/2fa/verify-code', verify2fa);
 
 // CHANGE EMAIL
-router.patch("/change-email", authEmail, changeEmail);
+router.patch('/change-email', authEmail, changeEmail);
 
 module.exports = router;

@@ -1,4 +1,6 @@
-const { all_permissions } = require('../../helpers/users_roles_permissions');
+const {
+  all_permissions: allPermissions,
+} = require('../../helpers/users_roles_permissions');
 
 const authorize = (req, res, next) => {
   const { token, permission } = req.body;
@@ -10,7 +12,7 @@ const authorize = (req, res, next) => {
     });
   }
 
-  if (permission && !all_permissions.includes(permission)) {
+  if (permission && !allPermissions.includes(permission)) {
     return res.status(400).json({ status: 400, message: 'invalid permission' });
   }
 

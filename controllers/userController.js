@@ -41,7 +41,7 @@ const verify2faSchema = Joi.object({
 
 const changeEmailSchema = Joi.object({
   newEmail: Joi.string().email().required(),
-})
+});
 
 async function createUser(req, res, next) {
   try {
@@ -422,7 +422,7 @@ const changeEmail = async (req, res, next) => {
     });
 
     if (!user) {
-      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
     }
 
     // Generate a JWT verification token for the user
@@ -446,7 +446,7 @@ const changeEmail = async (req, res, next) => {
     req.body = {
       email: newEmail,
       verificationCode: newVerificationToken,
-      user: user, // Pass the user object to the existing function
+      user, // Pass the user object to the existing function
     };
 
     // Send the verification code to the new email address
@@ -455,7 +455,8 @@ const changeEmail = async (req, res, next) => {
     // Return the new JWT verification token
     res.status(200).json({
       success: true,
-      message: "Email change request successful. JWT verification token sent to the user.",
+      message:
+        'Email change request successful. JWT verification token sent to the user.',
       verificationToken: newVerificationToken,
     });
   } catch (error) {
@@ -466,20 +467,20 @@ const changeEmail = async (req, res, next) => {
         message: error.message,
         errorCode: error.code,
       });
-    } else if (error instanceof ResourceNotFound) {
+    }
+    if (error instanceof ResourceNotFound) {
       return res.status(404).json({
         success: false,
         message: error.message,
         errorCode: error.code,
       });
-    } else {
-      // Handle other unexpected errors
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while processing your request.",
-        errorCode: SERVER_ERROR,
-      });
     }
+    // Handle other unexpected errors
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred while processing your request.',
+      errorCode: SERVER_ERROR,
+    });
   }
 };
 

@@ -1,5 +1,5 @@
-const sequelize = require('../../config/db');
 const jwt = require('jsonwebtoken');
+const sequelize = require('../../config/db');
 
 /**
  * @desc Check if user is authorized to perform permission
