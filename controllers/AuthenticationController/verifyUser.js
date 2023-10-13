@@ -23,9 +23,17 @@ const verifyUser = async (req, res) => {
   user.is_verified = true;
   user.save();
 
-  return res
-    .status(200)
-    .json({ status: 200, message: "User verified", data: { user } });
+  return res.status(200).json({
+    status: 200,
+    message: "User verified",
+    data: {
+      user: {
+        id: user.id,
+        firsName: user.first_name,
+        email: user.email,
+      },
+    },
+  });
 };
 
 module.exports = verifyUser;
