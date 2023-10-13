@@ -25,9 +25,9 @@ app.use('proxy', true);
 // CORS configuration
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://staging.zuri.team'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: true, // Enable preflight requests
-  credentials: true,
+  // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  // preflightContinue: true, // Enable preflight requests
+  // credentials: true,
   optionsSuccessStatus: 204, // Use 204 No Content for preflight success status
 };
 
@@ -48,8 +48,8 @@ const corsOptions = {
 
 // app.use(handlePreflight)
 
-app.options('*', cors(corsOptions)); // Set up a global OPTIONS handler
-app.use(cors(corsOptions)); // Use the configured CORS middleware for all routes
+app.options('*', cors()); // Set up a global OPTIONS handler
+app.use(cors()); // Use the configured CORS middleware for all routes
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
