@@ -71,10 +71,10 @@ require('./middleware/authGithub')(passport);
 app.use('/api/auth/api', indexRouter);
 
 // PLEASE DEFINE ALL AUTHENTICATION ROUTES WITH "/api/auth" OR PUT IN "routes/auth.js" ENSURE NO CONFLICTING ROUTE
-app.use('/api/auth', userAuthRoutes);
+app.use('/api/auth/auth', userAuthRoutes);
 
 // THIS IS ROUTE FOR UPDATING USER DETAILS, please ensure all related routes are placed incide the userUpdateRouter
-app.use('/api/users', userUpdateRouter);
+app.use('/api/auth/users', userUpdateRouter);
 
 // Serving Files
 app.use(errorLogger);
