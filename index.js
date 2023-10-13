@@ -20,10 +20,11 @@ const {
 const { notFound } = require('./middleware/notFound');
 
 const app = express();
+app.use('proxy', true);
 
 // CORS configuration
 const corsOptions = {
-  origin: '*',
+  origin: ['http://localhost:3000', 'https://staging.zuri.team'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: true, // Enable preflight requests
   credentials: true,
