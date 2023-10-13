@@ -878,5 +878,44 @@
         }
       }
     }
+  },
+  "/api/auth/change-email": {
+    "patch": {
+      "tags": ["Auth"],
+      "description": "Endpoint to change user email",
+      "parameters": [
+        {
+          "name": "Authorization",
+          "in": "header",
+          "type": "string",
+          "description": "JWT_token"
+        },
+        {
+          "name": "body",
+          "in": "body",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "newEmail": {
+                "type": "string",
+                "example": "newemail@gmail.com"
+              }
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Email change request successful. Verification code sent to the new email address."
+        },
+        "400": {
+          "description": "Bad Request, The user sent an invalid request."
+        },
+        "500": {
+          "description": "Internal Server Error, Error processing request from the server."
+        }
+      }
+    }
   }
 }
+
