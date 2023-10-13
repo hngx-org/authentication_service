@@ -22,18 +22,41 @@ const verifyUser = async (req, res) => {
   // update user to verified
   user.is_verified = true;
   user.save();
+  const jwt_payload = {
+    id: user.id,
+    firstName: user.first_name,
+    email: user.email,
+  };
 
-  return res.status(200).json({
+  const newtoken = jwt.sign(jwt_payload, process.env.JWT_SECRET);
+  res.header('Authorization', `Bearer ${newtoken}`);
+
+
+  // new response to sign user in immediately after verification
+   return res.status(200).json({
     status: 200,
-    message: "User verified",
+    message: 'verification successful user logged in',
     data: {
+      newtoken,
       user: {
         id: user.id,
-        firsName: user.first_name,
+        firstName: user.first_name,
+        lastName: user.last_name,
         email: user.email,
       },
     },
   });
+  // return res.status(200).json({
+  //   status: 200,
+  //   message: "User verified",
+  //   data: {
+  //     user: {
+  //       id: user.id,
+  //       firsName: user.first_name,
+  //       email: user.email,
+  //     },
+  //   },
+  // });
 };
 
 module.exports = verifyUser;
