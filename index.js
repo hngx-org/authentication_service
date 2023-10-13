@@ -1,5 +1,9 @@
 // dotenv config
-require('dotenv').config();
+const dotenvExpand = require('dotenv-expand');
+const dotenv = require('dotenv');
+
+const myEnv = dotenv.config();
+dotenvExpand.expand(myEnv);
 
 // library imports
 const express = require('express');
