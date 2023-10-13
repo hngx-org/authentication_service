@@ -1,8 +1,8 @@
-const { DataTypes, HasMany } = require("sequelize");
-const sequelize = require("../config/db");
+const { DataTypes, HasMany } = require('sequelize');
+const sequelize = require('../config/db');
 
 const Role = sequelize.define(
-  "role",
+  'role',
   {
     id: {
       type: DataTypes.INTEGER,

@@ -1,4 +1,4 @@
-const User = require("../../models/Users");
+const User = require('../../models/Users');
 
 const signup = async (req, res, next) => {
   const { email } = req.body;
@@ -8,7 +8,7 @@ const signup = async (req, res, next) => {
   if (user) {
     return res.status(409).json({
       status: 409,
-      message: "User with that email already exists",
+      message: 'User with that email already exists',
     });
   }
 

@@ -4,7 +4,7 @@ const User = require('../models/Users');
 /**
  * Controller set up for changing user roles
  */
-const roleNames = ["user", "admin"];
+const roleNames = ['user', 'admin'];
 const roleIds = [2, 3];
 
 module.exports.setRoleValidator = async (req, res, next) => {

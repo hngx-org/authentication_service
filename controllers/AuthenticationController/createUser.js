@@ -1,5 +1,4 @@
 const User = require("../../models/Users");
-const Role = require("../../models/Roles"); 
 const bcrypt = require("bcrypt");
 
 const createUser = async (req, res, next) => {
@@ -18,12 +17,11 @@ const createUser = async (req, res, next) => {
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
-      email: email,
+      email,
       password: hashedPassword,
       username: "",
       token: "",
       refresh_token: "",
-      role_id: roleId || 2, // Use the specified roleId or default to 2
     });
 
     req.user = {
@@ -37,7 +35,7 @@ const createUser = async (req, res, next) => {
     return res.status(500).json({
       status: 500,
       message: "Error creating user",
-      error: error,
+	  error: error,
     });
   }
 

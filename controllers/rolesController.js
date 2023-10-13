@@ -7,7 +7,7 @@ const {
   Conflict,
   Forbidden,
   ServerError,
-} = require("../errors/httpErrors");
+} = require('../errors/httpErrors');
 const {
   RESOURCE_NOT_FOUND,
   ACCESS_DENIED,
@@ -18,7 +18,7 @@ const {
   EXPIRED_TOKEN,
   CONFLICT_ERROR_CODE,
   THIRD_PARTY_API_FAILURE,
-} = require("../errors/httpErrorCodes");
+} = require('../errors/httpErrorCodes');
 /**
  * Controller set up for changing user roles
  */
