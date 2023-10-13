@@ -14,9 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: install dependencies
         run: |
-          npm i -g pnpm
           pnpm install
           # node index.js
 
