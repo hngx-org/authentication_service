@@ -8,8 +8,16 @@
   "host": "auth.akuya.tech",
   "servers": [
     {
+      "url": "localhost:3000",
+      "description": "local server"
+    },
+    {
       "url": "auth.akuya.tech",
-      "description": "Confirmed working well"
+      "description": "development sever"
+    },
+    {
+      "url": "staging.zuri.team",
+      "description": "production server"
     }
   ],
   "basePath": "/",
