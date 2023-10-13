@@ -3,7 +3,7 @@ const dotenvExpand = require('dotenv-expand');
 const dotenv = require('dotenv');
 
 const myEnv = dotenv.config();
-dotenvExpand(myEnv);
+dotenvExpand.expand(myEnv);
 
 // library imports
 const express = require('express');
