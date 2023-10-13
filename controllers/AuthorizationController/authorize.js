@@ -1,7 +1,3 @@
-const User = require("../../models/Users");
-const Permission = require("../../models/Permissions");
-const Role = require("../../models/Roles");
-const RolePermission = require("../../models/RolePermissions");
 const sequelize = require("../../config/db");
 
 const jwt = require("jsonwebtoken");
