@@ -73,7 +73,7 @@ const User = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  }
+  },
 );
 
 User.belongsTo(Role, { foreignKey: 'role_id' });

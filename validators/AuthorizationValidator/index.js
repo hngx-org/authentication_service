@@ -1,4 +1,4 @@
-const authorize = require("./authorize");
+const authorize = require('./authorize');
 
 const AuthorizationValidator = {
   authorize,

@@ -1,11 +1,11 @@
 const express = require('express');
+const passport = require('passport');
 const {
   enable2fa,
   send2faCode,
   verify2fa,
   changeEmail,
 } = require('../controllers/userController');
-const passport = require('passport');
 const { handleAuth } = require('../controllers/gauthControllers');
 require('../services/passportService');
 const { errorHandler } = require('../middleware/ErrorMiddleware');
@@ -16,9 +16,8 @@ const handleGithubAUth = require('../controllers/githubauthController');
 const {
   githubLogin,
   githubRedirectUrl,
-} = require("../controllers/githubLoginController");
-const authEmail = require('../middleware/authEmail')
-
+} = require('../controllers/githubLoginController');
+const authEmail = require('../middleware/authEmail');
 
 const router = express.Router();
 router.use(errorHandler);
@@ -28,7 +27,7 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: ['email', 'profile'],
-  })
+  }),
 );
 
 router.get(
@@ -36,36 +35,36 @@ router.get(
   passport.authenticate('google', {
     session: false,
   }),
-  handleAuth
+  handleAuth,
 );
 
 // FACEBOOK AUTH
 router.get(
   '/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
+  passport.authenticate('facebook', { scope: ['email', 'public_profile'] }),
 );
 router.get(
   '/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
-  authFacebook
+  authFacebook,
 );
 
 // GITHUB OAUTH
 router.get(
   '/github',
-  passport.authenticate('github', { scope: ['profile', 'user:email'] })
+  passport.authenticate('github', { scope: ['profile', 'user:email'] }),
 );
 router.get(
   '/github/redirect',
   passport.authenticate('github', { session: false }),
-  handleGithubAUth
+  handleGithubAUth,
 );
 
-router.post("/2fa/enable", enable2fa);
-router.post("/2fa/send-code", send2faCode);
-router.post("/2fa/verify-code", verify2fa);
+router.post('/2fa/enable', enable2fa);
+router.post('/2fa/send-code', send2faCode);
+router.post('/2fa/verify-code', verify2fa);
 
 // CHANGE EMAIL
-router.patch("/change-email", authEmail, changeEmail);
+router.patch('/change-email', authEmail, changeEmail);
 
 module.exports = router;

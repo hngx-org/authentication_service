@@ -1,8 +1,8 @@
-const { user_permissions } = require("../../helpers/users_roles_permissions");
-const Role = require("../../models/Roles");
-const Permission = require("../../models/Permissions");
-const RolePermissions = require("../../models/RolePermissions");
-const User = require("../../models/Users");
+const { user_permissions } = require('../../helpers/users_roles_permissions');
+const Role = require('../../models/Roles');
+const Permission = require('../../models/Permissions');
+const RolePermissions = require('../../models/RolePermissions');
+const User = require('../../models/Users');
 
 // help with populating permissions and roles
 module.exports.assignPermissionToRole = async (roleId, permissionId) => {
@@ -12,12 +12,12 @@ module.exports.assignPermissionToRole = async (roleId, permissionId) => {
 
     if (role && permission) {
       await role.addPermission(permission);
-      console.log("Permission assigned to role successfully.");
+      console.log('Permission assigned to role successfully.');
     } else {
-      console.error("Role or permission not found.");
+      console.error('Role or permission not found.');
     }
   } catch (error) {
-    console.error("Error assigning permission to role:", error);
+    console.error('Error assigning permission to role:', error);
   }
 };
 
@@ -28,12 +28,12 @@ module.exports.assignPermissionToUser = async (userId, permissionId) => {
 
     if (user && permission) {
       await user.addPermission(permission);
-      console.log("Permission assigned to user successfully.");
+      console.log('Permission assigned to user successfully.');
     } else {
-      console.error("User or permission not found.");
+      console.error('User or permission not found.');
     }
   } catch (error) {
-    console.error("Error assigning permission to user:", error);
+    console.error('Error assigning permission to user:', error);
   }
 };
 
@@ -58,7 +58,7 @@ module.exports.assignUserToRole = async (userId, roleName) => {
       `User ${user.username} assigned to role ${roleName} successfully.`,
     );
   } catch (error) {
-    console.error("Error assigning user to role:", error);
+    console.error('Error assigning user to role:', error);
   }
 };
 
@@ -73,12 +73,11 @@ module.exports.getPermissionsForRole = async (roleName) => {
     if (role) {
       const permissions = role.Permissions.map((permission) => permission.name);
       return permissions;
-    } else {
-      console.error(`Role ${roleName} not found.`);
-      return [];
     }
+    console.error(`Role ${roleName} not found.`);
+    return [];
   } catch (error) {
-    console.error("Error retrieving permissions:", error);
+    console.error('Error retrieving permissions:', error);
     return [];
   }
 };
@@ -89,8 +88,8 @@ module.exports.getUserPermissions = async (userId) => {
       include: [
         {
           model: Role,
-          as: "role",
-          include: [{ model: Permission, attributes: ["name"] }],
+          as: 'role',
+          include: [{ model: Permission, attributes: ['name'] }],
         },
         { model: Permission },
       ],
@@ -114,7 +113,7 @@ module.exports.getUserPermissions = async (userId) => {
     const allPermissions = [...rolePermissions, ...directPermissions];
     return allPermissions;
   } catch (error) {
-    console.error("Error getting user permissions:", error);
+    console.error('Error getting user permissions:', error);
     return [];
   }
 };
@@ -122,7 +121,7 @@ module.exports.getUserPermissions = async (userId) => {
 module.exports.getUserRole = async (userId) => {
   try {
     const user = await User.findByPk(userId, {
-      include: [{ model: Role, as: "role", attributes: ["name"] }],
+      include: [{ model: Role, as: 'role', attributes: ['name'] }],
     });
 
     if (!user) {
@@ -133,7 +132,7 @@ module.exports.getUserRole = async (userId) => {
 
     // return roles;
   } catch (error) {
-    console.error("Error getting user role:", error);
+    console.error('Error getting user role:', error);
     return null;
   }
 };

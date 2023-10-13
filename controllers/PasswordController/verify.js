@@ -1,5 +1,5 @@
-const User = require("../../models/Users");
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const User = require('../../models/Users');
 
 const verifyPasswordResetToken = (req, res) => {
   const { token } = req.params;
@@ -9,7 +9,7 @@ const verifyPasswordResetToken = (req, res) => {
     if (err) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid token",
+        message: 'Invalid token',
       });
     }
 
@@ -19,7 +19,7 @@ const verifyPasswordResetToken = (req, res) => {
     if (!user) {
       return res.status(400).json({
         status: 400,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
