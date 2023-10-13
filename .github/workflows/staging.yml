@@ -1,0 +1,39 @@
+---
+name: Auth Deployment
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  #  push:
+  #    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_app_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install dependencies
+        run: |
+          pnpm install
+          # node index.js
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: run app
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST_STAGING }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            su - devops
+            cd /home/devops/authentication_service
+            git stash
+            git pull origin main
+            npx pm2 restart auth
