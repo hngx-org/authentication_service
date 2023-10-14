@@ -20,6 +20,12 @@ router.post(
   MessagingController.sendSignUpEmail,
 );
 
+router.post(
+  '/signup-guest',
+  AuthenticationValidator.signup,
+  AuthenticationController.createGuest,
+);
+
 router.get('/verify/:token', AuthenticationController.verifyUser);
 
 router.post(
