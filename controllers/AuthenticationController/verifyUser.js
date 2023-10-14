@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
-const {sendWelcomeMail} = require("../MessagingController/sendWelcomeMail");
+const { sendWelcomeMail } = require('../MessagingController/sendWelcomeMail');
 
-const verifyUser = async (req, res, next()) => {
+const verifyUser = async (req, res, next) => {
   const { token } = req.params;
   const { JWT_SECRET } = process.env;
-  let decodedUser
+  let decodedUser;
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
@@ -24,12 +24,12 @@ const verifyUser = async (req, res, next()) => {
   // update user to verified
   user.is_verified = true;
   user.save();
-  req.user = user
-   // new response to sign user in immediately after verification
+  req.user = user;
+  // new response to sign user in immediately after verification
   const fullName = `${user.first_name} ${user.last_name}`;
   // Todo: add await if needed later
-  sendWelcomeMail(fullName, user.email)
-  return next()
+  sendWelcomeMail(fullName, user.email);
+  return next();
 };
 
 module.exports = verifyUser;
