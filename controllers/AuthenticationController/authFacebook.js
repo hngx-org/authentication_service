@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const errorHandler = require('../middleware/ErrorMiddleware');
+const errorHandler = require('../../middleware/ErrorMiddleware');
 
 // handling facebook auth callback
 const authFacebook = (req, res) => {
@@ -34,4 +34,4 @@ const authFacebook = (req, res) => {
   }
 };
 
-module.exports = { authFacebook };
+module.exports = authFacebook;
