@@ -1,3 +1,4 @@
+const axios = require('axios');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
@@ -22,6 +23,20 @@ const login = async (req, res, next) => {
   //   id: user.id,
   // };
 
+  // Check it user has 2fa enabled, then send 2fa code to user email
+
+  if (user.two_factor_auth) {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await user.update({ refresh_token: code });
+
+    await axios.post(EMAIL_SERVICE_2FA_URL, {
+      recipient: email,
+      name: user.first_name,
+      code,
+    });
+  }
+
   // const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
 
   // res.header('Authorization', `Bearer ${token}`);
@@ -37,7 +52,7 @@ const login = async (req, res, next) => {
   //       lastName: user.last_name,
   //       email: user.email,
   //       is_verified: user.is_verified,
-  //       two_factor_auth: user.two_factor_auth,
+  //       two_factor_auth: user.two_factor_auth,,
   //     },
   //   },
   // });
