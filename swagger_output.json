@@ -5,20 +5,21 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host": "auth.akuya.tech",
   "servers": [
-    {
-      "url": "localhost:3000",
-      "description": "local server"
+        {
+      "url": "staging.zuri.team",
+      "description": "production server"
     },
-    {
+      {
       "url": "auth.akuya.tech",
       "description": "development sever"
     },
     {
-      "url": "staging.zuri.team",
-      "description": "production server"
-    }
+      "url": "localhost:3000",
+      "description": "local server"
+    }Ï
+  
+
   ],
   "basePath": "/",
   "tags": [
