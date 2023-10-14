@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const passport = require('passport');
 const passwordRoute = require('./passwordRoute');
 
 const AuthenticationController = require('../controllers/AuthenticationController');
@@ -33,6 +34,43 @@ router.post(
   '/login',
   AuthenticationValidator.login,
   AuthenticationController.login,
+);
+
+// Google Oauth routes
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['email', 'profile'],
+  }),
+);
+router.get(
+  '/google/redirect',
+  passport.authenticate('google', {
+    session: false,
+  }),
+  AuthenticationController.authGoogle.handleAuth,
+);
+
+// Facebook Oauth routes
+router.get(
+  '/facebook',
+  passport.authenticate('facebook', { scope: ['email', 'public_profile'] }),
+);
+router.get(
+  '/facebook/redirect',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  AuthenticationController.authFacebook,
+);
+
+// GITHUB Oauth routes
+router.get(
+  '/github',
+  passport.authenticate('github', { scope: ['profile', 'user:email'] }),
+);
+router.get(
+  '/github/redirect',
+  passport.authenticate('github', { session: false }),
+  AuthenticationController.authGithub.handleGithubAUth,
 );
 
 // 2fa routes
