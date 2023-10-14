@@ -7,7 +7,6 @@ const MessagingController = require('../controllers/MessagingController');
 const registrationValidation = require('../middleware/registrationValidation');
 const AuthenticationValidator = require('../validators/AuthenticationValidator');
 const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
-const loginResponse = require('../middleware/logginResponse');
 
 const router = Router();
 
@@ -21,7 +20,11 @@ router.post(
   MessagingController.sendSignUpEmail,
 );
 
-router.get('/verify/:token', AuthenticationController.verifyUser);
+router.get(
+  '/verify/:token',
+  AuthenticationController.verifyUser,
+  AuthenticationController.loginResponse,
+);
 
 router.post(
   '/verify/resend',

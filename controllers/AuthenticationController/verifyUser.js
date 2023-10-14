@@ -2,19 +2,20 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
 const {sendWelcomeMail} = require("../MessagingController/sendWelcomeMail");
 
-const verifyUser = async (req, res) => {
+const verifyUser = async (req, res, next()) => {
   const { token } = req.params;
   const { JWT_SECRET } = process.env;
+  let decodedUser
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).json({ status: 401, message: 'Invalid token' });
     }
-    req.user = decoded;
+    decodedUser = decoded;
   });
 
   // vefiry user in database
-  const user = await User.findOne({ where: { email: req.user.email } });
+  const user = await User.findOne({ where: { email: decodedUser.email } });
 
   if (!user) {
     return res.status(401).json({ status: 401, message: 'Invalid token' });
@@ -23,44 +24,12 @@ const verifyUser = async (req, res) => {
   // update user to verified
   user.is_verified = true;
   user.save();
-  const jwt_payload = {
-    id: user.id,
-    firstName: user.first_name,
-    email: user.email,
-  };
-
-  const newtoken = jwt.sign(jwt_payload, process.env.JWT_SECRET);
-  res.header('Authorization', `Bearer ${newtoken}`);
-
-
-  // new response to sign user in immediately after verification
+  req.user = user
+   // new response to sign user in immediately after verification
   const fullName = `${user.first_name} ${user.last_name}`;
   // Todo: add await if needed later
   sendWelcomeMail(fullName, user.email)
-   return res.status(200).json({
-    status: 200,
-    message: 'verification successful user logged in',
-    data: {
-      newtoken,
-      user: {
-        id: user.id,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        email: user.email,
-      },
-    },
-  });
-  // return res.status(200).json({
-  //   status: 200,
-  //   message: "User verified",
-  //   data: {
-  //     user: {
-  //       id: user.id,
-  //       firsName: user.first_name,
-  //       email: user.email,
-  //     },
-  //   },
-  // });
+  return next()
 };
 
 module.exports = verifyUser;
