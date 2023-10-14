@@ -3,7 +3,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const dotenv = require('dotenv');
 const User = require('../models/Users');
 const errorHandler = require('../middleware/ErrorMiddleware');
-const {sendWelcomeMail} = require("../helpers/sendWelcomeMail");
+const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
 
 dotenv.config();
 // Facebook Strategy

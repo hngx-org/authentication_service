@@ -4,9 +4,8 @@ const axios = require('axios');
 
 async function sendWelcomeMail(name, recipient) {
     try {
-        const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/messaging/user/welcome-email`;
-        console.log(process.env.EMAIL_SERVICE_URL)
-        const redirectLink = `${process.env.AUTH_FRONTEND_URL}/dashboard`;
+        const emailServiceUrl = `${process.env.EMAIL_SERVICE_WELCOME_URL}`;
+        const redirectLink = `${process.env.AUTH_FRONTEND_DASHBOARD_URL}`;
 
         const response = await axios.post(emailServiceUrl, {
             name,

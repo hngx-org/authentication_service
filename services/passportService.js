@@ -2,7 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { Options } = require('../config/gauth.config');
 const User = require('../models/Users');
-const {sendWelcomeMail} = require("../helpers/sendWelcomeMail");
+const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
 
 passport.use(
   new GoogleStrategy(

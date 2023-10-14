@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
-const {sendWelcomeMail} = require("../../helpers/sendWelcomeMail");
+const {sendWelcomeMail} = require("../MessagingController/sendWelcomeMail");
 
 const verifyUser = async (req, res) => {
   const { token } = req.params;

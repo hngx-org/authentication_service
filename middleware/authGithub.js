@@ -1,7 +1,7 @@
 const GitHubStrategy = require('passport-github2').Strategy;
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
-const {sendWelcomeMail} = require("../helpers/sendWelcomeMail");
+const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
 
 module.exports = (passport) => {
   passport.use(
