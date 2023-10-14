@@ -1,5 +1,6 @@
 const checkEmail = require('./checkEmail');
 const createUser = require('./createUser');
+const createGuest = require('./createGuest');
 const verifyUser = require('./verifyUser');
 const resendVerification = require('./resendVerification');
 const login = require('./login');
@@ -13,6 +14,7 @@ const authGoogle = require('./authGoogle');
 const AuthenticationController = {
   checkEmail,
   createUser,
+  createGuest,
   enable2fa,
   send2faCode,
   verify2fa,
