@@ -1,5 +1,8 @@
 const User = require('../../models/Users');
 
+/**
+ * @description recieves an email from the user, verifies the email and sends a frontend link with token to the user's email
+ */
 const send = async (req, res, next) => {
   const { email } = req.body;
 

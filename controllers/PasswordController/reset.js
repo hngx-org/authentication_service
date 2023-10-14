@@ -2,6 +2,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../../models/Users');
 
+/**
+ * @description recieves a token and a new password from the user, verifies the token and updates the user's Password
+ * @param {object} req - request object
+ * @param {object} res - response object
+ */
 const reset = (req, res) => {
   const { token, password } = req.body;
   const { JWT_SECRET } = process.env;
