@@ -1,6 +1,7 @@
 const GitHubStrategy = require('passport-github2').Strategy;
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
+const {sendWelcomeMail} = require("../helpers/sendWelcomeMail");
 
 module.exports = (passport) => {
   passport.use(
@@ -48,6 +49,12 @@ module.exports = (passport) => {
             last_name: profile.displayName.split(' ')[1],
             refresh_token: '',
           });
+
+          // Todo: subject to improvement
+          const fullName = `${user.first_name} ${user.last_name}`;
+          // Todo: add await if needed
+          sendWelcomeMail(fullName, user.email)
+
           const token = jwt.sign(
             { userId: newUser._id },
             process.env.JWT_SECRET,

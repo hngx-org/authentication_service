@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
+const {sendWelcomeMail} = require("../../helpers/sendWelcomeMail");
 
 const verifyUser = async (req, res) => {
   const { token } = req.params;
@@ -33,6 +34,9 @@ const verifyUser = async (req, res) => {
 
 
   // new response to sign user in immediately after verification
+  const fullName = `${user.first_name} ${user.last_name}`;
+  // Todo: add await if needed later
+  sendWelcomeMail(fullName, user.email)
    return res.status(200).json({
     status: 200,
     message: 'verification successful user logged in',
