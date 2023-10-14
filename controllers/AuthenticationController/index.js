@@ -7,23 +7,20 @@ const login = require('./login');
 const enable2fa = require('./enable2fa');
 const send2faCode = require('./send2faCode');
 const verify2fa = require('./verify2fa');
-const authFacebook = require('./authFacebook');
-const authGithub = require('./authGithub');
-const authGoogle = require('./authGoogle');
+const loginResponse = require('../../middleware/loginResponse');
+loginResponse;
 
 const AuthenticationController = {
   checkEmail,
   createUser,
   createGuest,
+  loginResponse,
   enable2fa,
   send2faCode,
   verify2fa,
   verifyUser,
   resendVerification,
-  login,
-  authFacebook,
-  authGithub,
-  authGoogle
+  login
 };
 
 module.exports = AuthenticationController;

@@ -29,6 +29,7 @@ passport.use(
             refresh_token: '',
           });
         }
+        return cb(null, user)
       } catch {
         errorHandler(err, req, res);
       }
