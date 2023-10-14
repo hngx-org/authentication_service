@@ -13,11 +13,22 @@ const authFacebook = (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
+    res.header('Authorization', `Bearer ${token}`);
     res.status(200).json({
-      message: 'User logged in successfully',
+    status: 200,
+    message: 'Login successful',
+    data: {
       token,
-      user,
-    });
+      user: {
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        is_verified: user.is_verified,
+        two_factor_auth: user.two_factor_auth
+      },
+    },
+  });
   } catch (err) {
     errorHandler(err, req, res);
   }

@@ -5,6 +5,7 @@ const AuthenticationController = require('../controllers/AuthenticationControlle
 const MessagingController = require('../controllers/MessagingController');
 const registrationValidation = require('../middleware/registrationValidation');
 const AuthenticationValidator = require('../validators/AuthenticationValidator');
+const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
 
 const router = Router();
 
@@ -39,4 +40,6 @@ router.post('/2fa/enable', AuthenticationController.enable2fa);
 router.post('/2fa/send-code', AuthenticationController.send2faCode);
 router.post('/2fa/verify-code', AuthenticationController.verify2fa);
 
+
+router.get("/revalidate-login", revalidateLogin)
 module.exports = router;

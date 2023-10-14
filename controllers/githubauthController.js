@@ -20,10 +20,13 @@ const {
 
 const handleGithubAUth = (req, res) => {
   // Successful GitHub authentication, generate a JWT token
-  const token = req.user;
-  if (token) {
+  const response = req.user;
+  const token = response.data.token
+  if (response) {
     // Redirect to a client page with the token or send it as a JSON response
-    res.json({ token });
+
+    res.header('Authorization', `Bearer ${token}`);
+    res.json(response);
   } else {
     // Handle authentication failure
     res.status(401).json({ message: 'Authentication failed' });
