@@ -25,7 +25,7 @@ passport.use(
             is_verified: true,
             provider: 'google',
           });
-          if (user)  {
+          if (user) {
             const fullName = `${user.first_name} ${user.last_name}`;
             // Todo: add await if needed
             sendWelcomeMail(fullName, user.email)

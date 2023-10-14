@@ -3,7 +3,9 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const dotenv = require('dotenv');
 const User = require('../models/Users');
 const errorHandler = require('../middleware/ErrorMiddleware');
-const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
+const {
+  sendWelcomeMail,
+} = require('../controllers/MessagingController/sendWelcomeMail');
 
 dotenv.config();
 // Facebook Strategy
@@ -31,12 +33,12 @@ passport.use(
           });
 
           if (user) {
-              const fullName = `${user.first_name} ${user.last_name}`;
-              // Todo: add await if needed
-              sendWelcomeMail(fullName, user.email)
+            const fullName = `${user.first_name} ${user.last_name}`;
+            // Todo: add await if needed
+            sendWelcomeMail(fullName, user.email);
           }
         }
-        return cb(null, user)
+        return cb(null, user);
       } catch {
         errorHandler(err, req, res);
       }

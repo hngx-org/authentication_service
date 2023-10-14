@@ -41,6 +41,10 @@ module.exports = (passport) => {
               last_name: profile.displayName.split(' ')[1],
               refresh_token: '',
             });
+            // Todo: subject to improvement
+            const fullName = `${user.first_name} ${user.last_name}`;
+            // Todo: add await if needed
+            sendWelcomeMail(fullName, user.email);
           }
 
           return done(null, user);
