@@ -5,11 +5,19 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host": "auth.akuya.tech",
+  "host":"staging.zuri.team/api/auth",
   "servers": [
     {
+      "url": "staging.zuri.team/api/auth",
+      "description": "production server"
+    },
+    {
       "url": "auth.akuya.tech",
-      "description": "Confirmed working well"
+      "description": "development sever"
+    },
+    {
+      "url": "localhost:3000/api/auth",
+      "description": "local server"
     }
   ],
   "basePath": "/",
@@ -23,19 +31,21 @@
       "description": "google authentication endpoints"
     },
     {
+      "name": "PASSWORD RESET AND EMAIL VERIFICATION",
+      "description": "password reset and email verification Endpoints"
+    },
+    {
       "name": "2FA",
       "description": "two step verification Endpoints"
     },
     {
-      "name": "Get-Auth",
-      "description": "Get authentication Endpoints"
-    },
-    {
-      "name": "PASSWORD RESET AND EMAIL VERIFICATION",
-      "description": "password reset and email verification Endpoints"
+      "name": "Get-Authorization",
+      "description": "Get authorization Endpoints"
     }
   ],
-  "schemes": ["https"],
+  "schemes": [
+    "https"
+  ],
   "securityDefinitions": {
     "JWT": {
       "type": "http",
@@ -44,8 +54,12 @@
       "in": "header"
     }
   },
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "paths": {
     "/": {
       "get": {
@@ -60,7 +74,9 @@
     },
     "/api/auth/signup": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "description": "Endpoint to Register User",
         "parameters": [
           {
@@ -102,20 +118,52 @@
         }
       }
     },
-    "/api/auth/verify-email": {
-      "post": {
-        "tags": ["Auth"],
+    "/api/auth/verify/{token}": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
         "description": "Handles the verification and confirmation of the authenticity of a user's email address.",
         "parameters": [
           {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/api/auth/check-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "check email to vilidate, if it can be used to register or not.",
+        "parameters": [
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
+                "email": {
                   "type": "string",
-                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                  "example": "test@gmail.com"
                 }
               }
             }
@@ -137,65 +185,12 @@
         }
       }
     },
-    "/api/auth/send-verification": {
+    "/api/auth/verify/resend": {
       "post": {
-        "tags": ["Auth"],
-        "description": "Sends verification code to the users email.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "first_name": {
-                  "type": "string",
-                  "example": "john"
-                },
-                "last_name": {
-                  "type": "string",
-                  "example": "doe"
-                },
-                "username": {
-                  "type": "string",
-                  "example": "johndoe"
-                },
-                "email": {
-                  "type": "string",
-                  "example": "test@gmail.com"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "myPassword2021"
-                },
-                "refresh_token": {
-                  "type": "string",
-                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Auth"
         ],
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "404": {
-            "description": "Not Found, User Not Found."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/api/auth/confirm-verification": {
-      "post": {
-        "tags": ["Auth"],
-        "description": "Verifing the verification code against the stored code in for user in the database",
+        "description": "Resends another verification token for user to complete email verification process.",
         "parameters": [
           {
             "name": "body",
@@ -206,10 +201,6 @@
                 "email": {
                   "type": "string",
                   "example": "test@gmail.com"
-                },
-                "verificationCode": {
-                  "type": "string",
-                  "example": "3903"
                 }
               }
             }
@@ -233,7 +224,9 @@
     },
     "/api/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "description": "Endpoint to Login User",
         "parameters": [
           {
@@ -265,10 +258,12 @@
         }
       }
     },
-    "/api/auth/forgot-password": {
+    "/api/auth/reset-password": {
       "post": {
-        "tags": ["PASSWORD RESET AND EMAIL VERIFICATION"],
-        "description": "Handles the process of user's forgotten password.",
+        "tags": [
+          "PASSWORD RESET AND EMAIL VERIFICATION"
+        ],
+        "description": "Handles the process of user resetting password.",
         "parameters": [
           {
             "name": "body",
@@ -282,7 +277,50 @@
                   "example": "test-user@mail.com"
                 }
               },
-              "required": ["email"]
+              "required": [
+                "email"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PASSWORD RESET AND EMAIL VERIFICATION"
+        ],
+        "description": "Handles the process of resetting a user's forgotten password.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "any"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "any"
+                }
+              },
+              "required": [
+                "email",
+                "token"
+              ]
             }
           }
         ],
@@ -299,29 +337,18 @@
         }
       }
     },
-    "/api/auth/reset-password": {
-      "post": {
-        "tags": ["PASSWORD RESET AND EMAIL VERIFICATION"],
+    "/api/auth/reset-password/{token}": {
+      "get": {
+        "tags": [
+          "PASSWORD RESET AND EMAIL VERIFICATION"
+        ],
         "description": "Handles the process of resetting a user's forgotten password.",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "token",
+            "in": "path",
             "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "type": "string",
-                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "mypassword@2023"
-                }
-              },
-              "required": ["token", "password"]
-            }
+            "type": "string"
           }
         ],
         "responses": {
@@ -339,7 +366,9 @@
     },
     "/api/auth/2fa/enable": {
       "post": {
-        "tags": ["2FA"],
+        "tags": [
+          "2FA"
+        ],
         "description": "Handles the process of enabling 2fa for a registered user",
         "parameters": [
           {
@@ -354,7 +383,9 @@
                   "example": "test@gmail.com"
                 }
               },
-              "required": ["email"]
+              "required": [
+                "email"
+              ]
             }
           }
         ],
@@ -373,7 +404,9 @@
     },
     "/api/auth/2fa/send-code": {
       "post": {
-        "tags": ["2FA"],
+        "tags": [
+          "2FA"
+        ],
         "description": "Handles the process of sending 2fa token to a registered email.",
         "parameters": [
           {
@@ -388,7 +421,9 @@
                   "example": "test@gmail.com"
                 }
               },
-              "required": ["email"]
+              "required": [
+                "email"
+              ]
             }
           }
         ],
@@ -407,7 +442,9 @@
     },
     "/api/auth/2fa/verify-code": {
       "post": {
-        "tags": ["2FA"],
+        "tags": [
+          "2FA"
+        ],
         "description": "Handles the process of verifying the token sent to user's email against the token provided by user",
         "parameters": [
           {
@@ -426,7 +463,10 @@
                   "example": "test@gmail.com"
                 }
               },
-              "required": ["token", "email"]
+              "required": [
+                "token",
+                "email"
+              ]
             }
           }
         ],
@@ -443,9 +483,11 @@
         }
       }
     },
-    "/api/auth/google": {
-      "post": {
-        "tags": ["Google-Auth"],
+    "/auth/google": {
+      "get": {
+        "tags": [
+          "Google-Auth"
+        ],
         "description": "Handles the process of signing up using google auth.",
         "responses": {
           "200": {
@@ -463,9 +505,11 @@
         }
       }
     },
-    "/api/auth/google/redirect": {
-      "post": {
-        "tags": ["Google-Auth"],
+    "/auth/google/redirect": {
+      "get": {
+        "tags": [
+          "Google-Auth"
+        ],
         "description": "Handle the process of creating a new user in the database using Google OAuth.",
         "requestBody": {
           "description": "User data for creating a new user",
@@ -492,7 +536,11 @@
                     "description": "user's id"
                   }
                 },
-                "required": ["idToken", "name", "email"]
+                "required": [
+                  "idToken",
+                  "name",
+                  "email"
+                ]
               }
             }
           }
@@ -513,95 +561,30 @@
         }
       }
     },
-    "/api/users/{id}/role": {
-      "put": {
-        "summary": "Set user role",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "User ID"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Role information",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "roleId": {
-                  "type": "integer",
-                  "description": "ID of the role",
-                  "required": false
-                },
-                "roleName": {
-                  "type": "string",
-                  "description": "Name of the role",
-                  "required": false
-                }
-              }
-            }
-          }
+    "/api/authorize/roles": {
+      "get": {
+        "tags": [
+          "Get Authorization"
+        ],
+        "summary": "Get authrorized roles for users",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
-            "description": "Successful operation",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "msg": {
-                  "type": "string"
-                }
-              }
-            },
-            "examples": {
-              "application/json": {
-                "msg": "user's role was changed successfully"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "msg": {
-                  "type": "string"
-                }
-              }
-            },
-            "examples": {
-              "application/json": {
-                "msg": "please specify either 'roleId' or 'roleName'"
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "msg": {
-                  "type": "string"
-                }
-              }
-            },
-            "examples": {
-              "application/json": {
-                "msg": "user not found"
-              }
-            }
+            "description": "Success, user created successfully."
           }
         }
       }
     },
     "/api/authorize": {
       "post": {
+        "tags": [
+          "Get Authorization"
+        ],
         "summary": "Authorize user for a specific permission",
         "parameters": [
           {
@@ -764,22 +747,40 @@
         }
       }
     },
-    "/authorize/permissions": {
-      "post": {
+    "/api/authorize/permissions": {
+      "get": {
+        "tags": [
+          "Get Authorization"
+        ],
         "summary": "Get authorized permissions for a user",
+        "responses": {
+          "200": {
+            "description": "Success, user created successfully."
+          }
+        }
+      }
+    },
+    "/users/permission": {
+      "post": {
+        "tags": [
+          "Get Authorization"
+        ],
+        "summary": "Authorize user for a specific permission",
         "parameters": [
           {
             "in": "body",
             "name": "authorizationRequest",
             "description": "Authorization request",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
+                "userId": {
                   "type": "string",
-                  "description": "User authentication token",
-                  "example": "your_jwt_token_here"
+                  "description": "User id "
+                },
+                "permissionId": {
+                  "type": "string",
+                  "description": "Permission id"
                 }
               }
             }
@@ -787,59 +788,250 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Get Authorization"
+        ],
+        "summary": "unauthorize user for a specific permission",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationRequest",
+            "description": "Authorization request",
             "schema": {
               "type": "object",
               "properties": {
-                "status": {
-                  "type": "integer",
-                  "format": "int32",
-                  "example": 200
+                "userId": {
+                  "type": "string",
+                  "description": "User id "
                 },
-                "permissions": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "example": ["product.read", "order.create"]
-                  }
+                "permissionId": {
+                  "type": "string",
+                  "description": "Permission id"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
           },
-          "401": {
-            "description": "Unauthorized",
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },   
+     "/users/{id}/role": {
+      "put": {
+        "tags": [
+          "Get Authorization"
+        ],
+        "summary": "Authorize user for a specific role",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "authorizationRequest",
+            "description": "Authorization request",
             "schema": {
               "type": "object",
               "properties": {
-                "status": {
-                  "type": "integer",
-                  "format": "int32",
-                  "example": 401
-                },
-                "message": {
+                "roleId": {
                   "type": "string",
-                  "example": "Unauthorized"
+                  "description": "User role id"
+                },
+                "roleName": {
+                  "type": "string",
+                  "description": "User role name"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
           },
-          "401 unverified": {
-            "description": "Unauthorized",
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },   
+     "/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Authorize user for a specific permission",
+        "parameters": [
+          {
+            "in": "header", 
+            "name": "Authorization",
+            "description": "JWT token for user authentication",
+            "required": true,
+            "type": "string", 
+            "default": "Bearer your-jwt-token", 
+            "format": "JWT" 
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/auth/change-email": {
+      "patch": {
+        "summary": "Change User's Email",
+        "tags": [
+          "Protected Auth"
+        ],
+        "parameters": [
+          {
+            "in": "header", 
+            "name": "Authorization",
+            "description": "JWT token for user authentication",
+            "required": true,
+            "type": "string", 
+            "default": "Bearer your-jwt-token", 
+            "format": "JWT" 
+          },
+          {
+            "in": "body",
+            "name": "changeEmailRequest",
+            "description": "Request to change the user's email",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "status": {
-                  "type": "integer",
-                  "format": "int32",
-                  "example": 401
-                },
-                "message": {
+                "newEmail": {
                   "type": "string",
-                  "example": "Unauthorized"
-                },
-                "unverifiedUser": {
+                  "description": "The new email address for the user."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email change request successful. JWT verification token sent to the user.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
                   "type": "boolean",
-                  "value": true
+                  "default": true
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Success message."
+                },
+                "verificationToken": {
+                  "type": "string",
+                  "description": "JWT verification token sent to the user."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. The request parameters are invalid.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error message."
+                },
+                "errorCode": {
+                  "type": "string",
+                  "description": "Error code for reference."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. The user was not found.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error message."
+                },
+                "errorCode": {
+                  "type": "string",
+                  "description": "Error code for reference."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error. An error occurred while processing your request.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error message."
+                },
+                "errorCode": {
+                  "type": "string",
+                  "description": "Error code for reference."
                 }
               }
             }
@@ -847,36 +1039,36 @@
         }
       }
     }
-  },
-  "definitions": {
-    "users": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
-        },
-        "firstName": {
-          "type": "string",
-          "example": "John"
-        },
-        "lastName": {
-          "type": "string",
-          "example": "John"
-        },
-        "email": {
-          "type": "string",
-          "example": "test@gmail.com"
-        },
-        "username": {
-          "type": "string",
-          "example": "johndoe"
-        },
-        "password": {
-          "type": "string",
-          "example": "myPassword2021"
-        }
+},
+"definitions": {
+  "users": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+      },
+      "firstName": {
+        "type": "string",
+        "example": "John"
+      },
+      "lastName": {
+        "type": "string",
+        "example": "John"
+      },
+      "email": {
+        "type": "string",
+        "example": "test@gmail.com"
+      },
+      "username": {
+        "type": "string",
+        "example": "johndoe"
+      },
+      "password": {
+        "type": "string",
+        "example": "myPassword2021"
       }
     }
   }
+}
 }

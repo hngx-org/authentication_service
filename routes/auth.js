@@ -18,6 +18,7 @@ const {
   githubRedirectUrl,
 } = require('../controllers/githubLoginController');
 const authEmail = require('../middleware/authEmail');
+const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
 
 const router = express.Router();
 router.use(errorHandler);
@@ -59,7 +60,7 @@ router.get(
   passport.authenticate('github', { session: false }),
   handleGithubAUth,
 );
-
+router.get("/revalidate-login", revalidateLogin)
 // CHANGE EMAIL
 router.patch('/change-email', authEmail, changeEmail);
 
