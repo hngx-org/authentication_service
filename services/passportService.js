@@ -2,6 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { Options } = require('../config/gauth.config');
 const User = require('../models/Users');
+const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
 
 passport.use(
   new GoogleStrategy(
@@ -14,7 +15,7 @@ passport.use(
         let user = await User.findOne({
           where: { email: profile.emails[0].value },
         });
-        if (!user)
+        if (!user) {
           user = await User.create({
             username: profile.displayName,
             first_name: profile.name.givenName,
@@ -24,6 +25,12 @@ passport.use(
             is_verified: true,
             provider: 'google',
           });
+          if (user)  {
+            const fullName = `${user.first_name} ${user.last_name}`;
+            // Todo: add await if needed
+            sendWelcomeMail(fullName, user.email)
+          }
+        }
 
         if (!user) throw new Error('Errors');
         request.user = user;

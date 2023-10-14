@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function sendVerificationEmail(name, recipient, token) {
   try {
-    const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`;
+    const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/messaging/user/email-verification`;
 
     const verification_link = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete/?token=${token}`;
 
