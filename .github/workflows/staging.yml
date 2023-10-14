@@ -21,7 +21,7 @@ jobs:
       - name: install dependencies
         run: |
           pnpm install
-          node index.js
+          # node index.js
           # n=0
           # until [ $n -ge 30 ]; do
           #   curl -I -X GET http://localhost:4000/api/auth/api/docs && break
