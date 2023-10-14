@@ -6,19 +6,13 @@ const {
   verify2fa,
   changeEmail,
 } = require('../controllers/userController');
-const { handleAuth } = require('../controllers/gauthControllers');
 require('../services/passportService');
 const { errorHandler } = require('../middleware/ErrorMiddleware');
 const registrationValidation = require('../middleware/registrationValidation');
 require('../services/passportServiceFb');
-const { authFacebook } = require('../controllers/authFacebook');
-const handleGithubAUth = require('../controllers/githubauthController');
-const {
-  githubLogin,
-  githubRedirectUrl,
-} = require('../controllers/githubLoginController');
 const authEmail = require('../middleware/authEmail');
 const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
+const loginResponse = require('../middleware/logginResponse');
 
 const router = express.Router();
 router.use(errorHandler);
@@ -36,7 +30,7 @@ router.get(
   passport.authenticate('google', {
     session: false,
   }),
-  handleAuth,
+  loginResponse,
 );
 
 // FACEBOOK AUTH
@@ -47,7 +41,7 @@ router.get(
 router.get(
   '/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
-  authFacebook,
+  loginResponse,
 );
 
 // GITHUB OAUTH
@@ -58,9 +52,9 @@ router.get(
 router.get(
   '/github/redirect',
   passport.authenticate('github', { session: false }),
-  handleGithubAUth,
+  loginResponse,
 );
-router.get("/revalidate-login", revalidateLogin)
+router.get('/revalidate-login', revalidateLogin);
 // CHANGE EMAIL
 router.patch('/change-email', authEmail, changeEmail);
 

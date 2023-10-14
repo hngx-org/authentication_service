@@ -7,6 +7,7 @@ const MessagingController = require('../controllers/MessagingController');
 const registrationValidation = require('../middleware/registrationValidation');
 const AuthenticationValidator = require('../validators/AuthenticationValidator');
 const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
+const loginResponse = require('../middleware/logginResponse');
 
 const router = Router();
 
@@ -34,6 +35,7 @@ router.post(
   '/login',
   AuthenticationValidator.login,
   AuthenticationController.login,
+  AuthenticationController.loginResponse,
 );
 
 // Google Oauth routes
@@ -48,7 +50,7 @@ router.get(
   passport.authenticate('google', {
     session: false,
   }),
-  AuthenticationController.authGoogle.handleAuth,
+  AuthenticationController.loginResponse,
 );
 
 // Facebook Oauth routes
@@ -59,7 +61,7 @@ router.get(
 router.get(
   '/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
-  AuthenticationController.authFacebook,
+  AuthenticationController.loginResponse,
 );
 
 // GITHUB Oauth routes
@@ -70,7 +72,7 @@ router.get(
 router.get(
   '/github/redirect',
   passport.authenticate('github', { session: false }),
-  AuthenticationController.authGithub.handleGithubAUth,
+  AuthenticationController.loginResponse,
 );
 
 // 2fa routes
@@ -78,6 +80,5 @@ router.post('/2fa/enable', AuthenticationController.enable2fa);
 router.post('/2fa/send-code', AuthenticationController.send2faCode);
 router.post('/2fa/verify-code', AuthenticationController.verify2fa);
 
-
-router.get("/revalidate-login", revalidateLogin)
+router.get('/revalidate-login', revalidateLogin);
 module.exports = router;

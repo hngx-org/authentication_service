@@ -28,42 +28,19 @@ module.exports = (passport) => {
           });
 
           // User doesn't exist, create a new user and generate a JWT token.
-          if (!user)
-          {
+          if (!user) {
             user = await User.create({
-            email: profile._json.email,
-            username: profile.username,
-            profile_pic: profile._json.avatar_url,
-            is_verified: true,
-            first_name: profile.displayName.split(' ')[0],
-            last_name: profile.displayName.split(' ')[1],
-            refresh_token: '',
-          });
+              email: profile._json.email,
+              username: profile.username,
+              profile_pic: profile._json.avatar_url,
+              is_verified: true,
+              first_name: profile.displayName.split(' ')[0],
+              last_name: profile.displayName.split(' ')[1],
+              refresh_token: '',
+            });
           }
-          
-          const token = jwt.sign(
-            { userId: newUser._id },
-            process.env.JWT_SECRET,
-            {
-              expiresIn: '1d', // Set token expiration as needed
-            },
-          );
-          const toRespond = {
-          status: 200,
-          message: 'Login successful',
-          data: {
-          token,
-          user: {
-          id: user.id,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          email: user.email,
-          is_verified: user.is_verified,
-          two_factor_auth: user.two_factor_auth
-      },
-    },
-  }
-          return done(null, toRespond);
+
+          return done(null, user);
         } catch (error) {
           return done(error);
         }
