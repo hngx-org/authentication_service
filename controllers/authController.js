@@ -4,18 +4,17 @@ const Joi = require("joi");
 const User = require("../models/Users");
 const transporter = require("../middleware/mailConfig");
 const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
-const { sendResetEmail } = require("../helpers/sendResetPasswordEmail");
 const {
   ResourceNotFound,
   Unauthorized,
   BadRequest,
-} = require("../errors/httpErrors");
+} = require('../errors/httpErrors');
 const {
   RESOURCE_NOT_FOUND,
   INVALID_TOKEN,
   INVALID_REQUEST_PARAMETERS,
   EMAIL_ALREADY_VERIFIED,
-} = require("../errors/httpErrorCodes");
+} = require('../errors/httpErrorCodes');
 
 const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -47,20 +46,26 @@ async function forgotPassword(req, res, next) {
 
     if (!user) {
       // 404 Error or custom error handling
-      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
       // return res
       //   .status(404)
       //   .json({ success: false, message: "User not found" });
     }
-    const jwt_payload = {
-      id: user.id,
-    };
-    const resetToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    await sendResetEmail(user.first_name, user.email, resetToken);
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    res.status(200).json({ message: "Reset password link sent successfully." });
+    user.token = resetCode;
+    await user.save();
+
+    // Send an email with the verification code
+    const mailOptions = {
+      from: process.env.NODEMAILER_USER,
+      to: email,
+      subject: "Password Reset",
+      text: `Your password reset code is: ${resetCode}`,
+    };
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: 'Reset password link sent successfully.' });
   } catch (error) {
     next(error);
   }
@@ -73,7 +78,7 @@ const resetPassword = async (req, res, next) => {
     if (error) {
       throw new BadRequest(
         error.details[0].message,
-        INVALID_REQUEST_PARAMETERS
+        INVALID_REQUEST_PARAMETERS,
       );
     }
 
@@ -92,7 +97,11 @@ const resetPassword = async (req, res, next) => {
 
     // ... Implement reset password functionality here
     if (!user) {
+      // 404 Error or custom error handling
       throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      // return res
+      //   .status(404)
+      //   .json({ success: false, message: "User not found" });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -102,7 +111,7 @@ const resetPassword = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Password reset successfully." });
+      .json({ success: true, message: 'Password reset successfully.' });
   } catch (error) {
     next(error);
   }
@@ -115,7 +124,7 @@ const verifyEmail = async (req, res, next) => {
     if (error) {
       throw new BadRequest(
         error.details[0].message,
-        INVALID_REQUEST_PARAMETERS
+        INVALID_REQUEST_PARAMETERS,
       );
       // return res
       //   .status(400)
@@ -129,7 +138,7 @@ const verifyEmail = async (req, res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (jwtError) {
-      throw new Unauthorized("Invalid token", INVALID_TOKEN);
+      throw new Unauthorized('Invalid token', INVALID_TOKEN);
       // return res.status(404).json({ success: false, message: "Invalid token" });
     }
 
@@ -137,7 +146,7 @@ const verifyEmail = async (req, res, next) => {
     const user = await User.findByPk(decoded.id);
     if (!user) {
       // 404 Error or custom error handling
-      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
       // return res
       //   .status(404)
       //   .json({ success: false, message: "User not found" });
@@ -147,8 +156,8 @@ const verifyEmail = async (req, res, next) => {
     if (user.is_verified) {
       // 404 Error or custom error handling
       throw new BadRequest(
-        "Email already verified. please login",
-        EMAIL_ALREADY_VERIFIED
+        'Email already verified. please login',
+        EMAIL_ALREADY_VERIFIED,
       );
       // return res.status(404).json({
       //   success: false,
@@ -162,7 +171,7 @@ const verifyEmail = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Email verified successfully" });
+      .json({ success: true, message: 'Email verified successfully' });
   } catch (error) {
     next(error);
     // Internal error or custom error handling
@@ -177,7 +186,7 @@ const resendVerificationCode = async (req, res, next) => {
     if (error) {
       throw new BadRequest(
         error.details[0].message,
-        INVALID_REQUEST_PARAMETERS
+        INVALID_REQUEST_PARAMETERS,
       );
     }
 
@@ -191,8 +200,8 @@ const resendVerificationCode = async (req, res, next) => {
       // Check if user has already verified their Email
       if (user.is_verified) {
         throw new BadRequest(
-          "Email already verified. please login",
-          EMAIL_ALREADY_VERIFIED
+          'Email already verified. please login',
+          EMAIL_ALREADY_VERIFIED,
         );
       }
 
@@ -201,23 +210,23 @@ const resendVerificationCode = async (req, res, next) => {
         id: user.id,
       };
       const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
-        expiresIn: "1d",
+        expiresIn: '1d',
       });
 
       // Send verification link email to user
       await sendVerificationEmail(
         user.first_name,
         user.email,
-        verificationToken
+        verificationToken,
       );
 
       res.status(200).json({
         status: 200,
         success: true,
-        message: "Verification code has been resent to email.",
+        message: 'Verification code has been resent to email.',
       });
     } else {
-      throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found.', RESOURCE_NOT_FOUND);
       // return res.json("User not found ");
     }
   } catch (error) {

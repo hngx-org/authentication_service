@@ -1,10 +1,5 @@
-const User = require("../../models/Users");
-const Permission = require("../../models/Permissions");
-const Role = require("../../models/Roles");
-const RolePermission = require("../../models/RolePermissions");
-const sequelize = require("../../config/db");
-
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const sequelize = require('../../config/db');
 
 /**
  * @desc Check if user is authorized to perform permission
@@ -16,7 +11,7 @@ const authorize = (req, res) => {
     if (err) {
       return res.status(401).json({
         status: 401,
-        error: "Invalid token",
+        error: 'Invalid token',
       });
     }
 
@@ -30,7 +25,7 @@ const authorize = (req, res) => {
       return res.status(404).json({
         status: 404,
         authorized: false,
-        message: "No user found",
+        message: 'No user found',
       });
     }
 
@@ -40,7 +35,7 @@ const authorize = (req, res) => {
       `SELECT * FROM "role" WHERE id='${user.role_id}';`,
     );
 
-	const role = roles[0];
+    const role = roles[0];
 
     const [userPermissions] = await sequelize.query(
       `SELECT permission.name FROM "user_permission"
@@ -54,25 +49,31 @@ const authorize = (req, res) => {
 	 WHERE roles_permissions.role_id = '${user.role_id}';`,
     );
 
-
     if (user && !user.is_verified) {
       return res.status(401).json({
         status: 401,
         authorized: false,
-        message: "user is not verified",
+        message: 'user is not verified',
       });
     }
 
-    const permissions = [...new Set([...userPermissions, ...rolePermissions])];
+    const permissions = [
+      ...new Set([
+        ...userPermissions.map((permission) => permission.name),
+        ...rolePermissions.map((permission) => permission.name),
+      ]),
+    ];
+
+    console.log(permissions);
 
     if (user && !permission) {
       response = {
         status: 200,
         authorized: true,
-        message: "user is authenticated",
+        message: 'user is authenticated',
         user: {
           id,
-		  role: role.name,
+          role: role.name,
         },
       };
       return res.status(200).json(response);
@@ -82,11 +83,11 @@ const authorize = (req, res) => {
       response = {
         status: 200,
         authorized: true,
-        message: "user is authorized for this permission",
+        message: 'user is authorized for this permission',
         user: {
           id,
-		  permissions,
-		  role: role.name,
+          permissions,
+          role: role.name,
         },
       };
       return res.status(200).json(response);
@@ -95,7 +96,7 @@ const authorize = (req, res) => {
     return res.status(401).json({
       status: 401,
       authorized: false,
-      message: "user is not authorized for this permission",
+      message: 'user is not authorized for this permission',
     });
   });
 };

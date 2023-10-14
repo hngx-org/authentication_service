@@ -1,4 +1,4 @@
-const axios = require("axios");
+const axios = require('axios');
 
 async function sendVerificationEmail(name, recipient, token) {
   try {
@@ -13,12 +13,12 @@ async function sendVerificationEmail(name, recipient, token) {
     });
 
     if (response.status === 200) {
-      console.log("Verification email sent successfully.");
+      console.log('Verification email sent successfully.');
     } else {
-      console.error("Failed to send verification email.");
+      console.error('Failed to send verification email.');
     }
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error('Error sending email:', error);
   }
 }
 

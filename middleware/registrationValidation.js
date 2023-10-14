@@ -1,5 +1,6 @@
-const { check, validationResult } = require("express-validator");
-const db = require("../models/Users");
+const { check, validationResult } = require('express-validator');
+const db = require('../models/Users');
+
 const User = db.user;
 
 const registrationValidation = (req, res, next) => {
@@ -8,31 +9,31 @@ const registrationValidation = (req, res, next) => {
 
     check(firstName)
       .notEmpty()
-      .withMessage("First name is required")
+      .withMessage('First name is required')
       .isString()
-      .withMessage("First name must be a string");
+      .withMessage('First name must be a string');
 
     check(lastName)
       .notEmpty()
-      .withMessage("Last name is required")
+      .withMessage('Last name is required')
       .isString()
-      .withMessage("Last name must be a string");
+      .withMessage('Last name must be a string');
 
     check(email)
       .notEmpty()
-      .withMessage("Email is required")
+      .withMessage('Email is required')
       .isEmail()
-      .withMessage("Email is invalid");
+      .withMessage('Email is invalid');
 
     check(password)
       .notEmpty()
-      .withMessage("Password is required")
+      .withMessage('Password is required')
       .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long")
+      .withMessage('Password must be at least 6 characters long')
       .matches(/\d/)
-      .withMessage("Password must contain a number")
+      .withMessage('Password must contain a number')
       .matches(/[!@#$%^&*(),.?":{}|<>]/)
-      .withMessage("Password must contain a special character");
+      .withMessage('Password must contain a special character');
 
     const errors = validationResult(req);
 

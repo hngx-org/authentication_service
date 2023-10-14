@@ -3,9 +3,9 @@ const resendVerificationEmail = require('./resendVerificationEmail');
 const sendPasswordResetEmail = require('./sendPasswordResetEmail');
 
 const MessagingController = {
-	sendSignUpEmail,
-	resendVerificationEmail,
-	sendPasswordResetEmail,
+  sendSignUpEmail,
+  resendVerificationEmail,
+  sendPasswordResetEmail,
 };
 
 module.exports = MessagingController;

@@ -1,7 +1,12 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const User = require("../../models/Users");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../../models/Users');
 
+/**
+ * @description recieves a token and a new password from the user, verifies the token and updates the user's Password
+ * @param {object} req - request object
+ * @param {object} res - response object
+ */
 const reset = (req, res) => {
   const { token, password } = req.body;
   const { JWT_SECRET } = process.env;
@@ -10,7 +15,7 @@ const reset = (req, res) => {
     if (err) {
       return res.status(400).json({
         status: 400,
-        message: "Invalid token",
+        message: 'Invalid token',
       });
     }
 
@@ -20,7 +25,7 @@ const reset = (req, res) => {
     if (!user) {
       return res.status(400).json({
         status: 400,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
@@ -30,7 +35,7 @@ const reset = (req, res) => {
 
     return res.status(200).json({
       status: 200,
-      message: "Password reset successful",
+      message: 'Password reset successful',
     });
   });
 };

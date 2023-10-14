@@ -1,8 +1,8 @@
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
-const dotenv = require("dotenv");
-const User = require("../models/Users");
-const errorHandler = require("../middleware/ErrorMiddleware");
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
+const dotenv = require('dotenv');
+const User = require('../models/Users');
+const errorHandler = require('../middleware/ErrorMiddleware');
 
 dotenv.config();
 // Facebook Strategy
@@ -26,14 +26,14 @@ passport.use(
             first_name: profile.name.givenName,
             last_name: profile.name.familyName,
             email: profile.emails[0].value,
-            refresh_token: "",
+            refresh_token: '',
           });
         }
       } catch {
         errorHandler(err, req, res);
       }
-    }
-  )
+    },
+  ),
 );
 
 passport.serializeUser(function (user, cb) {

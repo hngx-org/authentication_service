@@ -1,17 +1,17 @@
-const { Router } = require("express");
-const PasswordController = require("../controllers/PasswordController");
-const MessagingController = require("../controllers/MessagingController");
+const { Router } = require('express');
+const PasswordController = require('../controllers/PasswordController');
+const MessagingController = require('../controllers/MessagingController');
 
 const router = Router();
 
-router.get("/:token", PasswordController.verifyPasswwordResetToken);
-
+// => /auth/reset-password
 router.post(
-  "/",
+  '/',
   PasswordController.send,
   MessagingController.sendPasswordResetEmail,
 );
 
-router.patch("/", PasswordController.reset);
+// => /auth/reset-password
+router.patch('/', PasswordController.reset);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const User = require("../../models/Users");
+const User = require('../../models/Users');
 
 const resendVerification = async (req, res, next) => {
   const { email } = req.body;
@@ -10,14 +10,14 @@ const resendVerification = async (req, res, next) => {
   if (!user) {
     return res.status(404).json({
       status: 404,
-      message: "User not found",
+      message: 'User not found',
     });
   }
 
   if (user.is_verified) {
     return res.status(400).json({
       status: 400,
-      message: "User already verified",
+      message: 'User already verified',
     });
   }
 
