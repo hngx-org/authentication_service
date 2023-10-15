@@ -89,5 +89,5 @@ router.post('/2fa/send-code', AuthenticationController.send2faCode);
 router.post('/2fa/verify-code', AuthenticationController.verify2fa);
 
 
-router.get('/revalidate-login', revalidateLogin);
+router.get('/revalidate-login/:token', revalidateLogin);
 module.exports = router;
