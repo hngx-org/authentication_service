@@ -7,7 +7,11 @@ interface User {
   firstName: string;
   email: string;
 }
-
+/**
+ * 
+ * @param user 
+ * @returns 
+ */
 const createJwtToken = (user: User): string => {
   const { JWT_SECRET } = process.env;
   const jwtPayload = {
@@ -51,7 +55,9 @@ const sendPasswordResetEmail = async (
     process.env;
   const { user } = req as any;
 
+//   Generate JWT token
   const token = createJwtToken(user);
+
   const emailServiceUrl = EMAIL_SERVICE_PASSWORD_RESET_URL as string;
   const passwordResetLink = `${PASSWORD_RESET_SUCCESS_URL}?token=${token}`;
 
@@ -93,7 +99,9 @@ const resendVerification = async (
 
   const { id, firstName, email } = req.user;
 
+//   Generate JWT token
   const token = createJwtToken({ id, firstName, email });
+
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
   const verificationLink =
     NODE_ENV === "production"
@@ -140,7 +148,9 @@ const sendSignUpEmail = async (
   }
   const { id, firstName, email } = req.user;
 
+  //   Generate JWT token
   const token = createJwtToken({ id, firstName, email });
+
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
   const verificationLink =
     NODE_ENV === "production"
