@@ -1,6 +1,7 @@
 const GitHubStrategy = require('passport-github2').Strategy;
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
+const {sendWelcomeMail} = require("../controllers/MessagingController/sendWelcomeMail");
 
 module.exports = (passport) => {
   passport.use(
@@ -30,17 +31,23 @@ module.exports = (passport) => {
           // User doesn't exist, create a new user and generate a JWT token.
           if (!user)
           {
-            user = await User.create({
-              email: profile._json.email,
-              username: profile.username,
-              profile_pic: profile._json.avatar_url,
-              is_verified: true,
-              first_name: profile.displayName.split(' ')[0],
-              last_name: profile.displayName.split(' ')[1],
-              refresh_token: '',
-          });
+                user = await User.create({
+                  email: profile._json.email,
+                  username: profile.username,
+                  profile_pic: profile._json.avatar_url,
+                  is_verified: true,
+                  first_name: profile.displayName.split(' ')[0],
+                  last_name: profile.displayName.split(' ')[1],
+                  refresh_token: '',
+              });
+            if (user) {
+                // new response to sign user in immediately after verification
+              const fullName = `${user.first_name} ${user.last_name}`;
+              // Todo: add await if needed later
+              sendWelcomeMail(fullName, user.email);
+            }
           }
-          
+
           return done(null, user);
         } catch (error) {
           return done(error);
