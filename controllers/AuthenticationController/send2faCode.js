@@ -1,8 +1,6 @@
 const Joi = require('joi');
 const User = require('../../models/Users');
-const { default: axios } = require('axios');
-
-const { EMAIL_SERVICE_2FA_URL } = process.env;
+const send2fa = require('../../helpers/send2fa');
 
 const enable2faSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -29,6 +27,8 @@ const send2faCode = async (req, res) => {
     });
   }
 
+    const response = await send2fa(user);
+    res.status(response.status).json({ response });
 };
 
 module.exports = send2faCode;
