@@ -1,9 +1,9 @@
-const User = require('../../models/Users');
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+const User = require('../../models/Users');
 
 const verify2faSchema = Joi.object({
   code: Joi.number().min(100000).max(999999).required(),
-  email: Joi.string().email().required(),
 });
 
 const verify2fa = async (req, res) => {
@@ -39,15 +39,29 @@ const verify2fa = async (req, res) => {
 
   await user.update({ refresh_token: null, two_factor_auth: true });
 
+  const jwt_payload = {
+    id: user.id,
+    firstName: user.first_name,
+    email: user.email,
+  };
+
+  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
+  res.header('Authorization', `Bearer ${token}`);
+
   return res.status(200).json({
     status: 200,
     message: 'Two factor code verified',
-    user: {
-      id: user.id,
-      firstName: user.first_name,
-      email: user.email,
-      twoFactorEnabled: user.two_factor_auth,
-      isVerified: user.is_verified,
+    data: {
+      token,
+      user: {
+        id: user.id,
+        roleId: user.role_id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        isVerified: user.is_verified,
+        twoFactorAuth: user.two_factor_auth,
+      },
     },
   });
 };
