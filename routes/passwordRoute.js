@@ -11,6 +11,11 @@ router.post(
   MessagingController.sendPasswordResetEmail,
 );
 
+router.post(
+  '/change',
+  PasswordController.change,
+);
+
 // => /auth/reset-password
 router.patch('/', PasswordController.reset);
 
