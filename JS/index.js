@@ -22,6 +22,7 @@ const {
   errorHandler,
 } = require('./middleware/errorHandlerMiddleware');
 const { notFound } = require('./middleware/notFound');
+const { logger } = require('./middleware/mailConfig');
 
 const app = express();
 app.set('trust proxy', true);
@@ -89,4 +90,4 @@ app.use(errorHandler);
 app.use(notFound);
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));
