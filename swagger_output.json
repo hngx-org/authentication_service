@@ -337,33 +337,6 @@
         }
       }
     },
-    "/api/auth/reset-password/{token}": {
-      "get": {
-        "tags": [
-          "PASSWORD RESET AND EMAIL VERIFICATION"
-        ],
-        "description": "Handles the process of resetting a user's forgotten password.",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
     "/api/auth/2fa/enable": {
       "post": {
         "tags": [
@@ -479,84 +452,6 @@
           },
           "500": {
             "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/auth/google": {
-      "get": {
-        "tags": [
-          "Google-Auth"
-        ],
-        "description": "Handles the process of signing up using google auth.",
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "401": {
-            "description": "Unauthorized Request, The user is not authorized for this request."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/auth/google/redirect": {
-      "get": {
-        "tags": [
-          "Google-Auth"
-        ],
-        "description": "Handle the process of creating a new user in the database using Google OAuth.",
-        "requestBody": {
-          "description": "User data for creating a new user",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "idToken": {
-                    "type": "string",
-                    "description": "Google ID token received during authentication"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "User's name"
-                  },
-                  "email": {
-                    "type": "string",
-                    "description": "User's email address"
-                  },
-                  "id": {
-                    "type": "string",
-                    "description": "user's id"
-                  }
-                },
-                "required": [
-                  "idToken",
-                  "name",
-                  "email"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success, user created successfully."
-          },
-          "400": {
-            "description": "Bad Request, invalid request or missing required fields."
-          },
-          "401": {
-            "description": "Unauthorized, user is not authorized for this request."
-          },
-          "500": {
-            "description": "Internal Server Error, error processing the request on the server."
           }
         }
       }
