@@ -13,7 +13,7 @@ const sendPasswordResetEmail = async (req, res) => {
     email: user.email,
   };
 
-  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
+  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET, {expiresIn: 600});
   const emailServiceUrl = EMAIL_SERVICE_PASSWORD_RESET_URL;
   const passwordResetLink = `${PASSWORD_RESET_SUCCESS_URL}?token=${token}`;
 

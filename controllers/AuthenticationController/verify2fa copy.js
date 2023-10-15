@@ -55,11 +55,12 @@ const verify2fa = async (req, res) => {
       token,
       user: {
         id: user.id,
+        roleId: user.role_id,
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
-        is_verified: user.is_verified,
-        two_factor_auth: user.two_factor_auth,
+        isVerified: user.is_verified,
+        twoFactorAuth: user.two_factor_auth,
       },
     },
   });
