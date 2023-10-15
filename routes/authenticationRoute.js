@@ -7,6 +7,7 @@ const MessagingController = require('../controllers/MessagingController');
 const registrationValidation = require('../middleware/registrationValidation');
 const AuthenticationValidator = require('../validators/AuthenticationValidator');
 const revalidateLogin = require('../controllers/AuthenticationController/revalidateLogin');
+const send2fa = require('../middleware/2faSender');
 
 const router = Router();
 
@@ -27,7 +28,7 @@ router.post(
 );
 
 router.get(
-  '/verify/:token', 
+  '/verify/:token',
   AuthenticationController.verifyUser,
   AuthenticationController.loginResponse,);
 
@@ -43,6 +44,7 @@ router.post(
   '/login',
   AuthenticationValidator.login,
   AuthenticationController.login,
+  send2fa,
   AuthenticationController.loginResponse,
 );
 
@@ -58,6 +60,7 @@ router.get(
   passport.authenticate('google', {
     session: false,
   }),
+  send2fa,
   AuthenticationController.loginResponse,
 );
 
@@ -69,6 +72,7 @@ router.get(
 router.get(
   '/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
+  send2fa,
   AuthenticationController.loginResponse,
 );
 
@@ -80,6 +84,7 @@ router.get(
 router.get(
   '/github/redirect',
   passport.authenticate('github', { session: false }),
+  send2fa,
   AuthenticationController.loginResponse,
 );
 

@@ -29,30 +29,6 @@ const send2faCode = async (req, res) => {
     });
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-  await user.update({ refresh_token: code });
-
-  try {
-    const response = await axios.post(EMAIL_SERVICE_2FA_URL, {
-      recipient: email,
-      name: user.first_name,
-      code,
-    });
-
-    if (response.status === 200) {
-      return res.status(200).json({
-        status: 200,
-        message: '2fa code sent',
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      message: 'Internal server error',
-      error: error,
-    });
-  }
 };
 
 module.exports = send2faCode;
