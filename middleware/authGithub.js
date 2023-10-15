@@ -28,6 +28,7 @@ module.exports = (passport) => {
                         where: {email: profile._json.email},
                     });
 
+
                     // User doesn't exist, create a new user and generate a JWT token.
                     if (!user) {
                         user = await User.create({

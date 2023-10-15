@@ -36,6 +36,7 @@ passport.use(
               sendWelcomeMail(fullName, user.email)
           }
         }
+        return cb(null, user)
       } catch {
         errorHandler(err, req, res);
       }
