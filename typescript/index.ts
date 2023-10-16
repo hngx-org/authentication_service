@@ -1,6 +1,8 @@
 import express from 'express';
 import sequelize from './config/db.config';
 import userRouterHandler from './routes/userRouter';
+import rbacRouterHandler from './routes/rbacRouter';
+
 import cors from 'cors';
 import dotenv from 'dotenv'; // ES6 import for dotenv
 
@@ -26,6 +28,8 @@ sequelize.sync({ force: true })
   });
 
 app.use('/api/auth', userRouterHandler);
+rbacRouterHandler
+app.use('/api/auth', rbacRouterHandler);
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

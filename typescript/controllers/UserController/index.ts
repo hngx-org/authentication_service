@@ -528,5 +528,5 @@ export const enable2fa = async (req: Request, res: Response) => {
 export const send2faCode = async (req: Request, res: Response) => {
   const code = await generateFourDigitPassword();
   // TODO SEND 2F CODE
-  return success("Two factor code send", null, 200, res);
+  return success("Two factor code send"+ code, null, 200, res);
 };
