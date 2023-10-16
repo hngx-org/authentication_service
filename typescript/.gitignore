@@ -4,3 +4,5 @@ yarn.lock
 .env
 .prettierrc
 dist/
+.idea/
+
