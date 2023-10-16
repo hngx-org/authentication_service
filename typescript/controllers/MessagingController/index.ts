@@ -23,6 +23,16 @@ const createJwtToken = (user: IUser): string => {
   return jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: 600 });
 };
 
+const generateVerificationLink = (token: string, NODE_ENV: string): string => {
+    const {  VERIFY_EMAIL_ENDPOINT_LIVE, VERIFY_EMAIL_ENDPOINT_DEV} = process.env;
+  const endpoint =
+    NODE_ENV === "production"
+      ? VERIFY_EMAIL_ENDPOINT_LIVE
+      : VERIFY_EMAIL_ENDPOINT_DEV;
+  return `${endpoint}?token=${token}`;
+};
+
+
 /**
  *
  * @param emailServiceUrl
@@ -101,10 +111,11 @@ const resendVerification = async (
   const token = createJwtToken({ id, firstName, email });
 
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
-  const verificationLink =
-    NODE_ENV === "production"
-      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
-      : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  // const verificationLink =
+  //   NODE_ENV === "production"
+  //     ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
+  //     : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  const verificationLink = generateVerificationLink(token, NODE_ENV as string);
 
   const emailSent = await sendEmail(emailServiceUrl, {
     recipient: email,
@@ -149,10 +160,11 @@ const sendSignUpEmail = async (
   const token = createJwtToken({ id, firstName, email });
 
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
-  const verificationLink =
-    NODE_ENV === "production"
-      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
-      : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  // const verificationLink =
+  //   NODE_ENV === "production"
+  //     ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
+  //     : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  const verificationLink = generateVerificationLink(token, NODE_ENV as string);
 
   const emailSent = await sendEmail(emailServiceUrl, {
     recipient: email,
