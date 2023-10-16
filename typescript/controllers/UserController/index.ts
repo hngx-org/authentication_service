@@ -22,6 +22,10 @@ const loginSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+const enable2faSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 const emailSchema = Joi.object({
   email: Joi.string().email().required(),
 });
@@ -447,7 +451,12 @@ export const restPassword = async (req: Request, res: Response) => {
     res
   );
 };
-
+/**
+ * 
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const revalidateLogin = async (req: Request, res: Response) => {
   const { token } = req.params;
 
@@ -458,7 +467,7 @@ export const revalidateLogin = async (req: Request, res: Response) => {
   if (!user) {
     res.status(404).json({ message: "user not found" });
   }
-  
+
   res.header("Authorization", `Bearer ${token}`);
 
   return res.status(200).json({
@@ -476,4 +485,40 @@ export const revalidateLogin = async (req: Request, res: Response) => {
       },
     },
   });
+};
+/**
+ * 
+ * @param req 
+ * @param res 
+ * @returns 
+ */
+export const enable2fa = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const result = registerSchema.validate(req.body);
+
+  if (result.error) {
+    return res.status(400).json({ errors: result.error.details });
+  }
+
+  const findUser = await findUserByEmail(email);
+
+  if (!findUser) {
+    return res.status(404).json({
+      status: 404,
+      message: "User not found",
+    });
+  }
+  findUser.twoFactorAuth = true;
+  await findUser.save();
+
+  return success(
+    "Two factor authentication enabled",
+    {
+      id: findUser.id,
+      email: findUser.email,
+    },
+    201,
+    res
+  );
 };
