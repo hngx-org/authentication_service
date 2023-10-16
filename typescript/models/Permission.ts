@@ -1,7 +1,7 @@
 import {Model, Table, Column, CreatedAt, DataType} from "sequelize-typescript";
 
 @Table({tableName: 'permissions', timestamps: false})
-export default class Permissions extends Model<Permissions> {
+export default class Permission extends Model<Permission> {
 @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
   id: number;
 

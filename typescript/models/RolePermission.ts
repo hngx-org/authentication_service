@@ -1,9 +1,9 @@
 import {Model, DataType, Column, Table, CreatedAt, BelongsToMany} from "sequelize-typescript";
-import Permissions from "./Permissions";
-import Roles from "./Roles.js";
+import Permission from "./Permission";
+import Role from "./Role";
 
 @Table({tableName: "role_permissions", timestamps: false})
-export default class RolePermissions extends Model<RolePermissions> {
+export default class RolePermission extends Model<RolePermission> {
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true, autoIncrementIdentity: true })
       id: number;
 
@@ -16,9 +16,9 @@ export default class RolePermissions extends Model<RolePermissions> {
     @CreatedAt
       created_at: Date;
 
-    @BelongsToMany(() => Permissions, () => RolePermissions,  'role_id',  'permission_id')
-      permissions: RolePermissions[];
+    @BelongsToMany(() => Permission, () => RolePermission,  'role_id',  'permission_id')
+      permissions: RolePermission[];
 
-    @BelongsToMany(() => Roles , () => RolePermissions,  'permission_id',  'role_id')
-      roles: RolePermissions[];
+    @BelongsToMany(() => Role , () => RolePermission,  'permission_id',  'role_id')
+      roles: RolePermission[];
 }

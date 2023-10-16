@@ -1,8 +1,8 @@
 import {Sequelize} from 'sequelize-typescript'
-import Users from "../models/Users";
-import Roles from "../models/Roles.js";
-import RolesPermissions from "../models/RolePermissions.js";
-import Permissions from "../models/Permissions.js";
+import User from "../models/User";
+import Role from "../models/Role";
+import RolesPermissions from "../models/RolePermission";
+import Permission from "../models/Permission";
 import PasswordResetToken from "../models/PasswordResetToken";
 
 const sequelize = new Sequelize({
@@ -13,9 +13,9 @@ const sequelize = new Sequelize({
   database: process.env.DB_NAME,
 });
 
-sequelize.addModels([Roles])
-sequelize.addModels([Users]);
-sequelize.addModels([Permissions])
+sequelize.addModels([Role])
+sequelize.addModels([User]);
+sequelize.addModels([Permission])
 sequelize.addModels([PasswordResetToken])
 sequelize.addModels([RolesPermissions])
 export default sequelize;

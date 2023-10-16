@@ -1,8 +1,8 @@
 import {Table, Column, Model, DataType, CreatedAt, ForeignKey, HasOne} from 'sequelize-typescript'
-import Roles from "./Roles.js";
+import Role from "./Role";
 
 @Table({tableName: 'users', timestamps: false})
-export default class Users extends Model<Users> {
+export default class User extends Model<User> {
   @Column({type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true})
     id: string;
 
@@ -33,7 +33,7 @@ export default class Users extends Model<Users> {
   @Column({type: DataType.STRING, field: 'refresh_token'})
     refreshToken: string;
 
-  @ForeignKey(() => Roles)
+  @ForeignKey(() => Role)
   @Column({type: DataType.INTEGER, defaultValue: 2, allowNull: false, field: 'role_id'})
     roleId: number;
 
@@ -52,6 +52,6 @@ export default class Users extends Model<Users> {
   @CreatedAt
     createdAt: Date;
 
-  @HasOne(() => Roles, 'role_id')
-    userRole: Roles;
+  @HasOne(() => Role, 'role_id')
+    userRole: Role;
 }
