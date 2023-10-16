@@ -3,6 +3,7 @@ import User from "../../models/User";
 import sendVerificationEmail, {
   IUserPayload,
   comparePassword,
+  generateFourDigitPassword,
   generateToken,
   hashPassword,
   success,
@@ -452,10 +453,10 @@ export const restPassword = async (req: Request, res: Response) => {
   );
 };
 /**
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export const revalidateLogin = async (req: Request, res: Response) => {
   const { token } = req.params;
@@ -487,10 +488,10 @@ export const revalidateLogin = async (req: Request, res: Response) => {
   });
 };
 /**
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export const enable2fa = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -521,4 +522,10 @@ export const enable2fa = async (req: Request, res: Response) => {
     201,
     res
   );
+};
+
+export const send2faCode = async (req: Request, res: Response) => {
+  const code = await generateFourDigitPassword();
+  // TODO SEND 2F CODE
+  return success("Two factor code send", null, 200, res);
 };

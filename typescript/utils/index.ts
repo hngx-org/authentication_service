@@ -83,4 +83,8 @@ export const sendVerificationEmail = async (
   }
 };
 
-export default sendVerificationEmail;
+export const  generateFourDigitPassword = ()=> {
+  const timestamp = Date.now().toString(); 
+  const lastFourDigits = timestamp.substr(timestamp.length - 4); // Extract the last 4 digits
+  return lastFourDigits;
+}
