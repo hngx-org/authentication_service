@@ -495,7 +495,7 @@ export const revalidateLogin = async (req: Request, res: Response) => {
 export const enable2fa = async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  const result = registerSchema.validate(req.body);
+  const result = enable2faSchema.validate(req.body);
 
   if (result.error) {
     return res.status(400).json({ errors: result.error.details });
