@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
-import sendVerificationEmail, {
+import {
   IUserPayload,
   comparePassword,
   generateFourDigitPassword,
   generateToken,
   hashPassword,
+  sendVerificationEmail,
   success,
   verifyToken,
 } from "../../utils";
