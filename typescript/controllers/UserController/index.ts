@@ -365,7 +365,7 @@ export const changePassword = async (req: Request, res: Response) => {
   findUser.password = await hashPassword(newPassword);
   await findUser.save();
   return success(
-    "Password changedsuccessfully",
+    "Password changed successfully",
     {
       id: findUser.id,
       email: findUser.email,
