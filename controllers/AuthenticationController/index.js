@@ -7,6 +7,7 @@ const login = require('./login');
 const enable2fa = require('./enable2fa');
 const send2faCode = require('./send2faCode');
 const verify2fa = require('./verify2fa');
+const disable2fa = require('./disable2fa');
 const loginResponse = require('../../middleware/loginResponse');
 loginResponse;
 
@@ -16,11 +17,12 @@ const AuthenticationController = {
   createGuest,
   loginResponse,
   enable2fa,
+  disable2fa,
   send2faCode,
   verify2fa,
   verifyUser,
   resendVerification,
-  login
+  login,
 };
 
 module.exports = AuthenticationController;
