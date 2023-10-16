@@ -9,6 +9,9 @@ export interface IUserPayload {
   id: string;
   email: string;
   firstName?: string;
+  isVerified?: boolean,
+  twoFactorAuth?: boolean
+
   // Add more user-related properties if needed
 }
 export function success(
@@ -62,7 +65,7 @@ export const sendVerificationEmail = async (
     // TODO email link not valid
     const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-    const response = await axios.post(`${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`, {
+    const response = await axios.post(`${process.env.EMAIL_SERVICE_URL}/api/user/email-verification`, {
       name,
       recipient,
       // eslint-disable-next-line camelcase

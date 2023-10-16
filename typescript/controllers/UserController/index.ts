@@ -11,6 +11,7 @@ import {
   verifyToken,
 } from "../../utils";
 import Joi from "Joi";
+import axios from "axios";
 
 const registerSchema = Joi.object({
   firstName: Joi.string().required(),
@@ -159,6 +160,8 @@ export const loginUser = async (req: Request, res: Response) => {
     const payload: IUserPayload = {
       email: findUser.email,
       id: findUser.id,
+      twoFactorAuth: findUser.twoFactorAuth,
+      isVerified: findUser.isVerified,
     };
 
     const token = await generateToken(payload);
@@ -526,7 +529,27 @@ export const enable2fa = async (req: Request, res: Response) => {
 };
 
 export const send2faCode = async (req: Request, res: Response) => {
-  const code = await generateFourDigitPassword();
-  // TODO SEND 2F CODE
-  return success("Two factor code send"+ code, null, 200, res);
+  // TODO PROTECT IT WITH AUTH MIDDLEWARE
+  const findUser = await findUserByEmail("email");
+  try {
+    if (!findUser) {
+      return res.status(404).json({
+        status: 404,
+        message: "User not found",
+      });
+    }
+
+    const code = await generateFourDigitPassword();
+    const response = await axios.post(process.env.EMAIL_SERVICE_2FA_URL, {
+      recipient: findUser.email,
+      name: findUser.firstName,
+      code,
+    });
+    if (response.status === 200) {
+      return success("Two factor code send", null, 200, res);
+    }
+    return res.status(500).json({ message: "email not sent" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
