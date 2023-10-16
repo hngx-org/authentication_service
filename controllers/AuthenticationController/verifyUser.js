@@ -4,11 +4,11 @@ const {sendWelcomeMail} = require("../MessagingController/sendWelcomeMail");
 
 const verifyUser = async (req, res, next) => {
   const { token } = req.params;
-  const { JWT_SECRET } = process.env;
+  const { SIGN_UP_JWT_SECRET } = process.env;
 
   try {
 
-    const decodedUser = jwt.verify(token, JWT_SECRET);
+    const decodedUser = jwt.verify(token, SIGN_UP_JWT_SECRET);
 
 
     // verify user in database
