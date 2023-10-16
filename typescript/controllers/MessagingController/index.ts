@@ -9,9 +9,9 @@ interface User {
   email: string;
 }
 /**
- * 
- * @param user 
- * @returns 
+ *
+ * @param user
+ * @returns
  */
 const createJwtToken = (user: User): string => {
   const { JWT_SECRET } = process.env;
@@ -37,7 +37,6 @@ const sendEmail = async (
     const response = await axios.post(emailServiceUrl, data);
     return response.status === 200;
   } catch (error) {
-    console.error("Error sending email:", error.message);
     return false;
   }
 };
@@ -56,7 +55,7 @@ const sendPasswordResetEmail = async (
     process.env;
   const { user } = req as any;
 
-//   Generate JWT token
+  //   Generate JWT token
   const token = createJwtToken(user);
 
   const emailServiceUrl = EMAIL_SERVICE_PASSWORD_RESET_URL as string;
@@ -69,7 +68,7 @@ const sendPasswordResetEmail = async (
   });
 
   if (emailSent) {
-      success('Password reset link sent successfully', 200)
+    success("Password reset link sent successfully", 200);
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
@@ -98,7 +97,7 @@ const resendVerification = async (
 
   const { id, firstName, email } = req.user;
 
-//   Generate JWT token
+  //   Generate JWT token
   const token = createJwtToken({ id, firstName, email });
 
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
@@ -114,7 +113,11 @@ const resendVerification = async (
   });
 
   if (emailSent) {
-      success('Verification email resent. Please check your email for the verification link', req.user, 200)
+    success(
+      "Verification email resent. Please check your email for the verification link",
+      req.user,
+      200
+    );
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
@@ -158,7 +161,11 @@ const sendSignUpEmail = async (
   });
 
   if (emailSent) {
-    success('Verification email resent. Please check your email for the verification link', req.user, 200)
+    success(
+      "Verification email resent. Please check your email for the verification link",
+      req.user,
+      200
+    );
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
