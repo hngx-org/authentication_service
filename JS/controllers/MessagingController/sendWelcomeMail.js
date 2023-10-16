@@ -1,12 +1,11 @@
 /*eslint-disable */
 const axios = require('axios');
-const { logger } = require('../../middleware/mailConfig');
+const logger = require('../../middleware/logger');
 async function sendWelcomeMail(name, recipient) {
   const responsObj = {};
   try {
     const emailServiceUrl = `${process.env.EMAIL_SERVICE_WELCOME_URL}`;
     const redirectLink = `${process.env.AUTH_FRONTEND_URL}`;
-
     const response = await axios.post(emailServiceUrl, {
       name,
       recipient,
