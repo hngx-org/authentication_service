@@ -24,14 +24,13 @@ const createJwtToken = (user: IUser): string => {
 };
 
 const generateVerificationLink = (token: string, NODE_ENV: string): string => {
-    const {  VERIFY_EMAIL_ENDPOINT_LIVE, VERIFY_EMAIL_ENDPOINT_DEV} = process.env;
+  const { VERIFY_EMAIL_ENDPOINT_LIVE, VERIFY_EMAIL_ENDPOINT_DEV } = process.env;
   const endpoint =
     NODE_ENV === "production"
       ? VERIFY_EMAIL_ENDPOINT_LIVE
       : VERIFY_EMAIL_ENDPOINT_DEV;
   return `${endpoint}?token=${token}`;
 };
-
 
 /**
  *
@@ -93,12 +92,7 @@ const resendVerification = async (
   req: Request | any,
   res: Response
 ): Promise<void> => {
-  const {
-    EMAIL_SERVICE_VERIFY_EMAIL_URL,
-    VERIFY_EMAIL_ENDPOINT_LIVE,
-    VERIFY_EMAIL_ENDPOINT_DEV,
-    NODE_ENV,
-  } = process.env;
+  const { EMAIL_SERVICE_VERIFY_EMAIL_URL, NODE_ENV } = process.env;
   const user = req.user as IUser | undefined;
 
   if (!user) {
@@ -110,11 +104,11 @@ const resendVerification = async (
   //   Generate JWT token
   const token = createJwtToken({ id, firstName, email });
 
-  const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
   // const verificationLink =
   //   NODE_ENV === "production"
   //     ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
   //     : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL as string;
   const verificationLink = generateVerificationLink(token, NODE_ENV as string);
 
   const emailSent = await sendEmail(emailServiceUrl, {
@@ -143,12 +137,7 @@ const sendSignUpEmail = async (
   req: Request | any,
   res: Response
 ): Promise<void> => {
-  const {
-    EMAIL_SERVICE_VERIFY_EMAIL_URL,
-    VERIFY_EMAIL_ENDPOINT_LIVE,
-    VERIFY_EMAIL_ENDPOINT_DEV,
-    NODE_ENV,
-  } = process.env;
+  const { EMAIL_SERVICE_VERIFY_EMAIL_URL, NODE_ENV } = process.env;
 
   const user = req.user as IUser | undefined;
   if (!user) {
