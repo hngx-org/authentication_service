@@ -1,7 +1,8 @@
 import {Table, Column, Model, DataType, CreatedAt, ForeignKey, HasOne} from 'sequelize-typescript'
 import Roles from "./Roles.js";
+import {DataTypes} from "sequelize";
 
-@Table({tableName: 'users'})
+@Table({tableName: 'users', timestamps: false})
 export default class Users extends Model<Users> {
     @Column({type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true})
     id: string;
