@@ -374,3 +374,32 @@ export const changePassword = async (req: Request, res: Response) => {
     res
   );
 };
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const result = emailSchema.validate(req.body);
+
+  if (result) {
+    return res.status(400).json({ errors: result.error.details });
+  }
+
+  const findUser = await findUserByEmail(email);
+
+  if (!findUser) {
+    return res
+      .status(400)
+      .json({ status: 401, message: "User not found" });
+  }
+
+  // TODO send resent link
+  return success(
+    "Forgot password link send successfully",
+    {
+      id: findUser.id,
+      email: findUser.email,
+    },
+    200,
+    res
+  );
+};
