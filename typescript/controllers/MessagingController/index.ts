@@ -36,7 +36,6 @@ const sendEmail = async (
     const response = await axios.post(emailServiceUrl, data);
     return response.status === 200;
   } catch (error) {
-    console.error("Error sending email:", error.message);
     return false;
   }
 };
