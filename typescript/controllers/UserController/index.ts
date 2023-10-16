@@ -32,6 +32,11 @@ const changePasswordSchema = Joi.object({
   confirmPasssword: Joi.ref("newPassword"),
 });
 
+const resetPasswordSchema = Joi.object({
+  newPassword: Joi.string().required(),
+  confirmPasssword: Joi.ref("newPassword"),
+});
+
 export const findUserByEmail = async (email: string): Promise<User | null> => {
   try {
     const findUser = await User.findOne({ where: { email } });
@@ -374,7 +379,12 @@ export const changePassword = async (req: Request, res: Response) => {
     res
   );
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -387,14 +397,43 @@ export const forgotPassword = async (req: Request, res: Response) => {
   const findUser = await findUserByEmail(email);
 
   if (!findUser) {
-    return res
-      .status(400)
-      .json({ status: 401, message: "User not found" });
+    return res.status(400).json({ status: 401, message: "User not found" });
   }
 
   // TODO send resent link
   return success(
     "Forgot password link send successfully",
+    {
+      id: findUser.id,
+      email: findUser.email,
+    },
+    200,
+    res
+  );
+};
+
+export const restPassword = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  const result = resetPasswordSchema.validate(req.body);
+
+  if (result) {
+    return res.status(400).json({ errors: result.error.details });
+  }
+
+  const decodedUser = verifyToken(token);
+
+  const findUser = await findUserByEmail(decodedUser.email);
+
+  if (!findUser) {
+    return res.status(401).json({ status: 401, message: "Invalid token" });
+  }
+
+  findUser.password = await hashPassword(newPassword);
+  await findUser.save();
+  return success(
+    "Password change successfully",
     {
       id: findUser.id,
       email: findUser.email,

@@ -1,5 +1,5 @@
 import express from 'express';
-import {changeEmail, changeEmailLink, changePassword, checkEmail, createUser, forgotPassword, loginUser, resendVerification, verifyUser} from "../controllers/UserController";
+import {changeEmail, changeEmailLink, changePassword, checkEmail, createUser, forgotPassword, loginUser, resendVerification, restPassword, verifyUser} from "../controllers/UserController";
 
 const userRouter = express.Router();
 
@@ -12,5 +12,7 @@ userRouter.post('change-email', changeEmailLink);
 userRouter.patch('change-email/:token', changeEmail);
 userRouter.put('change-password', changePassword);
 userRouter.post('forgot-password', forgotPassword);
+userRouter.post('reset-password/:token', restPassword);
+
 
 export default userRouter;
