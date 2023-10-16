@@ -1,4 +1,4 @@
-export function success(message: string, args: any = {} || null, statusCode?: number) {
+export function success(message: string, args: unknown = {} || null, statusCode?: number) {
   return {
     status: 'success',
     statusCode: statusCode || 200,
