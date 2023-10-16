@@ -9,7 +9,6 @@ const send2faCode = require('./send2faCode');
 const verify2fa = require('./verify2fa');
 const disable2fa = require('./disable2fa');
 const loginResponse = require('../../middleware/loginResponse');
-loginResponse;
 
 const AuthenticationController = {
   checkEmail,
