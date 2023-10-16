@@ -13,17 +13,16 @@ interface IUser {
  * @param user
  * @returns
  */
-const createJwtToken = (user: IUser): string => {
-  const { JWT_SECRET } = process.env;
+export const createJwtToken = (user: IUser): string => {
   const jwtPayload = {
     id: user.id,
     firstName: user.firstName,
     email: user.email,
   };
-  return jwt.sign(jwtPayload, JWT_SECRET, { expiresIn: 600 });
+  return jwt.sign(jwtPayload, process.env.JWT_SECRET as string, { expiresIn: 600 });
 };
 
-const generateVerificationLink = (token: string, NODE_ENV: string): string => {
+export const generateVerificationLink = (token: string, NODE_ENV: string): string => {
   const { VERIFY_EMAIL_ENDPOINT_LIVE, VERIFY_EMAIL_ENDPOINT_DEV } = process.env;
   const endpoint =
     NODE_ENV === "production"

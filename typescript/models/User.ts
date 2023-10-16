@@ -6,7 +6,7 @@ export default class User extends Model<User> {
   @Column({type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true})
     id: string;
 
-  @Column({type: DataType.STRING, allowNull: false})
+  @Column({type: DataType.STRING, allowNull: true})
     username: string;
 
   @Column({type: DataType.STRING, allowNull: false, field: 'first_name'})
