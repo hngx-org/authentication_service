@@ -411,7 +411,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     res
   );
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
 export const restPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -441,4 +446,34 @@ export const restPassword = async (req: Request, res: Response) => {
     200,
     res
   );
+};
+
+export const revalidateLogin = async (req: Request, res: Response) => {
+  const { token } = req.params;
+
+  const decodedUser = verifyToken(token);
+
+  const { id } = decodedUser;
+  const user = await User.findByPk(id);
+  if (!user) {
+    res.status(404).json({ message: "user not found" });
+  }
+  
+  res.header("Authorization", `Bearer ${token}`);
+
+  return res.status(200).json({
+    status: 200,
+    message: "Login successful",
+    token,
+    data: {
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        isVerified: user.isVerified,
+        twoFactorAuth: user.twoFactorAuth,
+      },
+    },
+  });
 };
