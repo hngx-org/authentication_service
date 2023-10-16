@@ -60,10 +60,9 @@ export const sendVerificationEmail = async (
 ) => {
   try {
     // TODO email link not valid
-    const emailServiceUrl = `${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`;
     const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-    const response = await axios.post(emailServiceUrl, {
+    const response = await axios.post(`${process.env.EMAIL_SERVICE_URL}/api/v1/user/email-verification`, {
       name,
       recipient,
       // eslint-disable-next-line camelcase
