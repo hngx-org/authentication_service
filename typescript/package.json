@@ -8,7 +8,9 @@
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix",
     "start": "node dist/index.js",
-    "dev": "nodemon dist/index.js"
+    "dev": "npm run clean && tsc && nodemon dist/index.js",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc"
   },
   "author": "",
   "license": "ISC",
