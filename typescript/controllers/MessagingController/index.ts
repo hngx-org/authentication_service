@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import axios from "axios";
 import { success } from "../../utils";
 
-interface User {
+interface IUser {
   id: string;
   firstName: string;
   email: string;
@@ -13,7 +13,7 @@ interface User {
  * @param user
  * @returns
  */
-const createJwtToken = (user: User): string => {
+const createJwtToken = (user: IUser): string => {
   const { JWT_SECRET } = process.env;
   const jwtPayload = {
     id: user.id,
@@ -89,7 +89,7 @@ const resendVerification = async (
     VERIFY_EMAIL_ENDPOINT_DEV,
     NODE_ENV,
   } = process.env;
-  const user = req.user as User | undefined;
+  const user = req.user as IUser | undefined;
 
   if (!user) {
     res.status(401).json({ status: 401, message: "User not found" });
@@ -139,7 +139,7 @@ const sendSignUpEmail = async (
     NODE_ENV,
   } = process.env;
 
-  const user = req.user as User | undefined;
+  const user = req.user as IUser | undefined;
   if (!user) {
     res.status(401).json({ status: 401, message: "User not found" });
   }
