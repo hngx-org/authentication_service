@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import { success } from "../../utils";
 
 interface User {
   id: string;
@@ -67,9 +68,7 @@ const sendPasswordResetEmail = async (
   });
 
   if (emailSent) {
-    res
-      .status(200)
-      .json({ status: 200, message: "Password reset link sent successfully" });
+    success('Password reset link sent successfully', 200)
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
@@ -114,12 +113,7 @@ const resendVerification = async (
   });
 
   if (emailSent) {
-    res.status(200).json({
-      status: 200,
-      message:
-        "Verification email resent. Please check your email for the verification link.",
-      user: req.user,
-    });
+    success('Verification email resent. Please check your email for the verification link', req.user, 200)
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
@@ -163,12 +157,7 @@ const sendSignUpEmail = async (
   });
 
   if (emailSent) {
-    res.status(200).json({
-      status: 200,
-      message:
-        "User created successfully. Please check your email to verify your account",
-      user: req.user,
-    });
+      success('Verification email resent. Please check your email for the verification link', req.user, 200)
   } else {
     res.status(500).json({ status: 500, message: "Email not sent" });
   }
