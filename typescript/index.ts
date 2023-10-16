@@ -1,8 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
-import passport from 'passport';
-import { Request, Response, NextFunction } from 'express';
 
 
 // dotenv config
