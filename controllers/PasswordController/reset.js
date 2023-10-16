@@ -9,9 +9,9 @@ const User = require('../../models/Users');
  */
 const reset = (req, res) => {
   const { token, password } = req.body;
-  const { JWT_SECRET } = process.env;
+  const { PASSWORD_RESET_JWT_SECRET } = process.env;
 
-  jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+  jwt.verify(token, PASSWORD_RESET_JWT_SECRET, async (err, decoded) => {
     if (err) {
       return res.status(400).json({
         status: 400,
