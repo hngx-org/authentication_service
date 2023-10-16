@@ -14,7 +14,8 @@ export default class RolePermission extends Model<RolePermission> {
       permissionId: number;
 
     @CreatedAt
-      created_at: Date;
+    @Column({type: DataType.DATE, field: 'created_at'})
+      createdAt: Date;
 
     @BelongsToMany(() => Permission, () => RolePermission,  'role_id',  'permission_id')
       permissions: RolePermission[];
