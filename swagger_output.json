@@ -879,7 +879,7 @@
               "type": "object",
               "properties": {
                 "roleId": {
-                  "type": "string",
+                  "type": "integer",
                   "description": "User role id"
                 },
                 "roleName": {
