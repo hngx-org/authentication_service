@@ -494,13 +494,27 @@ export const verify2faCodeService = async (code: string, res: Response) => {
   );
 };
 /**
- * 
- * @param res 
- * @returns 
+ *
+ * @param res
+ * @returns
  */
 export const fetchAllUserService = async (res: Response) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      attributes: [
+        "id",
+        "firstName",
+        "username",
+        "lastName",
+        "email",
+        "location",
+        "country",
+        "twoFactorAuth",
+        "isVerified",
+        "roleId",
+        "provider",
+      ],
+    });
     return success("Fetched successfully", users, 200, res);
   } catch (error) {
     return errorResponse("Internal Server Error", 500, res);
