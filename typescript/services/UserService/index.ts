@@ -486,9 +486,15 @@ export const verify2faCodeService = async (code: string, res: Response) => {
   }
   findCode.twoFACode = null;
   await findCode.save();
+  const payload: IUserPayload = {
+    email: findCode.email,
+    id: findCode.id,
+    firstName: findCode.firstName,
+  };
+  const token = await generateToken(payload);
   return success(
     "Two factor code verified",
-    { id: findCode.id, email: findCode.email },
+    { id: findCode.id, email: findCode.email, token },
     200,
     res
   );
