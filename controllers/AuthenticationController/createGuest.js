@@ -1,7 +1,7 @@
 const User = require('../../models/Users');
 const jwt = require('jsonwebtoken');
 
-const createGuest = async (req, res, next) => {
+const createGuest = async (req, res) => {
   const { firstName, lastName, email } = req.body;
 
   try {
