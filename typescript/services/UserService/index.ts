@@ -122,8 +122,13 @@ export const loginUserService = async (
  * @returns
  */
 export const verifyUserservice = async (res: Response, token: string) => {
+  const decodedUser = verifyToken(token);
+
+  if (!decodedUser) {
+    return errorResponse("Invalid token", 401, res);
+  }
+
   try {
-    const decodedUser = verifyToken(token);
     const findUser = await findUserByEmail(decodedUser.email);
 
     if (!findUser) {
@@ -142,7 +147,7 @@ export const verifyUserservice = async (res: Response, token: string) => {
       res
     );
   } catch (err) {
-    return errorResponse("Internal Server Error", 500, res);
+    return errorResponse("An error occurred", 500, res);
   }
 };
 /**
@@ -377,11 +382,21 @@ export const restPasswordService = async (
  * @param res
  * @returns
  */
-export const revalidateLoginService = async (id: string, res: Response) => {
-  const user = await User.findByPk(id);
+export const revalidateLoginService = async (token: string, res: Response) => {
+  const decodedUser = verifyToken(token);
+
+  if (!decodedUser) {
+    return errorResponse("Invalid token", 401, res);
+  }
+
+  const user = await User.findByPk(decodedUser.id);
+
   if (!user) {
     return errorResponse("User not found", 404, res);
   }
+
+  res.header("Authorization", `Bearer ${token}`);
+
   return success(
     "Login successful",
     {
@@ -439,7 +454,7 @@ export const send2faCodeService = async (user: any, res: Response) => {
       return success("Two factor code send", null, 200, res);
     }
     return errorResponse("email not sent", 500, res);
-  } catch (error) {
+  } catch (err) {
     return errorResponse("Internal Server Error", 500, res);
   }
 };

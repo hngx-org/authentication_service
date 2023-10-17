@@ -51,7 +51,7 @@ export const verifyToken = (token: string): IUserPayload | null => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as IUserPayload;
     return decoded;
-  } catch (error) {
+  } catch (err) {
     return null;
   }
 };

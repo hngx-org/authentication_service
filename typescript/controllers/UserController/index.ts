@@ -7,8 +7,7 @@ import {
   resetPasswordSchema,
 } from "./validation";
 import { Request, Response } from "express";
-import User from "../../models/User";
-import { errorResponse, verifyToken } from "../../utils";
+import { errorResponse } from "../../utils";
 import {
   changeEmailLinkService,
   changeEmailService,
@@ -25,14 +24,6 @@ import {
   verifyUserservice,
 } from "../../services/UserService/index";
 
-export const findUserByEmail = async (email: string): Promise<User | null> => {
-  try {
-    const findUser = await User.findOne({ where: { email } });
-    return findUser || null;
-  } catch (error) {
-    throw new Error("Error finding user by email: " + error.message);
-  }
-};
 /**
  * @param req
  * @param res
@@ -57,12 +48,15 @@ export const signUp = async (req: Request, res: Response) => {
  */
 export const loginUser = async (req: Request, res: Response) => {
   const result = loginSchema.validate(req.body);
+
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   const { email, password } = req.body;
 
   const user = await loginUserService(email, password, res);
+
   if (!user) {
     return errorResponse("An error occurred", 500, res);
   }
@@ -76,7 +70,12 @@ export const verifyUser = async (req: Request, res: Response) => {
   const { token } = req.params;
   return await verifyUserservice(res, token);
 };
-
+/**
+ * 
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const resendVerification = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -112,6 +111,7 @@ export const changeEmailLink = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   const { email } = req.body;
   return await changeEmailLinkService(email, res);
 };
@@ -122,9 +122,11 @@ export const changeEmailLink = async (req: Request, res: Response) => {
  */
 export const changeEmail = async (req: Request, res: Response) => {
   const { token } = req.params;
+
   if (!token) {
     return errorResponse("Provide token", 401, res);
   }
+
   return await changeEmailService(token, res);
 };
 
@@ -135,9 +137,11 @@ export const changeEmail = async (req: Request, res: Response) => {
  */
 export const changePassword = async (req: Request, res: Response) => {
   const result = changePasswordSchema.validate(req.body);
+
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   return await changePasswordService(req.body, res, req.user);
 };
 /**
@@ -153,6 +157,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   return await forgotPasswordService(email, res);
 };
 /**
@@ -169,6 +174,7 @@ export const restPassword = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   return await restPasswordService(token, newPassword, res);
 };
 /**
@@ -179,16 +185,7 @@ export const restPassword = async (req: Request, res: Response) => {
 export const revalidateLogin = async (req: Request, res: Response) => {
   const { token } = req.params;
 
-  const decodedUser = verifyToken(token);
-
-  const { id } = decodedUser;
-  const user = await User.findByPk(id);
-
-  if (!user) {
-    return errorResponse("user not found", 404, res);
-  }
-  res.header("Authorization", `Bearer ${token}`);
-  return await revalidateLoginService(id, res);
+  return await revalidateLoginService(token, res);
 };
 /**
  * @param req
@@ -203,9 +200,15 @@ export const enable2fa = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
+
   return await enable2faService(email, res);
 };
-
+/**
+ * 
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const send2faCode = async (req: Request, res: Response) => {
   return await send2faCodeService(req.user, res);
 };
