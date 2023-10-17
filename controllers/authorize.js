@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const jwt = require('jsonwebtoken');
 const {
   getUserPermissions,
   getRoleByUserId,
@@ -34,7 +35,6 @@ const {
   THIRD_PARTY_API_FAILURE,
 } = require('../errors/httpErrorCodes');
 
-const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
 const Permission = require('../models/Permissions');
 const Role = require('../models/Roles');
@@ -93,7 +93,7 @@ module.exports.authorize = async (req, res) => {
 
   const userPermissions = user.permissions.map((permission) => permission.name);
   const rolePermissions = user.role.permissions.map(
-    (permission) => permission.name
+    (permission) => permission.name,
   );
 
   const permissions = [...new Set([...userPermissions, ...rolePermissions])];

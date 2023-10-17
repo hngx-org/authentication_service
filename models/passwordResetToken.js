@@ -1,9 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
-const User = require("./User");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+const User = require('./User');
 
 const PasswordResetToken = sequelize.define(
-  "passwordResetToken",
+  'passwordResetToken',
   {
     id: {
       type: DataTypes.UUID,
@@ -16,7 +16,7 @@ const PasswordResetToken = sequelize.define(
       allowNull: false,
       references: {
         model: User,
-        key: "id",
+        key: 'id',
       },
     },
     token: {
@@ -31,7 +31,7 @@ const PasswordResetToken = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
-  }
+  },
 );
 
 module.exports = PasswordResetToken;

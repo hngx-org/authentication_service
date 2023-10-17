@@ -69,11 +69,17 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    last_login: {
+      type: DataTypes.DATE,
+    },
+    is_seller: {
+      type: DataTypes.BOOLEAN,
+    },
   },
   {
     freezeTableName: true,
     timestamps: false,
-  }
+  },
 );
 
 User.belongsTo(Role, { foreignKey: 'role_id' });

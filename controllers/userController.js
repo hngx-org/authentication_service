@@ -1,11 +1,11 @@
-const bcrypt = require("bcrypt");
-const User = require("../models/Users");
-const JwtStartegy = require("passport-jwt").Strategy;
-const jwt = require("jsonwebtoken");
-const transporter = require("../middleware/mailConfig");
-const validator = require("validator");
-const Joi = require("joi");
-const { sendVerificationEmail } = require("../helpers/sendVerificationEmail");
+const bcrypt = require('bcrypt');
+const User = require('../models/Users');
+const JwtStartegy = require('passport-jwt').Strategy;
+const jwt = require('jsonwebtoken');
+const validator = require('validator');
+const Joi = require('joi');
+const transporter = require('../middleware/mailConfig');
+const { sendVerificationEmail } = require('../helpers/sendVerificationEmail');
 // error handler middleware:
 
 const {
@@ -15,7 +15,7 @@ const {
   Conflict,
   Forbidden,
   ServerError,
-} = require("../errors/httpErrors");
+} = require('../errors/httpErrors');
 const {
   RESOURCE_NOT_FOUND,
   ACCESS_DENIED,
@@ -28,7 +28,7 @@ const {
   THIRD_PARTY_API_FAILURE,
   INVALID_INPUT_PARAMETERS,
   USER_NOT_VERIFIED,
-} = require("../errors/httpErrorCodes");
+} = require('../errors/httpErrorCodes');
 
 
 
@@ -39,12 +39,16 @@ const send2faSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
+const changeEmailSchema = Joi.object({
+  newEmail: Joi.string().email().required(),
+});
+
 async function createUser(req, res, next) {
   try {
     const { firstName, lastName, email, password } = req.body;
 
     if (!validator.isEmail(email)) {
-      throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
+      throw new BadRequest('Invalid email format.', INVALID_INPUT_PARAMETERS);
       // return res.status(400).json({
       //   success: false,
       //   message: "Invalid email format.",
@@ -53,7 +57,7 @@ async function createUser(req, res, next) {
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      throw new BadRequest("Email already exists.", EXISTING_USER_EMAIL);
+      throw new BadRequest('Email already exists.', EXISTING_USER_EMAIL);
       // return res.status(400).json({
       //   success: false,
       //   message: "Email already exists.",
@@ -65,9 +69,9 @@ async function createUser(req, res, next) {
     const newUser = await User.create({
       first_name: firstName,
       last_name: lastName,
-      email: email,
-      username: "",
-      refresh_token: "",
+      email,
+      username: '',
+      refresh_token: '',
       password: hashedPassword,
     });
 
@@ -76,7 +80,7 @@ async function createUser(req, res, next) {
       id: newUser.id,
     };
     const verificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: '1d',
     });
 
     // Send verification link email to user
@@ -85,7 +89,7 @@ async function createUser(req, res, next) {
     res.status(200).json({
       status: 200,
       success: true,
-      message: "User created successfully. Verification code sent to email.",
+      message: 'User created successfully. Verification code sent to email.',
       data: newUser.toJSON(),
     });
   } catch (error) {
@@ -104,7 +108,7 @@ async function login(req, res, next) {
     if (user) {
       // Check if user has verified their Email
       if (!user.is_verified) {
-        throw new Forbidden("Please verify your email.", USER_NOT_VERIFIED);
+        throw new Forbidden('Please verify your email.', USER_NOT_VERIFIED);
         // return res.status(400).json({
         //   success: false,
         //   message: "Please verify your email.",
@@ -114,7 +118,7 @@ async function login(req, res, next) {
       const checkPassword = bcrypt.compareSync(data.password, user.password);
 
       if (!checkPassword) {
-        throw new Forbidden("Incorrect password.", ACCESS_DENIED);
+        throw new Forbidden('Incorrect password.', ACCESS_DENIED);
         // return res.json("Incorrect passsword");
       } else {
         const jwt_payload = {
@@ -122,13 +126,13 @@ async function login(req, res, next) {
         };
         const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
         return res.json({
-          token: token,
+          token,
           data: user,
           statusCode: 200,
         });
       }
     } else {
-      throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found.', RESOURCE_NOT_FOUND);
       // return res.json("User not found ");
     }
   } catch (error) {
@@ -145,7 +149,7 @@ async function checkEmail(req, res) {
   try {
     const { email } = req.body;
     const user = await User.findOne({
-      where: { email: email },
+      where: { email },
     });
 
     if (user) {
@@ -155,24 +159,22 @@ async function checkEmail(req, res) {
           isRegistered: true,
           isVerified: true,
         });
-      } else {
-        return res.status(200).json({
-          success: true,
-          isRegistered: true,
-          isVerified: false,
-        });
       }
-    } else {
       return res.status(200).json({
         success: true,
-        isRegistered: false,
+        isRegistered: true,
         isVerified: false,
       });
     }
+    return res.status(200).json({
+      success: true,
+      isRegistered: false,
+      isVerified: false,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error checking email",
+      message: 'Error checking email',
       error: error.message,
     });
   }
@@ -188,16 +190,16 @@ const enable2fa = async (req, res, next) => {
     }
     const { email } = req.body;
     const user = await User.findOne({
-      where: { email: email },
+      where: { email },
     });
     if (!user) {
-      throw new ResourceNotFound("User not found", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
       // return res.status(400).json({ message: "User not found" });
     }
 
     user.two_factor_auth = true;
     user.save();
-    res.status(200).json({ message: "2fa enabled successfully " });
+    res.status(200).json({ message: '2fa enabled successfully ' });
   } catch (error) {
     next(error);
   }
@@ -213,11 +215,11 @@ const send2faCode = async (req, res, next) => {
       // return res.status(400).json({ message: error.details[0].message });
     }
     const user = await User.findOne({
-      where: { email: email },
+      where: { email },
     });
 
     const verificationCode = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
 
     if (!user) {
@@ -232,7 +234,6 @@ const send2faCode = async (req, res, next) => {
       expiresIn: "1d",
     });
 
-    // Send verification link email to user
     await send2FaEmail(user.first_name, email, verificationCode);
     res.status(200).json({ message: "You have been sent a code", token: verificationToken });
   } catch (error) {
@@ -260,6 +261,10 @@ const verify2fa = async (req, res, next) => {
       where: { id: payload.id },
     });
 
+    if (!user) {
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
+      // return res.status(400).json({ message: "User not found" });
+    }
 
 
     if (token === payload.code) {
@@ -280,7 +285,9 @@ const verify2fa = async (req, res, next) => {
     } else {
       throw new BadRequest("INVALID TOKEN", 400);
     }
+    });
 
+  
 
   } catch (error) {
     next(error);
@@ -296,7 +303,7 @@ const sendVerificationCode = async (req, res, next) => {
 
     // Validate email format
     if (!validator.isEmail(email)) {
-      throw new BadRequest("Invalid email format.", INVALID_INPUT_PARAMETERS);
+      throw new BadRequest('Invalid email format.', INVALID_INPUT_PARAMETERS);
       // return res.status(400).json({
       //   success: false,
       //   message: "Invalid email format.",
@@ -312,13 +319,13 @@ const sendVerificationCode = async (req, res, next) => {
       if (user.is_verified) {
         // 404 Error or custom error handling
         throw new BadRequest(
-          "Email already verified. please login",
-          EMAIL_ALREADY_VERIFIED
+          'Email already verified. please login',
+          EMAIL_ALREADY_VERIFIED,
         );
       }
 
       if (!checkPassword) {
-        throw new Forbidden("Incorrect password.", ACCESS_DENIED);
+        throw new Forbidden('Incorrect password.', ACCESS_DENIED);
         // return res.json("Incorrect passsword");
       } else {
         const jwt_payload = {
@@ -326,15 +333,31 @@ const sendVerificationCode = async (req, res, next) => {
         };
         const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
         return res.json({
-          token: token,
+          token,
           data: user,
           statusCode: 200,
         });
       }
     } else {
-      throw new ResourceNotFound("User not found.", RESOURCE_NOT_FOUND);
+      throw new ResourceNotFound('User not found.', RESOURCE_NOT_FOUND);
       // return res.json("User not found ");
     }
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Verification code has been resent to email.',
+      data: {
+        ...user,
+        token: undefined,
+        password: undefined,
+        refresh_token: undefined,
+        two_factor_auth: undefined,
+      },
+    });
+
   } catch (error) {
     next(error);
   }
@@ -346,8 +369,8 @@ const confirmVerificationCode = async (req, res, next) => {
 
     if (!email || !verificationCode) {
       throw new BadRequest(
-        "Email and verification code are required",
-        MISSING_REQUIRED_FIELD
+        'Email and verification code are required',
+        MISSING_REQUIRED_FIELD,
       );
       // return res.status(400).json({
       //   success: false,
@@ -360,7 +383,7 @@ const confirmVerificationCode = async (req, res, next) => {
     });
 
     if (!user || user.token !== verificationCode) {
-      throw new Forbidden("Invalid email or verification code", INVALID_TOKEN);
+      throw new Forbidden('Invalid email or verification code', INVALID_TOKEN);
       // return res.status(400).json({
       //   success: false,
       //   message: "Invalid email or verification code.",
@@ -375,11 +398,87 @@ const confirmVerificationCode = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Token verified",
+      message: 'Token verified',
     });
   } catch (error) {
     next(error);
     // res.send(error.message);
+  }
+};
+
+const changeEmail = async (req, res, next) => {
+  try {
+    const { error } = changeEmailSchema.validate(req.body);
+
+    if (error) {
+      throw new BadRequest(error.details[0].message, INVALID_INPUT_PARAMETERS);
+    }
+
+    const { newEmail } = req.body;
+    const user = await User.findOne({
+      where: { id: req.user.id }, // Use user authentication middleware to get the user's ID
+    });
+
+    if (!user) {
+      throw new ResourceNotFound('User not found', RESOURCE_NOT_FOUND);
+    }
+
+    // Generate a JWT verification token for the user
+    const jwt_payload = {
+      id: user.id,
+      email: newEmail, // Add the new email to the payload for reference
+      action: 'change_email',
+    };
+    const newVerificationToken = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    // Update the user's email, token, and verification status
+    user.email = newEmail;
+    user.token = newVerificationToken;
+    user.is_verified = false; // Mark the user as not verified
+
+    await user.save();
+
+    // Trigger the existing "sendVerificationCode" endpoint with the new email and verification code
+    req.body = {
+      email: newEmail,
+      verificationCode: newVerificationToken,
+      user, // Pass the user object to the existing function
+    };
+
+    // Send the verification code to the new email address
+    await sendVerificationCode(req, res, next);
+
+    // Return the new JWT verification token
+    res.status(200).json({
+      success: true,
+      message:
+        'Email change request successful. JWT verification token sent to the user.',
+      verificationToken: newVerificationToken,
+    });
+  } catch (error) {
+    // Handle errors and return appropriate responses
+    if (error instanceof BadRequest) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errorCode: error.code,
+      });
+    }
+    if (error instanceof ResourceNotFound) {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+        errorCode: error.code,
+      });
+    }
+    // Handle other unexpected errors
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred while processing your request.',
+      errorCode: SERVER_ERROR,
+    });
   }
 };
 
@@ -392,4 +491,5 @@ module.exports = {
   confirmVerificationCode,
   createUser,
   checkEmail,
+  changeEmail,
 };

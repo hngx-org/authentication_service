@@ -9,15 +9,19 @@ const handleAuth = (req, res) => {
     expiresIn: 24 * 60 * 60,
   });
   return res.json({
-    token: accessToken,
+    status: 200,
+    message: 'Login successful',
     data: {
-      ...user.dataValues,
-      token: undefined,
-      password: undefined,
-      refresh_token: undefined,
-      two_factor_auth: undefined,
-    },
-    statusCode: 200,
+      token: accessToken,
+      user:{
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        is_verified: user.is_verified,
+        two_factor_auth: user.two_factor_auth
+      }
+    }
   });
 };
 
