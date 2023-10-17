@@ -30,3 +30,7 @@ export const resetPasswordSchema = Joi.object({
   newPassword: Joi.string().required(),
   confirmPasssword: Joi.ref("newPassword"),
 });
+
+export const verify2FSchema = Joi.object({
+  code: Joi.string().required(),
+});

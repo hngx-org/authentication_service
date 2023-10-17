@@ -5,6 +5,7 @@ import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
+  verify2FSchema,
 } from "./validation";
 import { Request, Response } from "express";
 import { errorResponse } from "../../utils";
@@ -21,6 +22,7 @@ import {
   revalidateLoginService,
   send2faCodeService,
   signUpService,
+  verify2faCodeService,
   verifyUserservice,
 } from "../../services/UserService/index";
 
@@ -33,7 +35,7 @@ export const signUp = async (req: Request, res: Response) => {
   const result = registerSchema.validate(req.body);
 
   if (result.error) {
-    return errorResponse(result.error.details, 409, res);
+    return errorResponse(result.error.details, 400, res);
   }
 
   const user = await signUpService(req.body, res);
@@ -71,10 +73,10 @@ export const verifyUser = async (req: Request, res: Response) => {
   return await verifyUserservice(res, token);
 };
 /**
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export const resendVerification = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -204,11 +206,23 @@ export const enable2fa = async (req: Request, res: Response) => {
   return await enable2faService(email, res);
 };
 /**
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export const send2faCode = async (req: Request, res: Response) => {
   return await send2faCodeService(req.user, res);
+};
+
+export const verify2faCode = async (req: Request, res: Response) => {
+  const result = verify2FSchema.validate(req.body);
+
+  if (result.error) {
+    return errorResponse(result.error.details, 400, res);
+  }
+
+  const { code } = req.body;
+
+  return await verify2faCodeService(code, res);
 };
