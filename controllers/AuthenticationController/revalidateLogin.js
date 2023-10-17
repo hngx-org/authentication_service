@@ -15,7 +15,7 @@ const revalidateLogin = async (req, res, next) => {
     const { id } = decoded;
     const user = await User.findByPk(id);
     if (!user) {
-      res.status(404).json({ status: 401, essage: 'User not found' });
+      res.status(404).json({ status: 401, message: 'User not found' });
     }
     req.user = user;
     next();
