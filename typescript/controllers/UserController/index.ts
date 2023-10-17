@@ -8,22 +8,19 @@ import {
 } from "./../../utils/validation";
 import { Request, Response } from "express";
 import User from "../../models/User";
-import {
-  errorResponse,
-  generateFourDigitPassword,
-  success,
-  verifyToken,
-} from "../../utils";
-import axios from "axios";
+import { errorResponse, verifyToken } from "../../utils";
 import {
   changeEmailLinkService,
   changeEmailService,
   changePasswordService,
   checkEmailService,
+  enable2faService,
   forgotPasswordService,
   loginUserService,
   resendVerificationService,
   restPasswordService,
+  revalidateLoginService,
+  send2faCodeService,
   signUpService,
   verifyUserservice,
 } from "../../services/UserService/index";
@@ -186,27 +183,12 @@ export const revalidateLogin = async (req: Request, res: Response) => {
 
   const { id } = decodedUser;
   const user = await User.findByPk(id);
+
   if (!user) {
-    res.status(404).json({ message: "user not found" });
+    return errorResponse("user not found", 404, res);
   }
-
   res.header("Authorization", `Bearer ${token}`);
-
-  return res.status(200).json({
-    status: 200,
-    message: "Login successful",
-    token,
-    data: {
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        isVerified: user.isVerified,
-        twoFactorAuth: user.twoFactorAuth,
-      },
-    },
-  });
+  return await revalidateLoginService(id, res);
 };
 /**
  * @param req
@@ -219,53 +201,11 @@ export const enable2fa = async (req: Request, res: Response) => {
   const result = enable2faSchema.validate(req.body);
 
   if (result.error) {
-    return res.status(400).json({ errors: result.error.details });
+    return errorResponse(result.error.details, 400, res);
   }
-
-  const findUser = await findUserByEmail(email);
-
-  if (!findUser) {
-    return res.status(404).json({
-      status: 404,
-      message: "User not found",
-    });
-  }
-  findUser.twoFactorAuth = true;
-  await findUser.save();
-
-  return success(
-    "Two factor authentication enabled",
-    {
-      id: findUser.id,
-      email: findUser.email,
-    },
-    201,
-    res
-  );
+  return await enable2faService(email, res);
 };
 
 export const send2faCode = async (req: Request, res: Response) => {
-  // TODO PROTECT IT WITH AUTH MIDDLEWARE
-  const findUser = await findUserByEmail("email");
-  try {
-    if (!findUser) {
-      return res.status(404).json({
-        status: 404,
-        message: "User not found",
-      });
-    }
-
-    const code = await generateFourDigitPassword();
-    const response = await axios.post(process.env.EMAIL_SERVICE_2FA_URL, {
-      recipient: findUser.email,
-      name: findUser.firstName,
-      code,
-    });
-    if (response.status === 200) {
-      return success("Two factor code send", null, 200, res);
-    }
-    return res.status(500).json({ message: "email not sent" });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  return await send2faCodeService(req.user, res);
 };

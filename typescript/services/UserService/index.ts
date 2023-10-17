@@ -2,15 +2,17 @@ import { IUserSignUp } from "./../../interfaces/user/userSignupInterface";
 import User from "../../models/User";
 import { Response } from "express";
 import {
-  IUserPayload,
   comparePassword,
   errorResponse,
+  generateFourDigitPassword,
   generateToken,
   hashPassword,
+  IUserPayload,
   sendVerificationEmail,
   success,
   verifyToken,
 } from "../../utils/index";
+import axios from "axios";
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
   try {
@@ -65,7 +67,6 @@ export const signUpService = async (body: IUserSignUp, res: Response) => {
   }
 };
 /**
- *
  * @param email
  * @param password
  * @param res
@@ -116,7 +117,6 @@ export const loginUserService = async (
   }
 };
 /**
- *
  * @param res
  * @param token
  * @returns
@@ -146,7 +146,6 @@ export const verifyUserservice = async (res: Response, token: string) => {
   }
 };
 /**
- *
  * @param email
  * @param res
  * @returns
@@ -188,7 +187,6 @@ export const resendVerificationService = async (
   }
 };
 /**
- *
  * @param email
  * @param res
  * @returns
@@ -206,7 +204,6 @@ export const checkEmailService = async (email: string, res: Response) => {
   }
 };
 /**
- *
  * @param email
  * @param res
  * @returns
@@ -240,7 +237,6 @@ export const changeEmailLinkService = async (email: string, res: Response) => {
   }
 };
 /**
- *
  * @param token
  * @param res
  * @returns
@@ -270,7 +266,12 @@ export const changeEmailService = async (token: string, res: Response) => {
     return errorResponse("Internal Server Error", 500, res);
   }
 };
-
+/**
+ * @param body
+ * @param res
+ * @param user
+ * @returns
+ */
 export const changePasswordService = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: any,
@@ -305,7 +306,11 @@ export const changePasswordService = async (
     res
   );
 };
-
+/**
+ * @param email
+ * @param res
+ * @returns
+ */
 export const forgotPasswordService = async (email: string, res: Response) => {
   const findUser = await findUserByEmail(email);
 
@@ -335,7 +340,12 @@ export const forgotPasswordService = async (email: string, res: Response) => {
     res
   );
 };
-
+/**
+ * @param token
+ * @param newPassword
+ * @param res
+ * @returns
+ */
 export const restPasswordService = async (
   token: string,
   newPassword: string,
@@ -360,4 +370,76 @@ export const restPasswordService = async (
     200,
     res
   );
+};
+
+/**
+ * @param token
+ * @param res
+ * @returns
+ */
+export const revalidateLoginService = async (id: string, res: Response) => {
+  const user = await User.findByPk(id);
+  if (!user) {
+    return errorResponse("User not found", 404, res);
+  }
+  return success(
+    "Login successful",
+    {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isVerified: user.isVerified,
+      twoFactorAuth: user.twoFactorAuth,
+    },
+    200,
+    res
+  );
+};
+/**
+ * @param email
+ * @param res
+ * @returns
+ */
+
+export const enable2faService = async (email: string, res: Response) => {
+  const findUser = await findUserByEmail(email);
+
+  if (!findUser) {
+    return errorResponse("User not found", 404, res);
+  }
+  findUser.twoFactorAuth = true;
+  await findUser.save();
+
+  return success(
+    "Two factor authentication enabled",
+    {
+      id: findUser.id,
+      email: findUser.email,
+    },
+    201,
+    res
+  );
+};
+
+export const send2faCodeService = async (user: any, res: Response) => {
+  const findUser = await findUserByEmail(user.email);
+  try {
+    if (!findUser) {
+      return errorResponse("User not found", 404, res);
+    }
+
+    const code = await generateFourDigitPassword();
+    const response = await axios.post(process.env.EMAIL_SERVICE_2FA_URL, {
+      recipient: findUser.email,
+      name: findUser.firstName,
+      code,
+    });
+    if (response.status === 200) {
+      return success("Two factor code send", null, 200, res);
+    }
+    return errorResponse("email not sent", 500, res);
+  } catch (error) {
+    return errorResponse("Internal Server Error", 500, res);
+  }
 };
