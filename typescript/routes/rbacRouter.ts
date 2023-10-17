@@ -1,4 +1,4 @@
-import { createRole, fetchRoles } from './../controllers/UserController/RBACController/index';
+import { createRole, fetchRoles } from '../controllers/RBACController/index';
 import express from 'express';
 
 const rbacRouter = express.Router();

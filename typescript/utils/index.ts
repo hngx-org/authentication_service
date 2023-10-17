@@ -17,10 +17,10 @@ export interface IUserPayload {
 export function success(
   message: string,
   args: unknown = {} || null,
-  statusCode?: number,
+  statusCode: number = 200,
   res?: Response,
 ) {
-  return res.status(statusCode).json({ message: message, data: args });
+  return res.status(statusCode).json({statusCode, message,  data: args });
   // return {
   //   status: 'success',
   //   statusCode: statusCode || 200,
@@ -81,7 +81,6 @@ export const sendVerificationEmail = async (
       return "Failed to send verification email";
     }
   } catch (error) {
-    console.log(error);
     // return error;
   }
 };

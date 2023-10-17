@@ -18,7 +18,7 @@ export interface IUserService {
 
   changePassword(
     payload: { currentPassword: string; newPassword: string },
-    userId: number,
+    userId: string,
     res: unknown
   ): Promise<unknown>;
 
@@ -36,9 +36,9 @@ export interface IUserService {
 
   fetchAllUser(res: unknown): Promise<unknown>;
 
-  findUserById(id: number, res: unknown): Promise<unknown>;
+  findUserById(id: string, res: unknown): Promise<unknown>;
 
-  deleteUserById(id: number, res: unknown): Promise<unknown>;
+  deleteUserById(id: string, res: unknown): Promise<unknown>;
 
   updateUserById(
     payload: { firstName: string; lastName: string },

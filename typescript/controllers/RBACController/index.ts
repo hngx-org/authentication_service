@@ -1,4 +1,4 @@
-import { fetchRolesService } from './../../../services/RoleService/index';
+import { fetchRolesService } from '../../services/RoleService/index';
 import { Request, Response } from "express";
 
 export const createRole = async (req: Request, res: Response) => {
