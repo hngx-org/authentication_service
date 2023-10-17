@@ -500,7 +500,7 @@ export const verify2faCodeService = async (code: string, res: Response) => {
  */
 export const fetchAllUserService = async (res: Response) => {
   try {
-    const users = User.findAll();
+    const users = await User.findAll();
     return success("Fetched successfully", users, 200, res);
   } catch (error) {
     return errorResponse("Internal Server Error", 500, res);
