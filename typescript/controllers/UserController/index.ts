@@ -15,6 +15,7 @@ import {
   changePasswordService,
   checkEmailService,
   enable2faService,
+  fetchAllUserService,
   forgotPasswordService,
   loginUserService,
   resendVerificationService,
@@ -225,4 +226,10 @@ export const verify2faCode = async (req: Request, res: Response) => {
   const { code } = req.body;
 
   return await verify2faCodeService(code, res);
+};
+
+
+
+export const fetchAllUser = async (req: Request, res: Response) => {
+  return await fetchAllUserService(res);
 };

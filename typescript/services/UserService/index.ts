@@ -456,7 +456,7 @@ export const send2faCodeService = async (user: any, res: Response) => {
       return errorResponse("User not found", 404, res);
     }
     const code = await generateFourDigitPassword();
-    findUser.twoFCode = code;
+    findUser.twoFACode = code;
 
     await findUser.save();
     const response = await axios.post(process.env.EMAIL_SERVICE_2FA_URL, {
@@ -492,4 +492,17 @@ export const verify2faCodeService = async (code: string, res: Response) => {
     200,
     res
   );
+};
+/**
+ * 
+ * @param res 
+ * @returns 
+ */
+export const fetchAllUserService = async (res: Response) => {
+  try {
+    const users = User.findAll();
+    return success("Fetched successfully", users, 200, res);
+  } catch (error) {
+    return errorResponse("Internal Server Error", 500, res);
+  }
 };
