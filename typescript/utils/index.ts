@@ -93,9 +93,9 @@ export const generateFourDigitPassword = () => {
 };
 
 export const errorResponse = (
-  message: string | any,
+  message: string | unknown,
   statusCode: number,
-  res: Response
+  res?: Response
 ) => {
   return res.status(statusCode).json({ message: message });
 };

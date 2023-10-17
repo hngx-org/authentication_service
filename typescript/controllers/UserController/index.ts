@@ -1,45 +1,29 @@
+import userService from "../../services/UserService";
 import {
   changePasswordSchema,
   emailSchema,
-  enable2faSchema,
   loginSchema,
   registerSchema,
   resetPasswordSchema,
   verify2FSchema,
+  updateUserSchema,
 } from "./validation";
 import { Request, Response } from "express";
 import { errorResponse } from "../../utils";
-import {
-  changeEmailLinkService,
-  changeEmailService,
-  changePasswordService,
-  checkEmailService,
-  enable2faService,
-  fetchAllUserService,
-  forgotPasswordService,
-  loginUserService,
-  resendVerificationService,
-  restPasswordService,
-  revalidateLoginService,
-  send2faCodeService,
-  signUpService,
-  verify2faCodeService,
-  verifyUserservice,
-} from "../../services/UserService/index";
-
 /**
  * @param req
  * @param res
  * @returns
  */
+// TODO, findbt email, id, checkmail etc
 export const signUp = async (req: Request, res: Response) => {
   const result = registerSchema.validate(req.body);
 
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
-
-  const user = await signUpService(req.body, res);
+  const user = await userService.signUp(req.body, res);
+  // const user = await signUpService(req.body, res);
   if (!user) {
     return errorResponse("An error occurred", 500, res);
   }
@@ -56,9 +40,8 @@ export const loginUser = async (req: Request, res: Response) => {
     return errorResponse(result.error.details, 400, res);
   }
 
-  const { email, password } = req.body;
-
-  const user = await loginUserService(email, password, res);
+  const user = await userService.login(req.body, res);
+  // const user = await loginUserService(email, password, res);
 
   if (!user) {
     return errorResponse("An error occurred", 500, res);
@@ -71,7 +54,7 @@ export const loginUser = async (req: Request, res: Response) => {
  */
 export const verifyUser = async (req: Request, res: Response) => {
   const { token } = req.params;
-  return await verifyUserservice(res, token);
+  return await userService.verifyUser(token, res);
 };
 /**
  *
@@ -87,7 +70,7 @@ export const resendVerification = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
-  return await resendVerificationService(email, res);
+  return await userService.resendVerification(email, res);
 };
 /**
  * @param req
@@ -101,7 +84,7 @@ export const checkEmail = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
-  return await checkEmailService(email, res);
+  return await userService.checkEmail(email, res);
 };
 /**
  * @param req
@@ -116,7 +99,7 @@ export const changeEmailLink = async (req: Request, res: Response) => {
   }
 
   const { email } = req.body;
-  return await changeEmailLinkService(email, res);
+  return await userService.changeEmailLink(email, res);
 };
 /**
  * @param req
@@ -130,7 +113,7 @@ export const changeEmail = async (req: Request, res: Response) => {
     return errorResponse("Provide token", 401, res);
   }
 
-  return await changeEmailService(token, res);
+  return await userService.changeEmail(token, res);
 };
 
 /**
@@ -145,7 +128,8 @@ export const changePassword = async (req: Request, res: Response) => {
     return errorResponse(result.error.details, 400, res);
   }
 
-  return await changePasswordService(req.body, res, req.user);
+  const user = req.user as any;
+  return await userService.changePassword(req.body, user.id, res);
 };
 /**
  * @param req
@@ -161,14 +145,14 @@ export const forgotPassword = async (req: Request, res: Response) => {
     return errorResponse(result.error.details, 400, res);
   }
 
-  return await forgotPasswordService(email, res);
+  return await userService.forgotPassword(email, res);
 };
 /**
  * @param req
  * @param res
  * @returns
  */
-export const restPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
   const { newPassword } = req.body;
 
@@ -177,8 +161,7 @@ export const restPassword = async (req: Request, res: Response) => {
   if (result.error) {
     return errorResponse(result.error.details, 400, res);
   }
-
-  return await restPasswordService(token, newPassword, res);
+  return await userService.resetPassword(token, newPassword, res);
 };
 /**
  * @param req
@@ -187,24 +170,17 @@ export const restPassword = async (req: Request, res: Response) => {
  */
 export const revalidateLogin = async (req: Request, res: Response) => {
   const { token } = req.params;
-
-  return await revalidateLoginService(token, res);
+  return await userService.revalidateLogin(token, res);
 };
 /**
  * @param req
  * @param res
  * @returns
  */
-export const enable2fa = async (req: Request, res: Response) => {
-  const { email } = req.body;
+export const enable2fa = async (req: any, res: Response) => {
+  const { email } = req.user;
 
-  const result = enable2faSchema.validate(req.body);
-
-  if (result.error) {
-    return errorResponse(result.error.details, 400, res);
-  }
-
-  return await enable2faService(email, res);
+  return await userService.enable2fa(email, res);
 };
 /**
  *
@@ -212,8 +188,9 @@ export const enable2fa = async (req: Request, res: Response) => {
  * @param res
  * @returns
  */
-export const send2faCode = async (req: Request, res: Response) => {
-  return await send2faCodeService(req.user, res);
+export const send2faCode = async (req: any, res: Response) => {
+  const { email } = req.user;
+  return await userService.send2faCode(email, res);
 };
 
 export const verify2faCode = async (req: Request, res: Response) => {
@@ -225,11 +202,29 @@ export const verify2faCode = async (req: Request, res: Response) => {
 
   const { code } = req.body;
 
-  return await verify2faCodeService(code, res);
+  return await userService.resendVerification(code, res);
 };
 
-
-
 export const fetchAllUser = async (req: Request, res: Response) => {
-  return await fetchAllUserService(res);
+  return await userService.fetchAllUser(res);
+};
+
+export const findUserById = async (req: any, res: Response) => {
+  const { userId } = req.params;
+  return await userService.findUserById(userId, res);
+};
+
+export const deleteUserById = async (req: any, res: Response) => {
+  const { userId } = req.params;
+  return await userService.deleteUserById(userId, res);
+};
+
+export const updateUserById = async (req: Request | any, res: Response) => {
+  const result = updateUserSchema.validate(req.body);
+
+  if (result.error) {
+    return errorResponse(result.error.details, 400, res);
+  }
+  const { email } = req.user;
+  return await userService.updateUserById(req.body, email, res);
 };

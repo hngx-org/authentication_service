@@ -1,5 +1,5 @@
 export interface IUser {
-  id: string;
+  id?: string;
   username?: string;
   firstName: string;
   lastName: string;
@@ -9,12 +9,12 @@ export interface IUser {
   provider?: string;
   profilePic?: string;
   refreshToken?: string;
-  roleId: number;
-  isVerified: boolean;
-  twoFactorAuth: boolean;
+  roleId?: number;
+  isVerified?: boolean;
+  twoFactorAuth?: boolean;
   location?: string;
   country?: string;
-  createdAt: Date;
+  createdAt?: Date;
   userRole?: IRole;
 }
 

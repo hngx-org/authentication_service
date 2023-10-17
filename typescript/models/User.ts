@@ -1,3 +1,4 @@
+import { IUser } from './../@types/index';
 import {Table, Column, Model, DataType, CreatedAt, ForeignKey, HasOne} from 'sequelize-typescript'
 import Role from "./Role";
 

@@ -22,15 +22,20 @@ export const emailSchema = Joi.object({
 
 export const changePasswordSchema = Joi.object({
   currentPassword: Joi.string().required(),
-  newPassword: Joi.string().required(),
+  newPassword: Joi.string().min(6).required(),
   confirmPasssword: Joi.ref("newPassword"),
 });
 
 export const resetPasswordSchema = Joi.object({
-  newPassword: Joi.string().required(),
+  newPassword: Joi.string().min(6).required(),
   confirmPasssword: Joi.ref("newPassword"),
 });
 
 export const verify2FSchema = Joi.object({
   code: Joi.string().required(),
+});
+
+export const updateUserSchema = Joi.object({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
 });
