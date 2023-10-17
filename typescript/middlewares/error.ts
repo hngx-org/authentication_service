@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 
 class HttpError extends Error {
   statusCode: number;
   errorCode: number;
-  status: string = 'error';
+  status: string = "error";
 
   constructor(statusCode: number, message: string) {
     super(message);
@@ -60,6 +60,20 @@ const routeNotFound = (req: Request, res: Response, next: NextFunction) => {
   next(error);
 };
 
+const errorHandler = (
+  err: HttpError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { statusCode, status, message } = err;
+  res.status(statusCode).json({
+    status,
+    statusCode,
+    message,
+  });
+};
+
 export {
   ServerError,
   Conflict,
@@ -70,4 +84,5 @@ export {
   InvalidInput,
   HttpError,
   routeNotFound,
+  errorHandler,
 };

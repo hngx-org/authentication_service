@@ -4,6 +4,8 @@ import Role from "../models/Role";
 import RolesPermissions from "../models/RolePermission";
 import Permission from "../models/Permission";
 import PasswordResetToken from "../models/PasswordResetToken";
+import dotenv from 'dotenv'; // ES6 import for dotenv
+dotenv.config();
 
 const sequelize = new Sequelize({
   dialect: 'postgres',

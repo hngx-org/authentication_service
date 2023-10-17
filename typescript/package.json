@@ -15,9 +15,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/express-session": "^1.17.8",
+    "@types/jsonwebtoken": "^9.0.3",
     "@types/passport": "^1.0.13",
     "axios": "^1.5.1",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "dotenv-expand": "^10.0.0",

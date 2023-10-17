@@ -1,3 +1,4 @@
+import { IUser } from './../@types/index';
 import {Table, Column, Model, DataType, CreatedAt, ForeignKey, HasOne} from 'sequelize-typescript'
 import Role from "./Role";
 
@@ -6,7 +7,7 @@ export default class User extends Model<User> {
   @Column({type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true})
     id: string;
 
-  @Column({type: DataType.STRING, allowNull: false})
+  @Column({type: DataType.STRING, allowNull: true})
     username: string;
 
   @Column({type: DataType.STRING, allowNull: false, field: 'first_name'})
@@ -32,6 +33,9 @@ export default class User extends Model<User> {
 
   @Column({type: DataType.STRING, field: 'refresh_token'})
     refreshToken: string;
+
+  @Column({type: DataType.STRING, field: 'two_fa_code', allowNull: true })
+    twoFACode: string;
 
   @ForeignKey(() => Role)
   @Column({type: DataType.INTEGER, defaultValue: 2, allowNull: false, field: 'role_id'})
