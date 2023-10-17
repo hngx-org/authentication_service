@@ -9,6 +9,7 @@ const send2faCode = require('./send2faCode');
 const verify2fa = require('./verify2fa');
 const disable2fa = require('./disable2fa');
 const loginResponse = require('../../middleware/loginResponse');
+const setIsSeller = require('./setIsSeller');
 
 const AuthenticationController = {
   checkEmail,
@@ -22,6 +23,7 @@ const AuthenticationController = {
   verifyUser,
   resendVerification,
   login,
+  setIsSeller,
 };
 
 module.exports = AuthenticationController;
