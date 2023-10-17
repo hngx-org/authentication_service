@@ -1,3 +1,5 @@
+import { NextFunction, Request, Response } from 'express';
+
 class HttpError extends Error {
   statusCode: number;
   errorCode: number;
@@ -53,6 +55,11 @@ class ServerError extends HttpError {
   }
 }
 
+const routeNotFound = (req: Request, res: Response, next: NextFunction) => {
+  const error = new ResourceNotFound(`Route not found: ${req.originalUrl}`);
+  next(error);
+};
+
 export {
   ServerError,
   Conflict,
@@ -62,4 +69,5 @@ export {
   BadRequest,
   InvalidInput,
   HttpError,
+  routeNotFound,
 };
