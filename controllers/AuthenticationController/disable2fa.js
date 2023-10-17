@@ -33,7 +33,9 @@ const disable2fa = async (req, res) => {
         message: 'User not found',
       });
     }
-    user.update({ two_factor_auth: true });
+
+    user.update({ two_factor_auth: false });
+
     return res.status(200).json({
       status: 200,
       message: 'Two factor authentication disabled',
