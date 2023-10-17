@@ -8,12 +8,16 @@ import {
   generateToken,
   hashPassword,
   IUserPayload,
-  sendVerificationEmail,
   success,
   verifyToken,
 } from "../../utils/index";
-import axios from "axios";
 
+import {
+  resetPasswordNotification,
+  sendSignUpNotification,
+  twoFactorAuthNotification,
+  welcomeEmailNotification,
+} from "../../controllers/UserController/messaging";
 export const findUserByEmail = async (email: string): Promise<User | null> => {
   try {
     const findUser = await User.findOne({ where: { email } });
@@ -50,7 +54,9 @@ export const signUpService = async (body: IUserSignUp, res: Response) => {
       firstName: newUser.firstName,
     };
     const token = generateToken(payload);
-    sendVerificationEmail(newUser.firstName, newUser.email, token);
+    const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
+
+    sendSignUpNotification(newUser.email, newUser.firstName, verificationLink);
 
     // Return a success response
     return success(
@@ -141,6 +147,9 @@ export const verifyUserservice = async (res: Response, token: string) => {
 
     findUser.isVerified = true;
     await findUser.save();
+    const link = `${process.env.AUTH_FRONTEND_URL}`;
+    welcomeEmailNotification(findUser.email, findUser.firstName, link);
+
     return success(
       "Account activated successfully",
       {
@@ -180,7 +189,14 @@ export const resendVerificationService = async (
       firstName: findUser.firstName,
     };
     const token = generateToken(payload);
-    sendVerificationEmail(findUser.firstName, findUser.email, token);
+    const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
+
+    sendSignUpNotification(
+      findUser.email,
+      findUser.firstName,
+      verificationLink
+    );
+    // sendVerificationEmail(findUser.firstName, findUser.email, token);
     return success(
       "Verification email sent successfully",
       {
@@ -231,7 +247,13 @@ export const changeEmailLinkService = async (email: string, res: Response) => {
     };
 
     const token = await generateToken(payload);
-    sendVerificationEmail(findUser.firstName, findUser.email, token);
+    const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
+    sendSignUpNotification(
+      findUser.email,
+      findUser.firstName,
+      verificationLink
+    );
+    // sendVerificationEmail(findUser.firstName, findUser.email, token);
     return success(
       "Email change request link sent successfully",
       {
@@ -342,7 +364,14 @@ export const forgotPasswordService = async (email: string, res: Response) => {
     firstName: findUser.firstName,
   };
   const token = await generateToken(payload);
-  sendVerificationEmail(findUser.firstName, findUser.email, token);
+  const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
+
+  resetPasswordNotification(
+    findUser.email,
+    findUser.firstName,
+    verificationLink
+  );
+  // sendVerificationEmail(findUser.firstName, findUser.email, token);
   return success(
     "Forgot password link send successfully",
     {
@@ -459,15 +488,11 @@ export const send2faCodeService = async (user: any, res: Response) => {
     findUser.twoFACode = code;
 
     await findUser.save();
-    const response = await axios.post(process.env.EMAIL_SERVICE_2FA_URL, {
-      recipient: findUser.email,
-      name: findUser.firstName,
-      code,
-    });
-    if (response.status === 200) {
-      return success("Two factor code send", null, 200, res);
-    }
-    return errorResponse("email not sent", 500, res);
+    twoFactorAuthNotification(
+      findUser.email,
+      findUser.firstName,
+      findUser.twoFACode
+    );
   } catch (err) {
     return errorResponse("Internal Server Error", 500, res);
   }
