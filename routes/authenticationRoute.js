@@ -100,7 +100,11 @@ router.post(
   AuthenticationController.loginResponse,
 );
 
-router.get('/revalidate-login/:token', revalidateLogin);
+router.get(
+  '/revalidate-login/:token',
+  revalidateLogin,
+  AuthenticationController.loginResponse,
+);
 
 router.patch('/set-seller', AuthenticationController.setIsSeller);
 module.exports = router;
