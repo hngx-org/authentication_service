@@ -9,8 +9,8 @@ export interface IUserPayload {
   id: string;
   email: string;
   firstName?: string;
-  isVerified?: boolean,
-  twoFactorAuth?: boolean
+  isVerified?: boolean;
+  twoFactorAuth?: boolean;
 
   // Add more user-related properties if needed
 }
@@ -18,7 +18,7 @@ export function success(
   message: string,
   args: unknown = {} || null,
   statusCode?: number,
-  res?: Response
+  res?: Response,
 ) {
   return res.status(statusCode).json({ message: message, data: args });
   // return {
@@ -65,28 +65,37 @@ export const sendVerificationEmail = async (
     // TODO email link not valid
     const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-    const response = await axios.post(`${process.env.EMAIL_SERVICE_URL}/api/user/email-verification`, {
-      name,
-      recipient,
-      // eslint-disable-next-line camelcase
-      verification_link: verificationLink,
-    });
-
+    const response = await axios.post(
+      `${process.env.EMAIL_SERVICE_URL}/api/user/email-verification`,
+      {
+        name,
+        recipient,
+        // eslint-disable-next-line camelcase
+        verification_link: verificationLink,
+      }
+    );
 
     if (response.status === 200) {
-      console.log(response)
       return "Verification email sent successfully.";
     } else {
       return "Failed to send verification email";
     }
   } catch (error) {
-    console.log(error)
-    return error;
+    console.log(error);
+    // return error;
   }
 };
 
-export const  generateFourDigitPassword = ()=> {
-  const timestamp = Date.now().toString(); 
+export const generateFourDigitPassword = () => {
+  const timestamp = Date.now().toString();
   const lastFourDigits = timestamp.substr(timestamp.length - 4); // Extract the last 4 digits
   return lastFourDigits;
-}
+};
+
+export const errorResponse = (
+  message: string | any,
+  statusCode: number,
+  res: Response
+) => {
+  return res.status(statusCode).json({ message: message });
+};

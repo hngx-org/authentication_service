@@ -1,35 +1,28 @@
-import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
-import { Unauthorized } from './error';
+import { Request, Response, NextFunction } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
+import User from "../models/User";
+import { errorResponse, verifyToken } from "../utils/index";
+
+export const protectedRoute = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { authorization } = req.headers;
+  if (!authorization) {
+    return errorResponse("You must be logged in", 401, res);
   }
-}
-
-const { JWT_SECRET } = process.env;
-
-export function protectdRoute(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.header('Authorization');
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Unauthorized('Authentication token required');
-  }
-
-  const token = authHeader.split('Bearer ')[1];
-
-  // Verify the token
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      throw new Unauthorized('Invalid or expired token');
+  const token = authorization.replace("Bearer ", "");
+  try {
+    const decoded = verifyToken(token);
+    const { id } = decoded;
+    const user = await User.findByPk(id);
+    if (!user) {
+      return errorResponse("User not found", 404, res);
     }
-
-    // Attach the decoded user
-    req.user = decoded;
-
+    req.user = user;
     next();
-  });
-}
+  } catch (err) {
+    return errorResponse("Invalid token", 401, res);
+  }
+};

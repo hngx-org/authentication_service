@@ -28,8 +28,7 @@ sequelize.sync({ force: true })
   });
 
 app.use('/api/auth', userRouterHandler);
-rbacRouterHandler
-app.use('/api/auth', rbacRouterHandler);
+app.use('/api/roles', rbacRouterHandler);
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
