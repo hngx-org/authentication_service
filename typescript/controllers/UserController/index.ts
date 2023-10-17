@@ -5,7 +5,7 @@ import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
-} from "./../../utils/validation";
+} from "./validation";
 import { Request, Response } from "express";
 import User from "../../models/User";
 import { errorResponse, verifyToken } from "../../utils";
