@@ -135,6 +135,10 @@ export const verifyUserservice = async (res: Response, token: string) => {
       return errorResponse("Invalid token", 401, res);
     }
 
+    if (findUser.isVerified) {
+      return errorResponse("Account already verify", 401, res);
+    }
+
     findUser.isVerified = true;
     await findUser.save();
     return success(
@@ -247,9 +251,13 @@ export const changeEmailLinkService = async (email: string, res: Response) => {
  * @returns
  */
 export const changeEmailService = async (token: string, res: Response) => {
-  try {
-    const decodedUser = verifyToken(token);
+  const decodedUser = verifyToken(token);
 
+  if (!decodedUser) {
+    return errorResponse("Invalid token", 401, res);
+  }
+
+  try {
     const findUser = await findUserByEmail(decodedUser.email);
 
     if (findUser) {
@@ -357,6 +365,10 @@ export const restPasswordService = async (
   res: Response
 ) => {
   const decodedUser = verifyToken(token);
+
+  if (!decodedUser) {
+    return errorResponse("Invalid token", 401, res);
+  }
 
   const findUser = await findUserByEmail(decodedUser.email);
 
