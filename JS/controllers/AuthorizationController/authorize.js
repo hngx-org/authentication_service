@@ -49,6 +49,18 @@ const authorize = (req, res) => {
 	 WHERE roles_permissions.role_id = '${user.role_id}';`,
     );
 
+    if (user && role.name === 'guest') {
+      return res.status(200).json({
+        status: 200,
+        authorized: true,
+        message: 'user is authenticated',
+        user: {
+          id,
+          role: role.name,
+        },
+      });
+    }
+
     if (user && !user.is_verified) {
       return res.status(401).json({
         status: 401,
@@ -63,8 +75,6 @@ const authorize = (req, res) => {
         ...rolePermissions.map((permission) => permission.name),
       ]),
     ];
-
-    console.log(permissions);
 
     if (user && !permission) {
       response = {
