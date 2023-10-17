@@ -25,6 +25,7 @@ const loginResponse = async (req, res) => {
         email: user.email,
         isVerified: user.is_verified,
         twoFactorAuth: user.two_factor_auth,
+        isSeller: user.is_seller,
       },
     },
   });
