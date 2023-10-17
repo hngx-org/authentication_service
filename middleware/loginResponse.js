@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const loginResponse = async (req, res) => {
   const { user } = req;
+
+  user.update({ last_login: new Date() });
+
   const jwtPayload = {
     id: user.id,
   };
