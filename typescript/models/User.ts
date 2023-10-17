@@ -33,8 +33,8 @@ export default class User extends Model<User> {
   @Column({type: DataType.STRING, field: 'refresh_token'})
     refreshToken: string;
 
-  @Column({type: DataType.STRING, field: 'two_f_code', allowNull: true })
-    twoFCode: string;
+  @Column({type: DataType.STRING, field: 'two_fa_code', allowNull: true })
+    twoFACode: string;
 
   @ForeignKey(() => Role)
   @Column({type: DataType.INTEGER, defaultValue: 2, allowNull: false, field: 'role_id'})

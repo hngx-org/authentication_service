@@ -480,11 +480,11 @@ export const send2faCodeService = async (user: any, res: Response) => {
  * @returns
  */
 export const verify2faCodeService = async (code: string, res: Response) => {
-  const findCode = await User.findOne({ where: { twoFCode: code } });
+  const findCode = await User.findOne({ where: { twoFACode: code } });
   if (!findCode) {
     return errorResponse("Code not found", 404, res);
   }
-  findCode.twoFCode = null;
+  findCode.twoFACode = null;
   await findCode.save();
   return success(
     "Two factor code verified",
