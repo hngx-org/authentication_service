@@ -1,4 +1,5 @@
-import axios from "axios";
+/* eslint-disable camelcase */
+import axios from 'axios';
 /**
  *
  * @param recipient
@@ -18,12 +19,12 @@ export const sendSignUpNotification = async (
 
   try {
     const response = await axios.post(
-      "http://staging.zuri.team/api/messaging/api/v1/user/email-verification",
+      'http://staging.zuri.team/api/messaging/api/v1/user/email-verification',
       jsonData
     );
     return response.data;
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error('Error sending notification:', error);
   }
 };
 /**
@@ -45,14 +46,14 @@ export const resetPasswordNotification = async (
 
   try {
     const response = await axios.post(
-      "http://staging.zuri.team/api/messaging/api/v1/user/reset-password",
+      'http://staging.zuri.team/api/messaging/api/v1/user/reset-password',
       jsonData
     );
-    console.log("Notification sent successfully:", response.data);
+    console.log('Notification sent successfully:', response.data);
 
     return response.data;
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error('Error sending notification:', error);
   }
 };
 /**
@@ -74,13 +75,13 @@ export const twoFactorAuthNotification = async (
 
   try {
     const response = await axios.post(
-      "http://staging.zuri.team/api/messaging/api/v1/user/twoFactorAuth",
+      'http://staging.zuri.team/api/messaging/api/v1/user/twoFactorAuth',
       jsonData
     );
-    console.log("Notification sent successfully:", response.data);
+    console.log('Notification sent successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error('Error sending notification:', error);
   }
 };
 /**
@@ -102,12 +103,12 @@ export const welcomeEmailNotification = async (
 
   try {
     const response = await axios.post(
-      "http://staging.zuri.team/api/messaging/api/v1/user/welcome-email",
+      'http://staging.zuri.team/api/messaging/api/v1/user/welcome-email',
       jsonData
     );
-    console.log("Notification sent successfully:", response.data);
+    console.log('Notification sent successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error('Error sending notification:', error);
   }
 };

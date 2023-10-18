@@ -1,26 +1,16 @@
-import { Response } from "express";
-import * as bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import axios from "axios";
-dotenv.config();
+import { Response } from 'express';
+import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import axios from 'axios';
+import { ITwoFactorPayload, IUser, ITokenPayload } from '../@types/index';
 
-export interface IUserPayload {
-  id: string;
-  email: string;
-  firstName?: string;
-  isVerified?: boolean;
-  twoFactorAuth?: boolean;
-
-  // Add more user-related properties if needed
-}
 export function success(
   message: string,
   args: unknown = {} || null,
   statusCode: number = 200,
-  res?: Response,
+  res?: Response
 ) {
-  return res.status(statusCode).json({statusCode, message,  data: args });
+  return res.status(statusCode).json({ statusCode, message, data: args });
   // return {
   //   status: 'success',
   //   statusCode: statusCode || 200,
@@ -40,16 +30,35 @@ export async function comparePassword(
   return await bcrypt.compare(password, hash);
 }
 
-export const generateToken = (userPayload: IUserPayload): string => {
-  const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+export const generateToken = (user: IUser): string => {
+  const payload: ITokenPayload = {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: '1h',
   });
   return token;
 };
 
-export const verifyToken = (token: string): IUserPayload | null => {
+export const verifyToken = (token: string): ITokenPayload | null => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as IUserPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as ITokenPayload;
+    return decoded;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const verify2faToken = (token: string): ITwoFactorPayload | null => {
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    ) as ITwoFactorPayload;
+
     return decoded;
   } catch (err) {
     return null;
@@ -76,9 +85,9 @@ export const sendVerificationEmail = async (
     );
 
     if (response.status === 200) {
-      return "Verification email sent successfully.";
+      return 'Verification email sent successfully.';
     } else {
-      return "Failed to send verification email";
+      return 'Failed to send verification email';
     }
   } catch (error) {
     // return error;

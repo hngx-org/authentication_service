@@ -4,32 +4,41 @@ import {
   sendSignUpNotification,
   twoFactorAuthNotification,
   welcomeEmailNotification,
-} from "../../controllers/UserController/messaging";
+} from '../../controllers/UserController/messaging';
 import {
-  IUserPayload,
+  // IUserPayload,
   comparePassword,
   errorResponse,
   generateFourDigitPassword,
   generateToken,
   hashPassword,
   success,
+  verify2faToken,
   verifyToken,
-} from "../../utils/index";
-import { IUserSignUp } from "../../interfaces/user/userSignupInterface";
-import User from "../../models/User";
-import { IUserService } from "./IUserService";
-import { IUser } from "../../@types";
-import { Response } from "express";
+} from '../../utils/index';
+import User from '../../models/User';
+import { IUserService } from './IUserService';
+import { IUser } from '../../@types';
+import {
+  BadRequest,
+  Conflict,
+  Forbidden,
+  HttpError,
+  ResourceNotFound,
+  Unauthorized,
+} from '../../middlewares/error';
+import { IUserSignUp } from '../../@types/index';
 
 export class UserService implements IUserService {
   public async findUserByEmail(email: string): Promise<User | null> {
     try {
-      const findUser = await User.findOne({ where: { email } });
-      return findUser || null;
-    } catch (err) {
-      throw new Error("Error finding user by email: " + err.message);
+      const user = await User.findOne({ where: { email } });
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
   }
+
   /**
    *
    * @param payload
@@ -39,11 +48,10 @@ export class UserService implements IUserService {
     const { firstName, lastName, email, password } = payload;
 
     try {
-      const findUser = await this.findUserByEmail(email);
+      const userExists = await this.findUserByEmail(email);
 
-      if (findUser) {
-        throw new Error("User already exists")
-        // errorResponse("User already exists", 409, res);
+      if (userExists) {
+        throw new Conflict('User already exists');
       }
 
       const hashedPassword = await hashPassword(password);
@@ -55,13 +63,7 @@ export class UserService implements IUserService {
         password: hashedPassword,
       });
 
-      // Generate token and send email
-      const payload: IUserPayload = {
-        email: newUser.email,
-        id: newUser.id,
-        firstName: newUser.firstName,
-      };
-      const token = generateToken(payload);
+      const token = generateToken(newUser);
       const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
       sendSignUpNotification(
@@ -69,10 +71,11 @@ export class UserService implements IUserService {
         newUser.firstName,
         verificationLink
       );
-      // delete findUser.password;
+      // delete user.password;
       return newUser;
-    } catch (err) {
-      throw new Error('Internal Server Error')
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
+
       // throw new AuthErrorHandler(AuthErrorHandler.InternalServerError);
       // errorResponse("Internal Server Error", 500, res);
     }
@@ -87,34 +90,28 @@ export class UserService implements IUserService {
       email: string;
       password: string;
     }
-    // res: Response
+    //
   ): Promise<IUser> {
     const { email, password } = payload;
     try {
-      const findUser = await this.findUserByEmail(email);
+      const user = await this.findUserByEmail(email);
 
-      if (!findUser) {
-        throw new Error("Invalid username or password");
-        // return errorResponse("Invalid username or password", 403, res);
+      if (!user) {
+        throw new Unauthorized('Invalid email or password');
       }
 
-      if (findUser.isVerified === false) {
-        throw new Error("Email not verified");
-
-        // return errorResponse("Email not verified", 403, res);
-      }
-
-      const isMatch = await comparePassword(password, findUser.password);
-
+      const isMatch = await comparePassword(password, user.password);
       if (!isMatch) {
-        throw new Error("Invalid username or password");
-        // return errorResponse("Invalid username or password", 403, res);
+        throw new Unauthorized('Invalid email or password');
       }
-      delete findUser.password;
-      return findUser;
-    } catch (err) {
-      throw new Error("Internal Server Error");
-      // return errorResponse("Internal Server Error", 500, res);
+
+      if (user.isVerified === false) {
+        throw new Unauthorized('Email not verified');
+      }
+      delete user.password;
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
@@ -123,35 +120,31 @@ export class UserService implements IUserService {
    * @param token
    * @returns
    */
-  public async verifyUser(
-    token: string,
-    res: Response
-  ): Promise<IUser | unknown> {
-    const decodedUser = verifyToken(token);
-
-    if (!decodedUser) {
-      return errorResponse("Invalid token", 401, res);
-    }
-
+  public async verifyUser(token: string): Promise<IUser | Error> {
     try {
-      const findUser = await this.findUserByEmail(decodedUser.email);
+      const decodedUser = verifyToken(token);
 
-      if (!findUser) {
-        return errorResponse("Invalid token", 401, res);
+      if (!decodedUser) {
+        throw new Unauthorized('Expired');
+      }
+      const user = await this.findUserByEmail(decodedUser.email);
+
+      if (!user) {
+        throw new Unauthorized('Invalid token');
       }
 
-      if (findUser.isVerified) {
-        return errorResponse("Account already verify", 401, res);
+      if (user.isVerified) {
+        throw new BadRequest('Email already verified');
       }
 
-      findUser.isVerified = true;
-      await findUser.save();
+      user.isVerified = true;
+      await user.save();
       const link = `${process.env.AUTH_FRONTEND_URL}`;
-      welcomeEmailNotification(findUser.email, findUser.firstName, link);
+      welcomeEmailNotification(user.email, user.firstName, link);
 
-      return findUser;
-    } catch (err) {
-      return errorResponse("An error occurred", 500, res);
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -159,21 +152,16 @@ export class UserService implements IUserService {
    * @param email
    * @returns
    */
-  public async checkEmail(email: string, res: Response): Promise<unknown> {
+  public async checkEmail(email: string): Promise<unknown> {
     try {
-      const findUser = await this.findUserByEmail(email);
+      const user = await this.findUserByEmail(email);
 
-      if (!findUser) {
-        return success(
-          "Email is available for use",
-          { email: email },
-          200,
-          res
-        );
+      if (user) {
+        throw new Conflict('Email already in use');
       }
-      return errorResponse("Email already in use", 403, res);
-    } catch (err) {
-      return errorResponse("Internal Server Error", 500, res);
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -182,39 +170,29 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async changeEmailLink(email: string, res: Response): Promise<unknown> {
+  public async changeVerificationEmail(email: string): Promise<unknown> {
     try {
-      const findUser = await this.findUserByEmail(email);
+      const user = await this.findUserByEmail(email);
 
-      if (!findUser) {
-        return errorResponse("Email not found", 404, res);
+      if (!user) {
+        throw new ResourceNotFound('Email not found');
       }
 
-      const payload: IUserPayload = {
-        email: findUser.email,
-        id: findUser.id,
-      };
-
-      const token = await generateToken(payload);
+      const token = await generateToken(user);
       const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
-      sendSignUpNotification(
-        findUser.email,
-        findUser.firstName,
-        verificationLink
-      );
-      // sendVerificationEmail(findUser.firstName, findUser.email, token);
+      sendSignUpNotification(user.email, user.firstName, verificationLink);
+      // sendVerificationEmail(user.firstName, user.email, token);
       return success(
-        "Email change request link sent successfully",
+        'Email change request link sent successfully',
         {
-          id: findUser.id,
-          email: findUser.email,
+          id: user.id,
+          email: user.email,
           token,
         },
-        200,
-        res
+        200
       );
-    } catch (err) {
-      return errorResponse("Internal Server Error", 500);
+    } catch (error) {
+      return errorResponse('Internal Server Error', 500);
     }
   }
 
@@ -224,33 +202,32 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async changeEmail(token: string, res: Response): Promise<unknown> {
+  public async changeEmail(token: string): Promise<unknown> {
     const decodedUser = verifyToken(token);
 
     if (!decodedUser) {
-      return errorResponse("Invalid token", 401, res);
+      throw new Unauthorized('Invalid token');
     }
 
     try {
-      const findUser = await this.findUserByEmail(decodedUser.email);
+      const user = await this.findUserByEmail(decodedUser.email);
 
-      if (findUser) {
-        return errorResponse("Email already in use", 409, res);
+      if (user) {
+        throw new Conflict('Email already in use');
       }
 
-      findUser.email = decodedUser.email;
-      await findUser.save();
+      user.email = decodedUser.email;
+      await user.save();
       return success(
-        "Email changed successfully",
+        'Email changed successfully',
         {
-          id: findUser.id,
-          email: findUser.email,
+          id: user.id,
+          email: user.email,
         },
-        200,
-        res
+        200
       );
-    } catch (err) {
-      return errorResponse("Internal Server Error", 500, res);
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -262,27 +239,23 @@ export class UserService implements IUserService {
    */
   public async changePassword(
     payload: { currentPassword: string; newPassword: string },
-    userId: string,
-    res: Response
+    userId: string
   ): Promise<IUser | unknown> {
     const { currentPassword, newPassword } = payload;
 
-    const findUser = await User.findByPk(userId);
+    const user = await User.findByPk(userId);
 
-    if (!findUser) {
-      return errorResponse("User not found", 404, res);
+    if (!user) {
+      throw new ResourceNotFound('User not found');
     }
 
-    const matchPassword = await comparePassword(
-      currentPassword,
-      findUser.password
-    );
+    const matchPassword = await comparePassword(currentPassword, user.password);
     if (!matchPassword) {
-      return errorResponse("invalid current password", 403, res);
+      throw new Forbidden('Invalid current password');
     }
-    findUser.password = await hashPassword(newPassword);
-    await findUser.save();
-    return findUser;
+    user.password = await hashPassword(newPassword);
+    await user.save();
+    return user;
   }
   /**
    *
@@ -290,32 +263,23 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async forgotPassword(email: string, res: Response): Promise<unknown> {
-    const findUser = await this.findUserByEmail(email);
+  public async forgotPassword(email: string): Promise<unknown> {
+    const user = await this.findUserByEmail(email);
 
-    if (!findUser) {
-      return errorResponse("User not found", 404, res);
+    if (!user) {
+      throw new ResourceNotFound('User not found');
     }
 
-    if (findUser.isVerified === false) {
-      return errorResponse("Account not verified not found", 403, res);
+    if (user.isVerified === false) {
+      throw new HttpError(403, 'Account not verified not found');
     }
 
-    const payload: IUserPayload = {
-      email: findUser.email,
-      id: findUser.id,
-      firstName: findUser.firstName,
-    };
-    const token = await generateToken(payload);
+    const token = await generateToken(user);
     const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
 
-    resetPasswordNotification(
-      findUser.email,
-      findUser.firstName,
-      verificationLink
-    );
+    resetPasswordNotification(user.email, user.firstName, verificationLink);
 
-    return findUser;
+    return user;
   }
   /**
    *
@@ -326,24 +290,23 @@ export class UserService implements IUserService {
    */
   public async resetPassword(
     token: string,
-    password: string,
-    res: Response
+    password: string
   ): Promise<unknown> {
     const decodedUser = verifyToken(token);
 
     if (!decodedUser) {
-      return errorResponse("Invalid token", 401, res);
+      throw new Unauthorized('Invalid token');
     }
 
-    const findUser = await this.findUserByEmail(decodedUser.email);
+    const user = await this.findUserByEmail(decodedUser.email);
 
-    if (!findUser) {
-      return errorResponse("User not found", 404, res);
+    if (!user) {
+      throw new ResourceNotFound('User not found');
     }
 
-    findUser.password = await hashPassword(password);
-    await findUser.save();
-    return findUser;
+    user.password = await hashPassword(password);
+    await user.save();
+    return user;
   }
   /**
    *
@@ -351,91 +314,120 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async revalidateLogin(token: string, res: Response): Promise<unknown> {
-    const decodedUser = verifyToken(token);
-
-    if (!decodedUser) {
-      return errorResponse("Invalid token", 401, res);
-    }
-
-    const user = await User.findByPk(decodedUser.id);
-
-    if (!user) {
-      return errorResponse("User not found", 404, res);
-    }
-
-    res.header("Authorization", `Bearer ${token}`);
-
-    return user;
-  }
-  /**
-   *
-   * @param email
-   * @param res
-   * @returns
-   */
-  public async enable2fa(email: string, res: Response): Promise<unknown> {
-    const findUser = await this.findUserByEmail(email);
-
-    if (!findUser) {
-      return errorResponse("User not found", 404, res);
-    }
-    findUser.twoFactorAuth = true;
-    await findUser.save();
-
-    return findUser;
-  }
-  /**
-   *
-   * @param email
-   * @param res
-   * @returns
-   */
-  public async send2faCode(email: string, res: Response): Promise<unknown> {
-    const findUser = await this.findUserByEmail(email);
+  public async revalidateLogin(token: string): Promise<unknown> {
     try {
-      if (!findUser) {
-        return errorResponse("User not found", 404, res);
+      const decodedUser = verifyToken(token);
+      if (!decodedUser) {
+        throw new Unauthorized('Invalid token');
       }
 
-      if (findUser.twoFactorAuth === false) {
-        return errorResponse("Not allowed", 403, res);
+      const user = await User.findByPk(decodedUser.id);
+
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      throw new Unauthorized(error.message);
+    }
+  }
+  /**
+   *
+   * @param email
+   * @param res
+   * @returns
+   */
+  public async enable2fa(email: string): Promise<unknown> {
+    try {
+      const user = await this.findUserByEmail(email);
+
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+      user.twoFactorAuth = true;
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw new ResourceNotFound(error.message);
+    }
+  }
+  /**
+   *
+   * @param email
+   * @param res
+   * @returns
+   */
+  public async send2faCode(email: string): Promise<unknown> {
+    const user = await this.findUserByEmail(email);
+    try {
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+
+      if (user.twoFactorAuth === false) {
+        throw new Forbidden('2fa is not enabled');
       }
       const code = await generateFourDigitPassword();
-      findUser.twoFACode = code;
+      user.twoFACode = code;
 
-      await findUser.save();
-      twoFactorAuthNotification(
-        findUser.email,
-        findUser.firstName,
-        findUser.twoFACode
-      );
-      return findUser;
-    } catch (err) {
-      return errorResponse("Internal Server Error", 500, res);
+      await user.save();
+      twoFactorAuthNotification(user.email, user.firstName, user.twoFACode);
+      return user;
+    } catch (error) {
+      if (error.statusCode === 403) {
+        throw new Forbidden(error.message);
+      }
+      throw new ResourceNotFound(error.message);
     }
   }
 
-  public async fetchAllUser(res: Response): Promise<unknown> {
+  public async verify2faCode(token: string, code: string): Promise<unknown> {
+    try {
+      const decoded = verify2faToken(token);
+      if (decoded.exp && Date.now() / 1000 > decoded.exp) {
+        throw new Unauthorized('Token has expired');
+      }
+      if (decoded.code && decoded.code === code) {
+        const user = await User.findByPk(decoded.id);
+        if (!user) {
+          throw new ResourceNotFound('User not found');
+        }
+        user.twoFACode = null;
+        return user;
+      }
+      throw new BadRequest('Invalid code');
+    } catch (error) {
+      if (error.statusCode === 404) {
+        throw new ResourceNotFound(error.message);
+      } else if (error.statusCode === 401) {
+        throw new Unauthorized(error);
+      }
+      throw new BadRequest(error.message);
+    }
+  }
+
+  public async fetchAllUser(): Promise<unknown> {
     try {
       const users = await User.findAll({
         attributes: [
-          "id",
-          "firstName",
-          "username",
-          "lastName",
-          "email",
-          "location",
-          "country",
-          "twoFactorAuth",
-          "isVerified",
-          "roleId",
-          "provider",
+          'id',
+          'firstName',
+          'username',
+          'lastName',
+          'email',
+          'location',
+          'country',
+          'twoFactorAuth',
+          'isVerified',
+          'roleId',
+          'provider',
         ],
       });
       return users;
     } catch (error) {
-      return errorResponse("Internal Server Error", 500, res);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -444,106 +436,83 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async findUserById(
-    userId: string,
-    res: Response
-  ): Promise<IUser | unknown> {
+  public async findUserById(userId: string): Promise<IUser | unknown> {
     try {
-      const findUser = await User.findByPk(userId);
+      const user = await User.findByPk(userId);
 
-      if (!findUser) {
-        return errorResponse("User not found", 404, res);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
       }
-      return findUser;
+      return user;
     } catch (error) {
-      return errorResponse("Internal Server Error", 500, res);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
-  public async deleteUserById(
-    userId: string,
-    res: Response
-  ): Promise<IUser | unknown> {
+  public async deleteUserById(userId: string): Promise<IUser | unknown> {
     try {
-      const findUser = await User.destroy({ where: { id: userId } });
+      const user = await User.destroy({ where: { id: userId } });
 
-      if (!findUser) {
-        return errorResponse("User not found", 404, res);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
       }
-      return success("Deleted successfully", null, 201, res);
+      return user;
     } catch (error) {
-      return errorResponse("Internal Server Error", 500, res);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
   public async updateUserById(
     payload: { firstName: string; lastName: string },
-    email: string,
-    res: Response
+    email: string
   ): Promise<unknown> {
     const { firstName, lastName } = payload;
     try {
-      const findUser = await this.findUserByEmail(email);
+      const user = await this.findUserByEmail(email);
 
-      if (!findUser) {
-        return errorResponse("User not found", 404, res);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
       }
 
-      findUser.firstName = firstName;
-      findUser.lastName = lastName;
-      await findUser.save();
+      user.firstName = firstName;
+      user.lastName = lastName;
+      await user.save();
       return success(
-        "Deleted successfully",
-        { id: findUser.id, email: findUser.email },
-        201,
-        res
+        'Deleted successfully',
+        { id: user.id, email: user.email },
+        201
       );
     } catch (error) {
-      return errorResponse("Internal Server Error", 500, res);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
-  public async resendVerification(
-    email: string,
-    res: Response
-  ): Promise<unknown> {
+  public async resendVerification(email: string): Promise<unknown> {
     try {
-      const findUser = await this.findUserByEmail(email);
+      const user = await this.findUserByEmail(email);
 
-      if (!findUser) {
-        return errorResponse("User not found", 404, res);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
       }
 
-      if (findUser.isVerified === true) {
-        return errorResponse("User already verified", 403, res);
+      if (user.isVerified === true) {
+        throw new BadRequest('User already verified');
       }
 
-      const payload: IUserPayload = {
-        email: findUser.email,
-        id: findUser.id,
-        firstName: findUser.firstName,
-      };
-      const token = generateToken(payload);
+      const token = generateToken(user);
       const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-      sendSignUpNotification(
-        findUser.email,
-        findUser.firstName,
+      const response = await sendSignUpNotification(
+        user.email,
+        user.firstName,
         verificationLink
       );
-      // sendVerificationEmail(findUser.firstName, findUser.email, token);
-      return success(
-        "Verification email sent successfully",
-        {
-          id: findUser.id,
-          email: findUser.email,
-          token,
-        },
-        200,
-        res
-      );
+      // sendVerificationEmail(user.firstName, user.email, token);
+      return response;
     } catch (error) {
-      throw new Error("Internal Server Error");
-      // return errorResponse("Internal Server Error", 500, res);
+      if (error.statusCode === 404) {
+        throw new ResourceNotFound(error.message);
+      }
+      throw new BadRequest(error.message);
     }
   }
 }
