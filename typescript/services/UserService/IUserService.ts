@@ -1,4 +1,4 @@
-import { IUserSignUp } from "../../interfaces/user/userSignupInterface";
+import { IUserSignUp } from '../../interfaces/user/userSignupInterface';
 
 export interface IUserService {
   signUp(payload: IUserSignUp, res: unknown): Promise<unknown>;
@@ -10,7 +10,7 @@ export interface IUserService {
     res: unknown
   ): Promise<unknown>;
 
-  changeEmailLink(token: string, res: unknown): Promise<unknown>;
+  changeVerificationEmail(token: string, res: unknown): Promise<unknown>;
 
   checkEmail(token: string, res: unknown): Promise<unknown>;
 

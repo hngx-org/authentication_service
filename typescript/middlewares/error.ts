@@ -1,9 +1,11 @@
-import { NextFunction, Request, Response } from "express";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextFunction, Request, Response } from 'express';
+// import { AuthErrorHandler } from '../exceptions/AuthErrorHandler';
 
 class HttpError extends Error {
   statusCode: number;
   errorCode: number;
-  status: string = "error";
+  status: string = 'error';
 
   constructor(statusCode: number, message: string) {
     super(message);
@@ -56,8 +58,8 @@ class ServerError extends HttpError {
 }
 
 const routeNotFound = (req: Request, res: Response, next: NextFunction) => {
-  const error = new ResourceNotFound(`Route not found: ${req.originalUrl}`);
-  next(error);
+  const message = `Route not found: ${req.originalUrl}`;
+  res.status(404).json({ status: 'error', statusCode: 404, message });
 };
 
 const errorHandler = (
@@ -67,12 +69,30 @@ const errorHandler = (
   next: NextFunction
 ) => {
   const { statusCode, status, message } = err;
+  const cleanedMessage = message.replace(/"/g, '');
   res.status(statusCode).json({
     status,
     statusCode,
-    message,
+    message: cleanedMessage,
   });
 };
+
+// const errorHandler = (
+//   err: Error | AuthErrorHandler,
+//   req: Request,
+//   res: Response
+// ) => {
+//   if (err instanceof AuthErrorHandler) {
+//     // Handle specific errors
+//     res.status(err.status).json({ error: err.code, message: err.message });
+//   } else {
+//     // Handle other errors as internal server errors
+//     res.status(AuthErrorHandler.InternalServerError.status).json({
+//       error: AuthErrorHandler.InternalServerError.code,
+//       message: AuthErrorHandler.InternalServerError.message,
+//     });
+//   }
+// };
 
 export {
   ServerError,

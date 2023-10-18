@@ -42,3 +42,24 @@ export interface IRolePermission {
   permissionId: number;
   createdAt: Date;
 }
+
+export interface ITokenPayload {
+  id: string;
+  email: string;
+  firstName: string;
+  exp?: number;
+}
+
+export interface ITwoFactorPayload {
+  id: string;
+  code: string;
+  token: string;
+  exp: number;
+}
+
+export interface IUserSignUp {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
