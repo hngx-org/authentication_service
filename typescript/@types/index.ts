@@ -16,6 +16,8 @@ export interface IUser {
   twoFactorAuth?: boolean;
   location?: string;
   country?: string;
+  lastLogin?: Date;
+  isSeller?: boolean;
   createdAt?: Date;
   userRole?: IRole;
 }
