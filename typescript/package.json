@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run index.ts",
+    "test": "jest --watchAll --detectOpenHandles",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix",
     "start": "node dist/index.js",
     "dev": "npm run clean && tsc && nodemon dist/index.js",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "jest": {
+      "testEnvironment": "node",
+      "coveragePathIgnorePatterns": [
+        "/node_modules/"
+      ]
+    }
   },
   "author": "",
   "license": "ISC",
@@ -37,13 +43,19 @@
   "devDependencies": {
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.19",
+    "@types/jest": "^29.5.6",
+    "@types/mocha": "^10.0.3",
     "@types/node": "^20.8.6",
+    "@types/supertest": "^2.0.14",
     "@types/validator": "^13.11.3",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "eslint": "^8.51.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.3",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   }
 }

@@ -24,7 +24,7 @@ export const sendSignUpNotification = async (
     );
     return response.data;
   } catch (error) {
-    console.error('Error sending notification:', error);
+    // console.error('Error sending notification:', error);
   }
 };
 /**
