@@ -1,4 +1,4 @@
-import { fetchRolesService } from '../../services/RoleService/index';
+// import { fetchRolesService } from '../../services/RoleService/index';
 import { Request, Response } from "express";
 
 export const createRole = async (req: Request, res: Response) => {
@@ -6,5 +6,5 @@ export const createRole = async (req: Request, res: Response) => {
 };
 
 export const fetchRoles = async (res: Response) => {
-  return await fetchRolesService(res)
+  // return await fetchRolesService(res)
 };

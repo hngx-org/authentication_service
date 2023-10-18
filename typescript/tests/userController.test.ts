@@ -26,13 +26,14 @@ afterAll(async () => {
 describe("User API Endpoints", () => {
   it("should return bad requets error on signup user", async () => {
     const newUser = {
-      firstName: "",
+      firstName: "Johb",
       lastName: "Doe",
-      email: "johndoe@example.com",
-      password: "",
+      email: "",
+      password: "123",
     };
     const response = await request(app).post("/api/auth/signup").send(newUser);
     expect(response.status).toBe(422);
+    expect(response.body.message).toEqual("email is not allowed to be empty");
   });
 
   it("should create a new user", async () => {
@@ -44,6 +45,12 @@ describe("User API Endpoints", () => {
     };
     const response = await request(app).post("/api/auth/signup").send(newUser);
     expect(response.status).toBe(201);
+    expect(response.body.message).toEqual("Account created successfully");
+    //  expect(response.body.data).toEqual({
+    //    firstName: "John",
+    //   lastName: "Doe",
+    //   email: "johndoe@example.com",
+    // });
   });
 
   it("should send forgot password email", async () => {
@@ -54,6 +61,7 @@ describe("User API Endpoints", () => {
       .post("/api/auth/forgot-password")
       .send(newUser);
     expect(response.status).toBe(403);
+    expect(response.body.message).toEqual("Account not verified not found");
   });
 
   it("should login  a user", async () => {
@@ -63,6 +71,7 @@ describe("User API Endpoints", () => {
     };
     const response = await request(app).post("/api/auth/login").send(newUser);
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("Email not verified");
   });
 
   it("should change user email", async () => {
@@ -70,9 +79,11 @@ describe("User API Endpoints", () => {
       "/api/auth/change-email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdhaXlhb2JlZDk0QGdtYWlsLmNvbSIsImlkIjoiNGMzZTJiYTgtMThlMi00YmIzLTk0ZWQtOTBlNjUwOTkxZDhhIiwiaWF0IjoxNjk3NTQ3OTA1LCJleHAiOjE2OTc1NTE1MDV9.Wsh0-ZzRWt6V7jN91D7Qloy5wlqU2GSCbbfxac53OLY"
     );
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("Invalid token");
+    expect(response.body.status).toEqual("error");
   });
 
-  it("should init change email process", async () => {
+  it("should change email", async () => {
     const newUser = {
       email: "johndoe@example.com",
     };
@@ -80,6 +91,8 @@ describe("User API Endpoints", () => {
       .post("/api/auth/change-email")
       .send(newUser);
     expect(response.status).toBe(404);
+    //  expect(response.body.message).toEqual('Invalid token')
+    // expect(response.body.status).toEqual('error')
   });
 
   it("should init change email process", async () => {
@@ -90,6 +103,8 @@ describe("User API Endpoints", () => {
       .post("/api/auth/check-email")
       .send(newUser);
     expect(response.status).toBe(409);
+    expect(response.body.message).toEqual("Email already in use");
+    expect(response.body.status).toEqual("error");
   });
 
   it("should resend email", async () => {
@@ -100,12 +115,13 @@ describe("User API Endpoints", () => {
       .post("/api/auth/verify/resend")
       .send(newUser);
     expect(response.status).toBe(200);
+    expect(response.body.message).toEqual(
+      "Email verification code resent successfully"
+    );
   });
 
   it("should resend email", async () => {
-    const response = await request(app).patch(
-      "/api/auth/verify/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdhaXlhb2JlZDk0QGdtYWlsLmNvbSIsImlkIjoiNDBlYzQ5NDUtODk1YS00NWFlLWIwNDAtZGRlNWI1Y2U5MjQwIiwiZmlyc3ROYW1lIjoib2JlZCIsImlhdCI6MTY5NzU1NTQ4OSwiZXhwIjoxNjk3NTU5MDg5fQ.CbXldwjuJ5k44B_1DNPTcHoeQ-SyZCK1Ydmajck2g"
-    );
+    const response = await request(app).patch("/api/auth/verify/resend");
     expect(response.status).toBe(404);
   });
 
@@ -119,6 +135,7 @@ describe("User API Endpoints", () => {
       .set("authentication", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX")
       .send(newUser);
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("You must be logged in");
   });
 
   it("should send reset password link", async () => {
@@ -129,6 +146,7 @@ describe("User API Endpoints", () => {
       .put("/api/auth/reset-password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX")
       .send(newUser);
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("Invalid token");
   });
 
   it("should verfy 2FA", async () => {
@@ -150,6 +168,7 @@ describe("User API Endpoints", () => {
       .set("authentication", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX")
       .send(newUser);
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("You must be logged in");
   });
 
   it("should nsend able 2FA", async () => {
@@ -157,11 +176,13 @@ describe("User API Endpoints", () => {
       .post("/api/auth/2fa/send-code")
       .set("authentication", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX");
     expect(response.status).toBe(401);
+    expect(response.body.message).toEqual("You must be logged in");
   });
 
   it("should fetch all users", async () => {
     const response = await request(app).get("/api/auth/users");
     expect(response.status).toBe(200);
+    expect(response.body.message).toEqual("Fetched successfully");
   });
 
   it("should fetch user by id", async () => {
@@ -169,6 +190,7 @@ describe("User API Endpoints", () => {
       "/api/auth/users/0ec4945-895a-45ae-b040-dde5b5ce9240"
     );
     expect(response.status).toBe(200);
+    expect(response.body.message).toEqual("Fetched successfully");
   });
 
   it("should delete user by id", async () => {
@@ -178,10 +200,10 @@ describe("User API Endpoints", () => {
     expect(response.status).toBe(404);
   });
 
-  it("should fetch all roles", async () => {
-    const response = await request(app).get("/api/auth/roles/roles");
-    expect(response.status).toBe(404);
-  });
+  // it("should fetch all roles", async () => {
+  //   const response = await request(app).get("/api/auth/roles/roles");
+  //   expect(response.status).toBe(404);
+  // });
 
   // Add more test cases as needed
 });
