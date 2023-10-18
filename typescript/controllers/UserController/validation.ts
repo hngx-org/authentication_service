@@ -18,14 +18,14 @@ export const emailValidationSchema = Joi.object({
 });
 
 export const changePasswordSchema = Joi.object({
-  currentPassword: Joi.string().required(),
+  token: Joi.string().required(),
+  oldPassword: Joi.string().required(),
   newPassword: Joi.string().min(6).required(),
-  confirmPasssword: Joi.ref('newPassword'),
 });
 
 export const resetPasswordSchema = Joi.object({
-  newPassword: Joi.string().min(6).required(),
-  confirmPasssword: Joi.ref('newPassword'),
+  token: Joi.string().required(),
+  password: Joi.string().min(6).required(),
 });
 
 export const tokenValidationSchema = Joi.object({

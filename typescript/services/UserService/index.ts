@@ -6,9 +6,8 @@ import {
   welcomeEmailNotification,
 } from '../../controllers/UserController/messaging';
 import {
-  // IUserPayload,
   comparePassword,
-  errorResponse,
+  generateBearerToken,
   generateFourDigitPassword,
   generateToken,
   hashPassword,
@@ -71,7 +70,7 @@ export class UserService implements IUserService {
         newUser.firstName,
         verificationLink
       );
-      // delete user.password;
+      delete newUser.password;
       return newUser;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
@@ -170,7 +169,10 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async changeVerificationEmail(email: string): Promise<unknown> {
+  public async changeVerificationEmail(
+    userId: string,
+    email: string
+  ): Promise<unknown> {
     try {
       const user = await this.findUserByEmail(email);
 
@@ -192,7 +194,7 @@ export class UserService implements IUserService {
         200
       );
     } catch (error) {
-      return errorResponse('Internal Server Error', 500);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
@@ -237,25 +239,33 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async changePassword(
-    payload: { currentPassword: string; newPassword: string },
-    userId: string
-  ): Promise<IUser | unknown> {
-    const { currentPassword, newPassword } = payload;
+  public async changePassword(payload: {
+    token: string;
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<IUser | unknown> {
+    try {
+      const { token, oldPassword, newPassword } = payload;
+      const decodedUser = verifyToken(token);
 
-    const user = await User.findByPk(userId);
+      if (!decodedUser) {
+        throw new Unauthorized('Invalid token');
+      }
+      const user = await User.findByPk(decodedUser.id);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
 
-    if (!user) {
-      throw new ResourceNotFound('User not found');
+      const isMatch = await comparePassword(oldPassword, user.password);
+      if (!isMatch) {
+        throw new Unauthorized('Invalid password');
+      }
+      user.password = await hashPassword(newPassword);
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
-
-    const matchPassword = await comparePassword(currentPassword, user.password);
-    if (!matchPassword) {
-      throw new Forbidden('Invalid current password');
-    }
-    user.password = await hashPassword(newPassword);
-    await user.save();
-    return user;
   }
   /**
    *
@@ -264,22 +274,26 @@ export class UserService implements IUserService {
    * @returns
    */
   public async forgotPassword(email: string): Promise<unknown> {
-    const user = await this.findUserByEmail(email);
+    try {
+      const user = await this.findUserByEmail(email);
 
-    if (!user) {
-      throw new ResourceNotFound('User not found');
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+
+      if (user.isVerified === false) {
+        throw new HttpError(403, 'Account not verified not found');
+      }
+
+      const token = await generateToken(user);
+      const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
+
+      resetPasswordNotification(user.email, user.firstName, verificationLink);
+
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
-
-    if (user.isVerified === false) {
-      throw new HttpError(403, 'Account not verified not found');
-    }
-
-    const token = await generateToken(user);
-    const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
-
-    resetPasswordNotification(user.email, user.firstName, verificationLink);
-
-    return user;
   }
   /**
    *
@@ -292,21 +306,25 @@ export class UserService implements IUserService {
     token: string,
     password: string
   ): Promise<unknown> {
-    const decodedUser = verifyToken(token);
+    try {
+      const decodedUser = verifyToken(token);
 
-    if (!decodedUser) {
-      throw new Unauthorized('Invalid token');
+      if (!decodedUser) {
+        throw new Unauthorized('Invalid token');
+      }
+
+      const user = await this.findUserByEmail(decodedUser.email);
+
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+      user.password = await hashPassword(password);
+
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
     }
-
-    const user = await this.findUserByEmail(decodedUser.email);
-
-    if (!user) {
-      throw new ResourceNotFound('User not found');
-    }
-
-    user.password = await hashPassword(password);
-    await user.save();
-    return user;
   }
   /**
    *
@@ -329,7 +347,7 @@ export class UserService implements IUserService {
 
       return user;
     } catch (error) {
-      throw new Unauthorized(error.message);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -350,7 +368,7 @@ export class UserService implements IUserService {
 
       return user;
     } catch (error) {
-      throw new ResourceNotFound(error.message);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
   /**
@@ -376,10 +394,7 @@ export class UserService implements IUserService {
       twoFactorAuthNotification(user.email, user.firstName, user.twoFACode);
       return user;
     } catch (error) {
-      if (error.statusCode === 403) {
-        throw new Forbidden(error.message);
-      }
-      throw new ResourceNotFound(error.message);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
@@ -399,12 +414,7 @@ export class UserService implements IUserService {
       }
       throw new BadRequest('Invalid code');
     } catch (error) {
-      if (error.statusCode === 404) {
-        throw new ResourceNotFound(error.message);
-      } else if (error.statusCode === 401) {
-        throw new Unauthorized(error);
-      }
-      throw new BadRequest(error.message);
+      throw new HttpError(error.statusCode, error.message);
     }
   }
 
@@ -514,6 +524,34 @@ export class UserService implements IUserService {
       }
       throw new BadRequest(error.message);
     }
+  }
+
+  public async setIsSeller(token: string): Promise<unknown> {
+    try {
+      const decoded = verifyToken(token);
+
+      if ((decoded.exp && Date.now() / 1000 > decoded.exp) || !decoded) {
+        throw new Unauthorized('Invalid token');
+      }
+      const user = await User.findByPk(decoded.id);
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+
+      user.isSeller = true;
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
+    }
+  }
+
+  public async loginResponse(user: IUser): Promise<unknown> {
+    const authUser = await User.findByPk(user.id);
+    const token = generateBearerToken(authUser);
+    authUser.lastLogin = new Date();
+    await authUser.save();
+    return token;
   }
 }
 
