@@ -30,6 +30,17 @@ export async function comparePassword(
   return await bcrypt.compare(password, hash);
 }
 
+export const generateBearerToken = (user: IUser): string => {
+  const payload: { id: string } = {
+    id: user.id,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: '1d',
+  });
+  return token;
+};
+
 export const generateToken = (user: IUser): string => {
   const payload: ITokenPayload = {
     id: user.id,
