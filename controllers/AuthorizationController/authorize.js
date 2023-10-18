@@ -9,9 +9,19 @@ const authorize = (req, res) => {
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          status: 401,
+          authorized: false,
+          isExpired: true,
+          message: "token expired"
+        });
+      }
       return res.status(401).json({
         status: 401,
-        error: 'Invalid token',
+        authorized: false,
+        message: "Invalid token",
+        isValid: false
       });
     }
 
