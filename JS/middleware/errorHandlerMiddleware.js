@@ -2,7 +2,9 @@
 const { HttpError } = require('../errors/httpErrors');
 
 function errorLogger(err, req, res, next) {
-  if (err instanceof HttpError === false) console.log(err.message);
+  if (err && err.oauthError) {
+    return res.status(err.status).json(err);
+  }
   next(err);
 }
 
