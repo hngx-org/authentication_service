@@ -72,7 +72,7 @@ router.get(
 );
 router.get(
   '/facebook/redirect',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  passport.authenticate('facebook', { session: false }),
   send2fa,
   AuthenticationController.loginResponse,
 );

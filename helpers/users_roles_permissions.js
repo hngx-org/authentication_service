@@ -90,6 +90,10 @@ const guest_permissions = [
   'assessment.read',
   'badge.read',
   'event.read',
+  'order.create',
+  'order.read',
+  'order.update.own',
+  'order.delete.own',
 ];
 
 const user_permissions = [
