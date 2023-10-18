@@ -17,7 +17,7 @@ export interface IUserService {
   changeEmail(token: string, res: unknown): Promise<unknown>;
 
   changePassword(
-    payload: { currentPassword: string; newPassword: string },
+    payload: { token: string; oldPassword: string; newPassword: string },
     userId: string,
     res: unknown
   ): Promise<unknown>;

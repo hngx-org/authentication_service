@@ -11,7 +11,7 @@ import {
   updateUserSchema,
 } from './validation';
 import { NextFunction, Request, Response } from 'express';
-import { generateToken, success } from '../../utils';
+import { generateBearerToken, success } from '../../utils';
 import { InvalidInput } from '../../middlewares/error';
 // import { AuthErrorHandler } from '../../exceptions/AuthErrorHandler';
 
@@ -34,8 +34,13 @@ export const signUp = async (
       );
       throw new InvalidInput(errorMessages);
     }
-    const findUser = await userService.signUp(req.body);
-    return success('Account created successfully', findUser, 201, res);
+    const user = await userService.signUp(req.body);
+    res.status(200).json({
+      status: 200,
+      message:
+        'User created successfully. Please check your email to verify your account',
+      user,
+    });
   } catch (error) {
     next(error); // Pass the specific error to the error handling middleware
   }
@@ -61,9 +66,8 @@ export const loginUser = async (
     }
 
     const user: IUser = await userService.login(req.body);
-
-    const token = await generateToken(user);
-    return success('Login successfully', { token, user }, 200, res);
+    req.user = user;
+    next();
   } catch (error) {
     next(error);
   }
@@ -89,7 +93,8 @@ export const verifyUser = async (
     }
     const { token } = req.params;
     const user = await userService.verifyUser(token);
-    return success('Account activated successfully', user, 200, res);
+    req.user = user;
+    next();
   } catch (error) {
     next(error);
   }
@@ -157,27 +162,29 @@ export const checkEmail = async (
  * @param res
  * @returns
  */
-export const changeVerificationEmail = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { error } = emailValidationSchema.validate(req.body);
+// export const changeVerificationEmail = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { error } = emailValidationSchema.validate(req.body);
 
-    if (error) {
-      const errorMessages = error.details.map(
-        (detail: { message: string }) => detail.message
-      );
-      throw new InvalidInput(errorMessages);
-    }
+//     if (error) {
+//       const errorMessages = error.details.map(
+//         (detail: { message: string }) => detail.message
+//       );
+//       throw new InvalidInput(errorMessages);
+//     }
 
-    const { email } = req.body;
-    return await userService.changeVerificationEmail(email);
-  } catch (error) {
-    next(error);
-  }
-};
+//     const { email } = req.body;
+//     const userId = req.user.id;
+//     const message = await userService.changeVerificationEmail(userId, email);
+//     return success('Email changed successfully', message, 200, res);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 /**
  * @param req
  * @param res
@@ -224,9 +231,8 @@ export const changePassword = async (
       throw new InvalidInput(errorMessages);
     }
 
-    const user = req.user as IUser;
-    const findUser = await userService.changePassword(req.body, user.id);
-    return success('Password changed successfully', findUser, 201, res);
+    const findUser = await userService.changePassword(req.body);
+    return success('Password reset successful', findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -275,8 +281,7 @@ export const resetPassword = async (
   next: NextFunction
 ) => {
   try {
-    const { token } = req.params;
-    const { newPassword } = req.body;
+    const { token, password } = req.body;
 
     const { error } = resetPasswordSchema.validate(req.body);
 
@@ -286,8 +291,11 @@ export const resetPassword = async (
       );
       throw new InvalidInput(errorMessages);
     }
-    const findUser = await userService.resetPassword(token, newPassword);
-    return success('Password change successfully', findUser, 200, res);
+    const user = await userService.resetPassword(token, password);
+
+    if (user) {
+      return success('Password reset successful', null, 200, res);
+    }
   } catch (error) {
     next(error);
   }
@@ -305,7 +313,8 @@ export const revalidateLogin = async (
   try {
     const { token } = req.params;
     const user = await userService.revalidateLogin(token);
-    return success('Login successful', user, 200, res);
+    req.user = user;
+    next();
   } catch (error) {
     next(error);
   }
@@ -366,7 +375,9 @@ export const verify2faCode = async (
 
     const { code, token } = req.body;
 
-    return await userService.verify2faCode(code, token);
+    const user = await userService.verify2faCode(code, token);
+    req.user = user;
+    next();
   } catch (error) {
     next(error);
   }
@@ -393,6 +404,9 @@ export const findUserById = async (
   try {
     const { userId } = req.params;
     const findUser = await userService.findUserById(userId);
+    if (!findUser) {
+      throw new InvalidInput('User not found');
+    }
     return success('Fetched successfully', findUser, 200, res);
   } catch (error) {
     next(error);
@@ -406,7 +420,11 @@ export const deleteUserById = async (
 ) => {
   try {
     const { userId } = req.params;
-    return await userService.deleteUserById(userId);
+    const findUser = await userService.deleteUserById(userId);
+    if (!findUser) {
+      throw new InvalidInput('User not found');
+    }
+    return success('Deleted successfully', findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -428,6 +446,63 @@ export const updateUserById = async (
     }
     const { email } = req.user as IUser;
     return await userService.updateUserById(req.body, email);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const loginResponse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user as IUser;
+
+    const token = await generateBearerToken(user);
+
+    res.header('Authorization', `Bearer ${token}`);
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: user.id,
+          roleId: user.roleId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          isVerified: user.isVerified,
+          twoFactorAuth: user.twoFactorAuth,
+          isSeller: user.isSeller,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const setIsSeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { error } = tokenValidationSchema.validate(req.body);
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new InvalidInput(errorMessages);
+    }
+    const { token } = req.body;
+    const user = await userService.setIsSeller(token);
+    if (user) {
+      return success('User set as seller', user, 200, res);
+    }
   } catch (error) {
     next(error);
   }
