@@ -448,7 +448,7 @@ export class UserService implements IUserService {
    */
   public async findUserById(userId: string): Promise<IUser | unknown> {
     try {
-      const user = await User.findByPk(userId);
+      const user = await User.findOne({where: {id: userId}});
 
       if (!user) {
         throw new ResourceNotFound('User not found');

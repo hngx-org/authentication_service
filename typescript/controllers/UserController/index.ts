@@ -408,6 +408,7 @@ export const findUserById = async (
       throw new InvalidInput('User not found');
     }
     return success('Fetched successfully', findUser, 200, res);
+
   } catch (error) {
     next(error);
   }
