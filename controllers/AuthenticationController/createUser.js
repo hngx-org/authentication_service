@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/Users');
+const slugify = require('../../helpers/slugify');
 
 const createUser = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -14,10 +15,12 @@ const createUser = async (req, res, next) => {
       username: '',
       token: '',
       refresh_token: '',
+      slug: await slugify(`${firstName} ${lastName}`),
     });
 
     req.user = {
       id: newUser.id,
+      slug: newUser.slug,
       firstName: newUser.first_name,
       lastName: newUser.last_name,
       email: newUser.email,

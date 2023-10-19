@@ -1,5 +1,6 @@
 const User = require('../../models/Users');
 const jwt = require('jsonwebtoken');
+const slugify = require('../../helpers/slugify');
 
 const createGuest = async (req, res) => {
   const { firstName, lastName, email } = req.body;
@@ -14,6 +15,7 @@ const createGuest = async (req, res) => {
       refresh_token: '',
       role_id: 1,
       is_verified: true,
+      slug: await slugify(`${firstName} ${lastName}`),
     });
 
     const jwt_payload = {
@@ -32,6 +34,7 @@ const createGuest = async (req, res) => {
         token,
         user: {
           id: newGuest.id,
+          slug: newGuest.slug,
           firstName: newGuest.first_name,
           lastName: newGuest.last_name,
           email: newGuest.email,
