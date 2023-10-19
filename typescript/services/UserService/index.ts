@@ -286,6 +286,7 @@ export class UserService implements IUserService {
       }
 
       const token = await generateToken(user);
+      console.log(token)
       const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
 
       resetPasswordNotification(user.email, user.firstName, verificationLink);
@@ -401,7 +402,7 @@ export class UserService implements IUserService {
   public async verify2faCode(token: string, code: string): Promise<unknown> {
     try {
       const decoded = verify2faToken(token);
-      if (decoded.exp && Date.now() / 1000 > decoded.exp) {
+      if (!decoded) {
         throw new Unauthorized('Token has expired');
       }
       if (decoded.code && decoded.code === code) {
