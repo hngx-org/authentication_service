@@ -1,3 +1,5 @@
 export default interface IRoleService {
-  createRolesAndPermission(): Promise<unknown>;
+  seedRole(): Promise<unknown>;
+    seedPermission(): Promise<unknown>;
+
 }
