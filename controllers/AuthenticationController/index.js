@@ -1,4 +1,5 @@
 const checkEmail = require('./checkEmail');
+const changeEmail = require('./changeEmail');
 const createUser = require('./createUser');
 const createGuest = require('./createGuest');
 const verifyUser = require('./verifyUser');
@@ -13,6 +14,7 @@ const setIsSeller = require('./setIsSeller');
 
 const AuthenticationController = {
   checkEmail,
+  changeEmail,
   createUser,
   createGuest,
   loginResponse,
