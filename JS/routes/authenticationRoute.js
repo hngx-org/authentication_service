@@ -16,7 +16,7 @@ router.post('/check-email', AuthenticationController.checkEmail);
 router.patch(
   '/change-email',
   AuthenticationController.changeEmail,
-  MessagingController.resendVerificationEmail,
+  MessagingController.sendSignUpEmail,
 );
 
 router.post(
