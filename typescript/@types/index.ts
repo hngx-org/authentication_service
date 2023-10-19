@@ -1,4 +1,4 @@
-import {Request} from 'express';
+import { Request } from 'express';
 
 export interface IUser {
   id?: string;
@@ -57,8 +57,7 @@ export interface ITokenPayload {
 export interface ITwoFactorPayload {
   id: string;
   code: string;
-  token: string;
-  exp: number;
+  exp?: number;
 }
 
 export interface IUserSignUp {
@@ -67,7 +66,6 @@ export interface IUserSignUp {
   email: string;
   password: string;
 }
-
 
 export interface GenericRequest<T> extends Request {
   user: T;

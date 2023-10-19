@@ -9,10 +9,10 @@ import {
   tokenValidationSchema,
   twofaValidationSchema,
   updateUserSchema,
-} from "./validation";
-import { NextFunction, Request, Response } from "express";
-import { generateBearerToken, success } from "../../utils";
-import { InvalidInput } from "../../middlewares/error";
+} from './validation';
+import { NextFunction, Request, Response } from 'express';
+import { generateBearerToken, success } from '../../utils';
+import { InvalidInput, ResourceNotFound } from '../../middlewares/error';
 // import { AuthErrorHandler } from '../../exceptions/AuthErrorHandler';
 
 /**
@@ -35,11 +35,39 @@ export const signUp = async (
       throw new InvalidInput(errorMessages);
     }
     const user = await userService.signUp(req.body);
+    const { id, firstName, lastName, email } = user;
     res.status(200).json({
       status: 200,
       message:
-        "User created successfully. Please check your email to verify your account",
-      user,
+        'User created successfully. Please check your email to verify your account',
+      user: { id, firstName, lastName, email },
+    });
+  } catch (error) {
+    next(error); // Pass the specific error to the error handling middleware
+  }
+};
+
+export const guestSignup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { error } = registerSchema.validate(req.body);
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new InvalidInput(errorMessages);
+    }
+    req.body.roleId = 1;
+    const user = await userService.signUp(req.body);
+    const { id, firstName, lastName, email } = user;
+    res.status(200).json({
+      status: 200,
+      message:
+        'User created successfully. Please check your email to verify your account',
+      user: { id, firstName, lastName, email },
     });
   } catch (error) {
     next(error); // Pass the specific error to the error handling middleware
@@ -161,29 +189,6 @@ export const checkEmail = async (
  * @param res
  * @returns
  */
-// export const changeVerificationEmail = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { error } = emailValidationSchema.validate(req.body);
-
-//     if (error) {
-//       const errorMessages = error.details.map(
-//         (detail: { message: string }) => detail.message
-//       );
-//       throw new InvalidInput(errorMessages);
-//     }
-
-//     const { email } = req.body;
-//     const userId = req.user.id;
-//     const message = await userService.changeVerificationEmail(userId, email);
-//     return success('Email changed successfully', message, 200, res);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 /**
  * @param req
  * @param res
@@ -195,21 +200,27 @@ export const changeEmail = async (
   next: NextFunction,
 ) => {
   try {
-    const { error } = tokenValidationSchema.validate(req.params);
+    const { error } = emailValidationSchema.validate(req.body);
     if (error) {
       const errorMessages = error.details.map(
         (detail: { message: string }) => detail.message,
       );
       throw new InvalidInput(errorMessages);
     }
-    const { token } = req.params;
+    const token = req.headers.authorization as string;
 
-    return await userService.changeEmail(token);
+    const user = await userService.changeEmail(token, req.body.email);
+    const { id, firstName, lastName, email } = user;
+    res.status(200).json({
+      status: 200,
+      message:
+        'User created successfully. Please check your email to verify your account',
+      user: { id, firstName, lastName, email },
+    });
   } catch (error) {
     next(error);
   }
 };
-
 /**
  * @param req
  * @param res
@@ -230,8 +241,8 @@ export const changePassword = async (
       throw new InvalidInput(errorMessages);
     }
 
-    const findUser = await userService.changePassword(req.body);
-    return success("Password reset successful", findUser, 200, res);
+    await userService.changePassword(req.body);
+    return success('Password reset successful', null, 200, res);
   } catch (error) {
     next(error);
   }
@@ -247,10 +258,8 @@ export const forgotPassword = async (
   next: NextFunction,
 ) => {
   try {
-    const { email } = req.body;
-
     const { error } = emailValidationSchema.validate(req.body);
-
+    const { email } = req.body;
     if (error) {
       const errorMessages = error.details.map(
         (detail: { message: string }) => detail.message,
@@ -258,13 +267,10 @@ export const forgotPassword = async (
       throw new InvalidInput(errorMessages);
     }
 
-    const findUser = await userService.forgotPassword(email);
-    return success(
-      "Forgot password link send successfully",
-      findUser,
-      200,
-      res,
-    );
+    const response = await userService.forgotPassword(email);
+    if (response) {
+      return success('Password reset link sent successfully', null, 200, res);
+    }
   } catch (error) {
     next(error);
   }
@@ -329,14 +335,49 @@ export const enable2fa = async (
   next: NextFunction,
 ) => {
   try {
-    const { email } = req.user as IUser;
-
-    const findUser = await userService.enable2fa(email);
-    return success("Two factor authentication enabled", findUser, 201, res);
+    const { error } = tokenValidationSchema.validate(req.body);
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new ResourceNotFound(errorMessages);
+    }
+    const { token } = req.body;
+    const response = await userService.enable2fa(token);
+    if (response) {
+      return success('Two factor authentication enabled', null, 200, res);
+    }
   } catch (error) {
     next(error);
   }
 };
+
+export const disable2fa = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { error } = tokenValidationSchema.validate(req.body);
+
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new ResourceNotFound(errorMessages);
+    }
+
+    const { token } = req.body;
+
+    const response = await userService.disable2fa(token);
+    if (response) {
+      return success('Two factor authentication disabled', null, 200, res);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * @param req
  * @param res
@@ -348,9 +389,24 @@ export const send2faCode = async (
   next: NextFunction,
 ) => {
   try {
-    const { email } = req.user as IUser;
-    const findUser = await userService.send2faCode(email);
-    return success("Two factor code sent", findUser, 201, res);
+    const { error } = emailValidationSchema.validate(req.body);
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new InvalidInput(errorMessages);
+    }
+    const { email } = req.body;
+
+    const response = await userService.send2faCode(email);
+    const { user, token } = response;
+    return res.status(200).json({
+      status: 200,
+      message: 'Two factor code sent',
+      email: user.email,
+      twoFactor: true,
+      token,
+    });
   } catch (error) {
     next(error);
   }
@@ -371,10 +427,9 @@ export const verify2faCode = async (
       throw new InvalidInput(errorMessages);
     }
 
-    const { code, token } = req.body;
+    const { token, code } = req.body;
 
-    const user = await userService.verify2faCode(code, token);
-    console.log(user);
+    const user = await userService.verify2faCode(token, code);
     req.user = user;
   return  success("verified", user, 200, res);
   } catch (error) {
@@ -446,7 +501,8 @@ export const updateUserById = async (
       throw new InvalidInput(errorMessages);
     }
     const { email } = req.user as IUser;
-    return await userService.updateUserById(req.body, email);
+    const user = await userService.updateUserById(req.body, email);
+    return success('User details updated', user, 200, res);
   } catch (error) {
     next(error);
   }

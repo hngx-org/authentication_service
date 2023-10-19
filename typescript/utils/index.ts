@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -35,8 +36,17 @@ export const generateBearerToken = (user: IUser): string => {
     id: user.id,
   };
 
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
+  return token;
+};
+
+export const generate2faToken = (user: IUser, code: string): string => {
+  const payload: ITwoFactorPayload = {
+    id: user.id,
+    code,
+  };
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: '1d',
+    expiresIn: 15 * 60 * 1000,
   });
   return token;
 };
@@ -49,7 +59,7 @@ export const generateToken = (user: IUser): string => {
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: '1h',
+    expiresIn: 600,
   });
   return token;
 };
@@ -83,7 +93,7 @@ export const sendVerificationEmail = async (
 ) => {
   try {
     // TODO email link not valid
-    const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
+    const verification_link = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
     const response = await axios.post(
       `${process.env.EMAIL_SERVICE_URL}/api/user/email-verification`,
@@ -91,7 +101,7 @@ export const sendVerificationEmail = async (
         name,
         recipient,
         // eslint-disable-next-line camelcase
-        verification_link: verificationLink,
+        verification_link,
       }
     );
 
@@ -103,12 +113,6 @@ export const sendVerificationEmail = async (
   } catch (error) {
     // return error;
   }
-};
-
-export const generateFourDigitPassword = () => {
-  const timestamp = Date.now().toString();
-  const lastFourDigits = timestamp.substr(timestamp.length - 4); // Extract the last 4 digits
-  return lastFourDigits;
 };
 
 export const errorResponse = (
