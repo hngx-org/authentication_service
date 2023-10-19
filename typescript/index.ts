@@ -2,6 +2,8 @@ import express from 'express';
 import sequelize from './config/db.config';
 import userRouterHandler from './routes/userRouter';
 import rbacRouterHandler from './routes/rbacRouter';
+import authRouter from './routes/authRouter';
+
 import cors from 'cors';
 import { config } from 'dotenv'; // ES6 import for dotenv
 import { errorHandler, routeNotFound } from './middlewares/error';
@@ -31,6 +33,8 @@ sequelize
 
 app.use('/api/auth', userRouterHandler);
 app.use('/api/roles', rbacRouterHandler);
+app.use('/api/authorize', authRouter);
+
 
 app.use(errorHandler);
 app.use(routeNotFound);

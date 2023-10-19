@@ -3,6 +3,7 @@ import User from '../models/User';
 import Role from '../models/Role';
 import RolesPermissions from '../models/RolePermission';
 import Permission from '../models/Permission';
+import UserPermission from '../models/UserPermission';
 import PasswordResetToken from '../models/PasswordResetToken';
 import dotenv from 'dotenv'; // ES6 import for dotenv
 dotenv.config();
@@ -21,6 +22,7 @@ sequelize.addModels([User]);
 sequelize.addModels([Permission]);
 sequelize.addModels([PasswordResetToken]);
 sequelize.addModels([RolesPermissions]);
+sequelize.addModels([UserPermission]);
 
 sequelize
   .sync()
