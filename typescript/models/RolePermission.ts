@@ -2,7 +2,7 @@ import {Model, DataType, Column, Table, CreatedAt, BelongsToMany} from "sequeliz
 import Permission from "./Permission";
 import Role from "./Role";
 
-@Table({tableName: "role_permissions", timestamps: false})
+@Table({tableName: "roles_permissions", timestamps: false})
 export default class RolePermission extends Model<RolePermission> {
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true, autoIncrementIdentity: true })
       id: number;

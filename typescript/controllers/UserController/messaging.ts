@@ -32,7 +32,7 @@ export const sendSignUpNotification = async (user: IUser, token: string) => {
     const response = await axios.post(EMAIL_SERVICE_VERIFY_EMAIL_URL, jsonData);
     return response.data;
   } catch (error) {
-    // console.error('Error sending notification:', error);
+    console.error('Error sending notification:', error);
   }
 };
 /**

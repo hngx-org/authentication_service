@@ -1,5 +1,5 @@
-import { IUser } from './../../@types/index';
-import userService from '../../services/UserService';
+import { IUser } from "./../../@types/index";
+import userService from "../../services/UserService";
 import {
   changePasswordSchema,
   emailValidationSchema,
@@ -9,10 +9,10 @@ import {
   tokenValidationSchema,
   twofaValidationSchema,
   updateUserSchema,
-} from './validation';
-import { NextFunction, Request, Response } from 'express';
-import { generateBearerToken, success } from '../../utils';
-import { InvalidInput, ResourceNotFound } from '../../middlewares/error';
+} from "./validation";
+import { NextFunction, Request, Response } from "express";
+import { generateBearerToken, success } from "../../utils";
+import { InvalidInput, ResourceNotFound } from "../../middlewares/error";
 // import { AuthErrorHandler } from '../../exceptions/AuthErrorHandler';
 
 /**
@@ -39,7 +39,7 @@ export const signUp = async (
     res.status(200).json({
       status: 200,
       message:
-        'User created successfully. Please check your email to verify your account',
+        "User created successfully. Please check your email to verify your account",
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
@@ -66,7 +66,7 @@ export const guestSignup = async (
     res.status(200).json({
       status: 200,
       message:
-        'User created successfully. Please check your email to verify your account',
+        "User created successfully. Please check your email to verify your account",
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
@@ -129,7 +129,6 @@ export const verifyUser = async (
 };
 
 /**
- *
  * @param req
  * @param res
  * @returns
@@ -151,7 +150,7 @@ export const resendVerification = async (
     const { email } = req.body;
     const response = await userService.resendVerification(email);
     return success(
-      'Email verification code resent successfully',
+      "Email verification code resent successfully",
       response,
       200,
       res
@@ -179,7 +178,7 @@ export const checkEmail = async (
     const { email } = req.body;
     const emailAvailable = await userService.checkEmail(email);
     if (!emailAvailable) {
-      return success('Email is available for use', emailAvailable, 200, res);
+      return success("Email is available for use", emailAvailable, 200, res);
     }
   } catch (error) {
     next(error);
@@ -215,7 +214,7 @@ export const changeEmail = async (
     res.status(200).json({
       status: 200,
       message:
-        'User created successfully. Please check your email to verify your account',
+        "User created successfully. Please check your email to verify your account",
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
@@ -243,7 +242,7 @@ export const changePassword = async (
     }
 
     await userService.changePassword(req.body);
-    return success('Password reset successful', null, 200, res);
+    return success("Password reset successful", null, 200, res);
   } catch (error) {
     next(error);
   }
@@ -270,7 +269,7 @@ export const forgotPassword = async (
 
     const response = await userService.forgotPassword(email);
     if (response) {
-      return success('Password reset link sent successfully', null, 200, res);
+      return success("Password reset link sent successfully", null, 200, res);
     }
   } catch (error) {
     next(error);
@@ -300,7 +299,7 @@ export const resetPassword = async (
     const user = await userService.resetPassword(token, password);
 
     if (user) {
-      return success('Password reset successful', null, 200, res);
+      return success("Password reset successful", null, 200, res);
     }
   } catch (error) {
     next(error);
@@ -346,7 +345,7 @@ export const enable2fa = async (
     const { token } = req.body;
     const response = await userService.enable2fa(token);
     if (response) {
-      return success('Two factor authentication enabled', null, 200, res);
+      return success("Two factor authentication enabled", null, 200, res);
     }
   } catch (error) {
     next(error);
@@ -372,7 +371,7 @@ export const disable2fa = async (
 
     const response = await userService.disable2fa(token);
     if (response) {
-      return success('Two factor authentication disabled', null, 200, res);
+      return success("Two factor authentication disabled", null, 200, res);
     }
   } catch (error) {
     next(error);
@@ -380,7 +379,6 @@ export const disable2fa = async (
 };
 
 /**
- *
  * @param req
  * @param res
  * @returns
@@ -404,7 +402,7 @@ export const send2faCode = async (
     const { user, token } = response;
     return res.status(200).json({
       status: 200,
-      message: 'Two factor code sent',
+      message: "Two factor code sent",
       email: user.email,
       twoFactor: true,
       token,
@@ -433,8 +431,11 @@ export const verify2faCode = async (
 
     const user = await userService.verify2faCode(token, code);
     req.user = user;
-    next();
+    // return success("verified", user, 200, res);
+    next()
   } catch (error) {
+    // console.log(error);
+    // res.status(500).json({ error: error.message });
     next(error);
   }
 };
@@ -446,7 +447,7 @@ export const fetchAllUser = async (
 ) => {
   try {
     const users = await userService.fetchAllUser();
-    return success('Fetched successfully', users, 200, res);
+    return success("Fetched successfully", users, 200, res);
   } catch (error) {
     next(error);
   }
@@ -461,10 +462,9 @@ export const findUserById = async (
     const { userId } = req.params;
     const findUser = await userService.findUserById(userId);
     if (!findUser) {
-      throw new InvalidInput('User not found');
+      throw new InvalidInput("User not found");
     }
-    return success('Fetched successfully', findUser, 200, res);
-
+    return success("Fetched successfully", findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -479,9 +479,9 @@ export const deleteUserById = async (
     const { userId } = req.params;
     const findUser = await userService.deleteUserById(userId);
     if (!findUser) {
-      throw new InvalidInput('User not found');
+      throw new InvalidInput("User not found");
     }
-    return success('Deleted successfully', findUser, 200, res);
+    return success("Deleted successfully", findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -503,7 +503,7 @@ export const updateUserById = async (
     }
     const { email } = req.user as IUser;
     const user = await userService.updateUserById(req.body, email);
-    return success('User details updated', user, 200, res);
+    return success("User details updated", user, 200, res);
   } catch (error) {
     next(error);
   }
@@ -519,11 +519,11 @@ export const loginResponse = async (
 
     const token = await generateBearerToken(user);
 
-    res.header('Authorization', `Bearer ${token}`);
+    res.header("Authorization", `Bearer ${token}`);
 
     return res.status(200).json({
       status: 200,
-      message: 'Login successful',
+      message: "Login successful",
       data: {
         token,
         user: {
@@ -559,7 +559,7 @@ export const setIsSeller = async (
     const { token } = req.body;
     const user = await userService.setIsSeller(token);
     if (user) {
-      return success('User set as seller', user, 200, res);
+      return success("User set as seller", user, 200, res);
     }
   } catch (error) {
     next(error);
