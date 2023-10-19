@@ -21,4 +21,14 @@ sequelize.addModels([User]);
 sequelize.addModels([Permission]);
 sequelize.addModels([PasswordResetToken]);
 sequelize.addModels([RolesPermissions]);
+
+sequelize
+  .sync()
+  .then(() => {
+    console.log('Database synchronized successfully.');
+  })
+  .catch((error) => {
+    console.error('Error synchronizing database:', error);
+  });
+
 export default sequelize;

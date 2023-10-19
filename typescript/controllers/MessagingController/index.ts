@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import axios from "axios";
-import { success } from "../../utils";
+/* eslint-disable camelcase */
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import axios from 'axios';
+import { success } from '../../utils';
 
 interface IUser {
   id: string;
@@ -19,13 +20,18 @@ export const createJwtToken = (user: IUser): string => {
     firstName: user.firstName,
     email: user.email,
   };
-  return jwt.sign(jwtPayload, process.env.JWT_SECRET as string, { expiresIn: 600 });
+  return jwt.sign(jwtPayload, process.env.JWT_SECRET as string, {
+    expiresIn: 600,
+  });
 };
 
-export const generateVerificationLink = (token: string, NODE_ENV: string): string => {
+export const generateVerificationLink = (
+  token: string,
+  NODE_ENV: string
+): string => {
   const { VERIFY_EMAIL_ENDPOINT_LIVE, VERIFY_EMAIL_ENDPOINT_DEV } = process.env;
   const endpoint =
-    NODE_ENV === "production"
+    NODE_ENV === 'production'
       ? VERIFY_EMAIL_ENDPOINT_LIVE
       : VERIFY_EMAIL_ENDPOINT_DEV;
   return `${endpoint}?token=${token}`;
@@ -76,9 +82,9 @@ const sendPasswordResetEmail = async (
   });
 
   if (emailSent) {
-    success("Password reset link sent successfully", 200);
+    success('Password reset link sent successfully', 200);
   } else {
-    res.status(500).json({ status: 500, message: "Email not sent" });
+    res.status(500).json({ status: 500, message: 'Email not sent' });
   }
 };
 
@@ -95,7 +101,7 @@ const resendVerification = async (
   const user = req.user as IUser | undefined;
 
   if (!user) {
-    res.status(401).json({ status: 401, message: "User not found" });
+    res.status(401).json({ status: 401, message: 'User not found' });
   }
 
   const { id, firstName, email } = req.user;
@@ -118,12 +124,12 @@ const resendVerification = async (
 
   if (emailSent) {
     success(
-      "Verification email resent. Please check your email for the verification link",
+      'Verification email resent. Please check your email for the verification link',
       req.user,
       200
     );
   } else {
-    res.status(500).json({ status: 500, message: "Email not sent" });
+    res.status(500).json({ status: 500, message: 'Email not sent' });
   }
 };
 
@@ -140,7 +146,7 @@ const sendSignUpEmail = async (
 
   const user = req.user as IUser | undefined;
   if (!user) {
-    res.status(401).json({ status: 401, message: "User not found" });
+    res.status(401).json({ status: 401, message: 'User not found' });
   }
   const { id, firstName, email } = req.user;
 
@@ -162,12 +168,12 @@ const sendSignUpEmail = async (
 
   if (emailSent) {
     success(
-      "Verification email resent. Please check your email for the verification link",
+      'Verification email resent. Please check your email for the verification link',
       req.user,
       200
     );
   } else {
-    res.status(500).json({ status: 500, message: "Email not sent" });
+    res.status(500).json({ status: 500, message: 'Email not sent' });
   }
 };
 
@@ -193,8 +199,8 @@ const sendWelcomeMail = async (
     call_to_action: redirectLink,
   });
   return emailSent
-    ? "Welcome email sent successfully."
-    : "Welcome email not sent successfully.";
+    ? 'Welcome email sent successfully.'
+    : 'Welcome email not sent successfully.';
 };
 
 export {

@@ -1,27 +1,35 @@
 /* eslint-disable camelcase */
+import { IUser } from '../../@types';
 import axios from 'axios';
+
+// const { EMAIL_SERVICE_URL, AUTH_FRONTEND_URL } = process.env;
+const {
+  AUTH_FRONTEND_URL,
+  EMAIL_SERVICE_VERIFY_EMAIL_URL,
+  VERIFY_EMAIL_ENDPOINT_LIVE,
+  EMAIL_SERVICE_PASSWORD_RESET_URL,
+  PASSWORD_RESET_SUCCESS_URL,
+  EMAIL_SERVICE_WELCOME_URL,
+  EMAIL_SERVICE_2FA_URL,
+} = process.env;
+
 /**
  *
  * @param recipient
  * @param name
  * @param link
  */
-export const sendSignUpNotification = async (
-  recipient: string,
-  name: string,
-  link: string
-) => {
+export const sendSignUpNotification = async (user: IUser, token: string) => {
+  // const verificationLink = `${AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
+  const verificationLink = `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`;
   const jsonData = {
-    recipient: recipient,
-    name: name,
-    sign_up_notification_link: link,
+    recipient: user.email,
+    name: user.firstName,
+    verification_link: verificationLink,
   };
 
   try {
-    const response = await axios.post(
-      'http://staging.zuri.team/api/messaging/api/v1/user/email-verification',
-      jsonData
-    );
+    const response = await axios.post(EMAIL_SERVICE_VERIFY_EMAIL_URL, jsonData);
     return response.data;
   } catch (error) {
     // console.error('Error sending notification:', error);
@@ -33,24 +41,20 @@ export const sendSignUpNotification = async (
  * @param name
  * @param link
  */
-export const resetPasswordNotification = async (
-  recipient: string,
-  name: string,
-  link: string
-) => {
+export const resetPasswordNotification = async (user: IUser, token: string) => {
+  // const reset_link = `${AUTH_FRONTEND_URL}/auth/password-reset?token=${token}`;
+  const reset_link = `${PASSWORD_RESET_SUCCESS_URL}?token=${token}`;
   const jsonData = {
-    recipient: recipient,
-    name: name,
-    sign_up_notification_link: link,
+    name: user.firstName,
+    recipient: user.email,
+    reset_link,
   };
 
   try {
     const response = await axios.post(
-      'http://staging.zuri.team/api/messaging/api/v1/user/reset-password',
+      EMAIL_SERVICE_PASSWORD_RESET_URL,
       jsonData
     );
-    console.log('Notification sent successfully:', response.data);
-
     return response.data;
   } catch (error) {
     console.error('Error sending notification:', error);
@@ -62,26 +66,17 @@ export const resetPasswordNotification = async (
  * @param name
  * @param code
  */
-export const twoFactorAuthNotification = async (
-  recipient: string,
-  name: string,
-  code: string
-) => {
+export const twoFactorAuthNotification = async (user: IUser, code: string) => {
   const jsonData = {
-    recipient: recipient,
-    name: name,
-    code: code,
+    recipient: user.email,
+    name: user.firstName,
+    code: Number(code),
   };
-
   try {
-    const response = await axios.post(
-      'http://staging.zuri.team/api/messaging/api/v1/user/twoFactorAuth',
-      jsonData
-    );
-    console.log('Notification sent successfully:', response.data);
+    const response = await axios.post(EMAIL_SERVICE_2FA_URL, jsonData);
     return response.data;
   } catch (error) {
-    console.error('Error sending notification:', error);
+    console.error('Error sending notification:', error.message);
   }
 };
 /**
@@ -90,25 +85,17 @@ export const twoFactorAuthNotification = async (
  * @param name
  * @param link
  */
-export const welcomeEmailNotification = async (
-  recipient: string,
-  name: string,
-  link: string
-) => {
+export const welcomeEmailNotification = async (user: IUser) => {
   const jsonData = {
-    recipient: recipient,
-    name: name,
-    call_to_action: link,
+    recipient: user.email,
+    name: user.firstName,
+    call_to_action: AUTH_FRONTEND_URL,
   };
 
   try {
-    const response = await axios.post(
-      'http://staging.zuri.team/api/messaging/api/v1/user/welcome-email',
-      jsonData
-    );
-    console.log('Notification sent successfully:', response.data);
+    const response = await axios.post(EMAIL_SERVICE_WELCOME_URL, jsonData);
     return response.data;
   } catch (error) {
-    console.error('Error sending notification:', error);
+    console.error('Error sending notification:', error.message);
   }
 };
