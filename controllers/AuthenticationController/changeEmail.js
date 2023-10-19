@@ -9,7 +9,7 @@ const changeEmailSchema = Joi.object({
   newEmail: Joi.string().email().required(),
 });
 
-const changeEmail = async (req, res) => {
+const changeEmail = async (req, res, next) => {
   const { error } = changeEmailSchema.validate(req.body);
 
   if (error) {
@@ -54,11 +54,12 @@ const changeEmail = async (req, res) => {
     user.email = newEmail;
     await user.save();
 
-    // Return a success response
-    res.status(200).json({
-      success: true,
-      message: 'Email address changed successfully',
-    });
+    // Set req.user with user information b
+    req.user = {
+      id: user.id,
+      firstName: user.firstName,
+      email: user.email,
+    };
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({
@@ -67,6 +68,8 @@ const changeEmail = async (req, res) => {
       error,
     });
   }
+
+  next();
 };
 
 module.exports = changeEmail;
