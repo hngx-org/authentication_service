@@ -1,9 +1,9 @@
-import jwt from "jsonwebtoken";
-import {Response} from "express"
-import {GenericRequest, IUser} from "../../@types";
+import jwt from 'jsonwebtoken';
+import { Response } from 'express';
+import { GenericRequest, IUser } from '../../@types';
 
 export const handleAuth = async (req: GenericRequest<IUser>, res: Response) => {
-  const {user} = req;
+  const { user } = req;
   const payload = {
     id: user,
   };
@@ -17,11 +17,13 @@ export const handleAuth = async (req: GenericRequest<IUser>, res: Response) => {
       token: accessToken,
       user: {
         id: user.id,
+        roleId: user.roleId,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         isVerified: user.isVerified,
         twoFactorAuth: user.twoFactorAuth,
+        isSeller: user.isSeller,
       },
     },
   });

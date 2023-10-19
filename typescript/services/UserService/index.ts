@@ -7,8 +7,8 @@ import {
 } from '../../controllers/UserController/messaging';
 import {
   comparePassword,
+  generate2faToken,
   generateBearerToken,
-  generateFourDigitPassword,
   generateToken,
   hashPassword,
   success,
@@ -52,7 +52,6 @@ export class UserService implements IUserService {
       if (userExists) {
         throw new Conflict('User already exists');
       }
-
       const hashedPassword = await hashPassword(password);
 
       const newUser = await User.create({
@@ -63,14 +62,9 @@ export class UserService implements IUserService {
       });
 
       const token = generateToken(newUser);
-      const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-      sendSignUpNotification(
-        newUser.email,
-        newUser.firstName,
-        verificationLink
-      );
-      delete newUser.password;
+      await sendSignUpNotification(newUser, token);
+
       return newUser;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
@@ -126,7 +120,7 @@ export class UserService implements IUserService {
       if (!decodedUser) {
         throw new Unauthorized('Expired');
       }
-      const user = await this.findUserByEmail(decodedUser.email);
+      const user = await User.findByPk(decodedUser.id);
 
       if (!user) {
         throw new Unauthorized('Invalid token');
@@ -138,8 +132,7 @@ export class UserService implements IUserService {
 
       user.isVerified = true;
       await user.save();
-      const link = `${process.env.AUTH_FRONTEND_URL}`;
-      welcomeEmailNotification(user.email, user.firstName, link);
+      welcomeEmailNotification(user);
 
       return user;
     } catch (error) {
@@ -172,27 +165,25 @@ export class UserService implements IUserService {
   public async changeVerificationEmail(
     userId: string,
     email: string
-  ): Promise<unknown> {
+  ): Promise<IUser | Error> {
     try {
-      const user = await this.findUserByEmail(email);
+      // const user = await this.findUserByEmail(email);
+      const user = await User.findByPk(userId);
 
       if (!user) {
-        throw new ResourceNotFound('Email not found');
+        throw new ResourceNotFound('User not found');
       }
 
+      if (user.isVerified) {
+        throw new BadRequest('Email already verified');
+      }
+
+      user.email = email;
+      user.save();
       const token = await generateToken(user);
-      const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
-      sendSignUpNotification(user.email, user.firstName, verificationLink);
-      // sendVerificationEmail(user.firstName, user.email, token);
-      return success(
-        'Email change request link sent successfully',
-        {
-          id: user.id,
-          email: user.email,
-          token,
-        },
-        200
-      );
+      await sendSignUpNotification(user, token);
+      delete user.password;
+      return user;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
     }
@@ -204,7 +195,7 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async changeEmail(token: string): Promise<unknown> {
+  public async changeEmail(token: string, email: string): Promise<User> {
     const decodedUser = verifyToken(token);
 
     if (!decodedUser) {
@@ -212,22 +203,16 @@ export class UserService implements IUserService {
     }
 
     try {
-      const user = await this.findUserByEmail(decodedUser.email);
+      const user = await User.findByPk(decodedUser.id);
 
       if (user) {
         throw new Conflict('Email already in use');
       }
 
-      user.email = decodedUser.email;
+      user.email = email;
       await user.save();
-      return success(
-        'Email changed successfully',
-        {
-          id: user.id,
-          email: user.email,
-        },
-        200
-      );
+      await sendSignUpNotification(user, token);
+      return user;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
     }
@@ -286,10 +271,11 @@ export class UserService implements IUserService {
       }
 
       const token = await generateToken(user);
-      const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/reset-password?token=${token}`;
 
-      resetPasswordNotification(user.email, user.firstName, verificationLink);
-
+      const response = resetPasswordNotification(user, token);
+      if (!response) {
+        throw new HttpError(500, 'Internal Server Error');
+      }
       return user;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
@@ -313,7 +299,7 @@ export class UserService implements IUserService {
         throw new Unauthorized('Invalid token');
       }
 
-      const user = await this.findUserByEmail(decodedUser.email);
+      const user = await User.findByPk(decodedUser.id);
 
       if (!user) {
         throw new ResourceNotFound('User not found');
@@ -356,30 +342,55 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async enable2fa(email: string): Promise<unknown> {
+  public async enable2fa(token: string): Promise<unknown> {
     try {
-      const user = await this.findUserByEmail(email);
+      const decodedUser = verifyToken(token);
+      if (!decodedUser) {
+        throw new Unauthorized('Token has Expired');
+      }
+      const user = await User.findByPk(decodedUser.id);
 
       if (!user) {
         throw new ResourceNotFound('User not found');
       }
       user.twoFactorAuth = true;
       await user.save();
-
       return user;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
     }
   }
+
+  public async disable2fa(token: string): Promise<unknown> {
+    try {
+      const decodedUser = verifyToken(token);
+      if (!decodedUser) {
+        throw new Unauthorized('Token has Expired');
+      }
+      const user = await User.findByPk(decodedUser.id);
+
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+      user.twoFactorAuth = false;
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new HttpError(error.statusCode, error.message);
+    }
+  }
+
   /**
    *
    * @param email
    * @param res
    * @returns
    */
-  public async send2faCode(email: string): Promise<unknown> {
-    const user = await this.findUserByEmail(email);
+  public async send2faCode(
+    email: string
+  ): Promise<{ user: User; token: string }> {
     try {
+      const user = await this.findUserByEmail(email);
       if (!user) {
         throw new ResourceNotFound('User not found');
       }
@@ -387,12 +398,15 @@ export class UserService implements IUserService {
       if (user.twoFactorAuth === false) {
         throw new Forbidden('2fa is not enabled');
       }
-      const code = await generateFourDigitPassword();
-      user.twoFACode = code;
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const token = generate2faToken(user, code);
 
-      await user.save();
-      twoFactorAuthNotification(user.email, user.firstName, user.twoFACode);
-      return user;
+      const mailSent = await twoFactorAuthNotification(user, code);
+      if (!mailSent) {
+        throw new HttpError(500, 'Internal Server Error');
+      }
+      const response = { user, token };
+      return response;
     } catch (error) {
       throw new HttpError(error.statusCode, error.message);
     }
@@ -401,8 +415,8 @@ export class UserService implements IUserService {
   public async verify2faCode(token: string, code: string): Promise<unknown> {
     try {
       const decoded = verify2faToken(token);
-      if (decoded.exp && Date.now() / 1000 > decoded.exp) {
-        throw new Unauthorized('Token has expired');
+      if (!decoded) {
+        throw new Unauthorized('Invalid Token');
       }
       if (decoded.code && decoded.code === code) {
         const user = await User.findByPk(decoded.id);
@@ -446,7 +460,7 @@ export class UserService implements IUserService {
    * @param res
    * @returns
    */
-  public async findUserById(userId: string): Promise<IUser | unknown> {
+  public async findUserById(userId: string): Promise<IUser | Error> {
     try {
       const user = await User.findByPk(userId);
 
@@ -509,14 +523,8 @@ export class UserService implements IUserService {
       }
 
       const token = generateToken(user);
-      const verificationLink = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
 
-      const response = await sendSignUpNotification(
-        user.email,
-        user.firstName,
-        verificationLink
-      );
-      // sendVerificationEmail(user.firstName, user.email, token);
+      const response = await sendSignUpNotification(user, token);
       return response;
     } catch (error) {
       if (error.statusCode === 404) {
@@ -530,7 +538,7 @@ export class UserService implements IUserService {
     try {
       const decoded = verifyToken(token);
 
-      if ((decoded.exp && Date.now() / 1000 > decoded.exp) || !decoded) {
+      if (!decoded) {
         throw new Unauthorized('Invalid token');
       }
       const user = await User.findByPk(decoded.id);
