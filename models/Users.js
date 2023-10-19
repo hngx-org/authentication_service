@@ -75,6 +75,9 @@ const User = sequelize.define(
     is_seller: {
       type: DataTypes.BOOLEAN,
     },
+    slug: {
+      type: DataTypes.STRING(255),
+    },
   },
   {
     freezeTableName: true,
