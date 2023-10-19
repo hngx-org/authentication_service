@@ -1,3 +1,5 @@
+import {Request} from 'express';
+
 export interface IUser {
   id?: string;
   username?: string;
@@ -64,4 +66,9 @@ export interface IUserSignUp {
   lastName: string;
   email: string;
   password: string;
+}
+
+
+export interface GenericRequest<T> extends Request {
+  user: T;
 }

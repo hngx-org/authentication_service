@@ -189,6 +189,7 @@ const sendWelcomeMail = async (
   const emailSent = await sendEmail(emailServiceUrl, {
     name,
     recipient,
+    // eslint-disable-next-line camelcase
     call_to_action: redirectLink,
   });
   return emailSent
