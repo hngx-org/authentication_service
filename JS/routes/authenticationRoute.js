@@ -13,6 +13,8 @@ const router = Router();
 
 router.post('/check-email', AuthenticationController.checkEmail);
 
+router.patch('/change-email', AuthenticationController.changeEmail);
+
 router.post(
   '/signup',
   registrationValidation,
