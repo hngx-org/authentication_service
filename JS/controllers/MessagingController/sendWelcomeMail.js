@@ -12,7 +12,7 @@ async function sendWelcomeMail(name, recipient) {
       call_to_action: redirectLink,
     });
     if (response.status === 200) {
-      responseObj.success = true;
+      responsObj.success = true;
       responsObj.message = 'email sent';
     } else {
       responsObj.success = false;
