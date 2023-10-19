@@ -37,3 +37,10 @@ it("should fetch all permissions", async () => {
   expect(response.body.data).toBeInstanceOf(Object);
 });
 
+it("should fetch all roles permissions", async () => {
+  const response = await request(app).get("/api/roles/roles-permissions");
+  expect(response.status).toBe(200);
+  expect(response.body.message).toEqual("Fetched successfully");
+  expect(response.body.data).toBeInstanceOf(Object);
+});
+

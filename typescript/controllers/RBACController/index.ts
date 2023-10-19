@@ -1,35 +1,31 @@
+import { success } from "../../utils/index";
 import roleAndPermissionService from "../../services/RoleService/index";
-import { Response, Request, NextFunction } from "express";
+import { Response, Request } from "express";
 
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
 export const seedRole = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     await roleAndPermissionService.seedRole();
-    res.status(200).json({
-      status: 200,
-      message: "seed successfully",
-    });
+    success("seed successfully", null, 201, res);
   } catch (error) {
-    next(error);
+    res.send(error.message);
   }
 };
 
-export const seedPermission = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const seedPermission = async (req: Request, res: Response) => {
   try {
     await roleAndPermissionService.seedPermission();
-    res.status(200).json({
-      status: 200,
-      message: "seed successfully",
-    });
+    success("seed successfully", null, 201, res);
   } catch (error) {
-    next(error);
+    res.send(error.message);
   }
 };
 
@@ -39,20 +35,12 @@ export const seedPermission = async (
  * @param res
  * @param next
  */
-export const fetchRoles = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const fetchRoles = async (req: Request, res: Response) => {
   try {
     const roles = await roleAndPermissionService.fetchRoles();
-    res.status(200).json({
-      status: 200,
-      message: "Fetched successfully",
-      data: roles,
-    });
+    return success("Fetched successfully", roles, 200, res);
   } catch (error) {
-    next(error);
+    res.send(error.message);
   }
 };
 /**
@@ -61,19 +49,37 @@ export const fetchRoles = async (
  * @param res
  * @param next
  */
-export const fetchPermission = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const fetchPermission = async (req: Request, res: Response) => {
   try {
     const permission = await roleAndPermissionService.fetchPermission();
-    res.status(200).json({
-      status: 200,
-      message: "Fetched successfully",
-      data: permission,
-    });
+    return success("Fetched successfully", permission, 200, res);
   } catch (error) {
-    next(error);
+    res.send(error.message);
+  }
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+export const seedRolePermissions = async (req: Request, res: Response) => {
+  try {
+    const permission = await roleAndPermissionService.seedRolePermissions();
+    success("seed successfully", permission, 201, res);
+  } catch (error) {
+    res.send(error.message);
+  }
+};
+/**
+ * 
+ * @param req 
+ * @param res 
+ */
+export const fetchRolePermissions = async (req: Request, res: Response) => {
+  try {
+    const permission = await roleAndPermissionService.fetchRolePermissions();
+    success("Fetched successfully", permission, 200, res);
+  } catch (error) {
+    res.send(error.message);
   }
 };
