@@ -1,12 +1,16 @@
-import { createRole, fetchRoles } from '../controllers/RBACController/index';
-import express from 'express';
+import {
+  fetchPermission,
+  fetchRoles,
+  seedPermission,
+  seedRole,
+} from "../controllers/RBACController/index";
+import express from "express";
 
 const rbacRouter = express.Router();
 
-rbacRouter.post( '/', createRole);
-
-// rbacRouter.get('/permissions', AuthorizationController.permissions);
-rbacRouter.get('/roles', fetchRoles);
-
+rbacRouter.post("/seed-role", seedRole);
+rbacRouter.post("/seed-permission", seedPermission);
+rbacRouter.get("/", fetchRoles);
+rbacRouter.get("/permissions", fetchPermission);
 
 export default rbacRouter;
