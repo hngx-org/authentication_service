@@ -24,7 +24,6 @@ import { InvalidInput, ResourceNotFound } from "../../middlewares/error";
 export const signUp = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = registerSchema.validate(req.body);
@@ -43,14 +42,13 @@ export const signUp = async (
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    next(error); // Pass the specific error to the error handling middleware
+    return res.status(500).json({error:error.message});
   }
 };
 
 export const guestSignup = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = registerSchema.validate(req.body);
@@ -70,7 +68,7 @@ export const guestSignup = async (
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    next(error); // Pass the specific error to the error handling middleware
+    return res.status(500).json({error:error.message});
   }
 };
 
@@ -97,7 +95,7 @@ export const loginUser = async (
     req.user = user;
     next();
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 
@@ -124,7 +122,7 @@ export const verifyUser = async (
     req.user = user;
     next();
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 
@@ -136,7 +134,6 @@ export const verifyUser = async (
 export const resendVerification = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -156,7 +153,7 @@ export const resendVerification = async (
       res
     );
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -197,7 +194,6 @@ export const checkEmail = async (
 export const changeEmail = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -218,7 +214,7 @@ export const changeEmail = async (
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -229,7 +225,6 @@ export const changeEmail = async (
 export const changePassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = changePasswordSchema.validate(req.body);
@@ -244,7 +239,7 @@ export const changePassword = async (
     await userService.changePassword(req.body);
     return success("Password reset successful", null, 200, res);
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -255,7 +250,6 @@ export const changePassword = async (
 export const forgotPassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -272,7 +266,7 @@ export const forgotPassword = async (
       return success("Password reset link sent successfully", null, 200, res);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -283,7 +277,6 @@ export const forgotPassword = async (
 export const resetPassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { token, password } = req.body;
@@ -302,7 +295,7 @@ export const resetPassword = async (
       return success("Password reset successful", null, 200, res);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -321,7 +314,7 @@ export const revalidateLogin = async (
     req.user = user;
     next();
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 /**
@@ -332,7 +325,6 @@ export const revalidateLogin = async (
 export const enable2fa = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -348,14 +340,13 @@ export const enable2fa = async (
       return success("Two factor authentication enabled", null, 200, res);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 
 export const disable2fa = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -374,7 +365,7 @@ export const disable2fa = async (
       return success("Two factor authentication disabled", null, 200, res);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 
@@ -508,7 +499,6 @@ export const updateUserById = async (
 export const loginResponse = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const user = req.user as IUser;
@@ -535,14 +525,13 @@ export const loginResponse = async (
       },
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
 
 export const setIsSeller = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -558,6 +547,6 @@ export const setIsSeller = async (
       return success("User set as seller", user, 200, res);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({error:error.message});
   }
 };
