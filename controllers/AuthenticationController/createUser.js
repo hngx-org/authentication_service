@@ -15,7 +15,7 @@ const createUser = async (req, res, next) => {
       username: '',
       token: '',
       refresh_token: '',
-      slug: await slugify(`${firstName} ${lastName}`),
+      slug: await slugify(firstName, lastName),
     });
 
     req.user = {
