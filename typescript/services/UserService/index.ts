@@ -34,7 +34,7 @@ export class UserService implements IUserService {
       const user = await User.findOne({ where: { email } });
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -58,6 +58,7 @@ export class UserService implements IUserService {
         firstName,
         lastName,
         email,
+        slug: await this.slugify(`${firstName} ${lastName}`),
         password: hashedPassword,
       });
 
@@ -67,7 +68,7 @@ export class UserService implements IUserService {
 
       return newUser;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
 
       // throw new AuthErrorHandler(AuthErrorHandler.InternalServerError);
       // errorResponse("Internal Server Error", 500, res);
@@ -104,7 +105,7 @@ export class UserService implements IUserService {
       delete user.password;
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -136,7 +137,7 @@ export class UserService implements IUserService {
 
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -153,7 +154,7 @@ export class UserService implements IUserService {
       }
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -185,7 +186,7 @@ export class UserService implements IUserService {
       delete user.password;
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -214,7 +215,7 @@ export class UserService implements IUserService {
       await sendSignUpNotification(user, token);
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -249,7 +250,7 @@ export class UserService implements IUserService {
       await user.save();
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -278,7 +279,7 @@ export class UserService implements IUserService {
       }
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -309,7 +310,7 @@ export class UserService implements IUserService {
       await user.save();
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -333,7 +334,7 @@ export class UserService implements IUserService {
 
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -357,7 +358,7 @@ export class UserService implements IUserService {
       await user.save();
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -376,7 +377,7 @@ export class UserService implements IUserService {
       await user.save();
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -408,7 +409,7 @@ export class UserService implements IUserService {
       const response = { user, token };
       return response;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -423,12 +424,11 @@ export class UserService implements IUserService {
         if (!user) {
           throw new ResourceNotFound('User not found');
         }
-        user.twoFACode = null;
         return user;
       }
       throw new BadRequest('Invalid code');
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -451,7 +451,7 @@ export class UserService implements IUserService {
       });
       return users;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   /**
@@ -462,14 +462,14 @@ export class UserService implements IUserService {
    */
   public async findUserById(userId: string): Promise<IUser | Error> {
     try {
-      const user = await User.findOne({where: {id: userId}});
+      const user = await User.findOne({ where: { id: userId } });
 
       if (!user) {
         throw new ResourceNotFound('User not found');
       }
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
   public async deleteUserById(userId: string): Promise<IUser | unknown> {
@@ -481,7 +481,7 @@ export class UserService implements IUserService {
       }
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -506,7 +506,7 @@ export class UserService implements IUserService {
         201
       );
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -527,10 +527,7 @@ export class UserService implements IUserService {
       const response = await sendSignUpNotification(user, token);
       return response;
     } catch (error) {
-      if (error.statusCode === 404) {
-        throw new ResourceNotFound(error.message);
-      }
-      throw new BadRequest(error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -550,7 +547,7 @@ export class UserService implements IUserService {
       await user.save();
       return user;
     } catch (error) {
-      throw new HttpError(error.statusCode, error.message);
+      throw new HttpError(error.statusCode || 500, error.message);
     }
   }
 
@@ -560,6 +557,27 @@ export class UserService implements IUserService {
     authUser.lastLogin = new Date();
     await authUser.save();
     return token;
+  }
+
+  public async slugify(str: string): Promise<string> {
+    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+
+    str = str.toLowerCase(); // convert string to lowercase
+
+    str = str
+      .replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+      .replace(/\s+/g, '_') // replace spaces with hyphens
+      .replace(/-+/g, '_'); // remove consecutive hyphens
+
+    // check if slug already exists
+    const count = await User.count({ where: { slug: str } });
+
+    // if slug exists, append count to slug
+    if (count) {
+      str += '_' + count;
+    }
+
+    return str;
   }
 }
 

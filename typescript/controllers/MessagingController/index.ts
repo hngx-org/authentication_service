@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { success } from '../../utils';
+import { GenericRequest } from '../../@types';
 
 interface IUser {
   id: string;
@@ -45,7 +46,7 @@ export const generateVerificationLink = (
  */
 const sendEmail = async (
   emailServiceUrl: string,
-  data: any
+  data: Record<string, unknown>
 ): Promise<boolean> => {
   try {
     const response = await axios.post(emailServiceUrl, data);
@@ -62,12 +63,12 @@ const sendEmail = async (
  */
 
 const sendPasswordResetEmail = async (
-  req: Request,
+  req: GenericRequest<IUser>,
   res: Response
 ): Promise<void> => {
   const { EMAIL_SERVICE_PASSWORD_RESET_URL, PASSWORD_RESET_SUCCESS_URL } =
     process.env;
-  const { user } = req as any;
+  const { user } = req;
 
   //   Generate JWT token
   const token = createJwtToken(user);
@@ -94,7 +95,7 @@ const sendPasswordResetEmail = async (
  * @param res
  */
 const resendVerification = async (
-  req: Request | any,
+  req: GenericRequest<IUser>,
   res: Response
 ): Promise<void> => {
   const { EMAIL_SERVICE_VERIFY_EMAIL_URL, NODE_ENV } = process.env;
@@ -139,12 +140,12 @@ const resendVerification = async (
  * @param res
  */
 const sendSignUpEmail = async (
-  req: Request | any,
+  req: GenericRequest<IUser>,
   res: Response
 ): Promise<void> => {
   const { EMAIL_SERVICE_VERIFY_EMAIL_URL, NODE_ENV } = process.env;
 
-  const user = req.user as IUser | undefined;
+  const user = req.user;
   if (!user) {
     res.status(401).json({ status: 401, message: 'User not found' });
   }
