@@ -7,15 +7,15 @@ async function slugify(str) {
 
   str = str
     .replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-    .replace(/\s+/g, '-') // replace spaces with hyphens
-    .replace(/-+/g, '-'); // remove consecutive hyphens
+    .replace(/\s+/g, '_') // replace spaces with hyphens
+    .replace(/-+/g, '_'); // remove consecutive hyphens
 
   // check if slug already exists
   const count = await User.count({ where: { slug: str } });
 
   // if slug exists, append count to slug
   if (count) {
-    str += '-' + count;
+    str += '_' + count;
   }
 
   return str;
