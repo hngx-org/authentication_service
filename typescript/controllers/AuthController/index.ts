@@ -30,6 +30,6 @@ export const authorize = async (
     }
     return res.status(200).json(response);
   } catch (err) {
-    return res.status(500).json({error: err.message})
+    return res.status(500).json({error: err})
   }
 };

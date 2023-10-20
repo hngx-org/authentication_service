@@ -42,7 +42,8 @@ export const signUp = async (
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    console.log(error)
+    return res.status(500).json({error:error});
   }
 };
 
