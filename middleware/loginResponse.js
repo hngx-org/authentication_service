@@ -19,6 +19,7 @@ const loginResponse = async (req, res) => {
       token,
       user: {
         id: user.id,
+        slug: user.slug,
         roleId: user.role_id,
         firstName: user.first_name,
         lastName: user.last_name,
