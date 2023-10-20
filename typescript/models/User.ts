@@ -9,7 +9,7 @@ import {
 } from "sequelize-typescript";
 import Role from "./Role";
 
-@Table({ tableName: "users", timestamps: false })
+@Table({ tableName: "user", timestamps: false })
 export default class User extends Model<User> {
   @Column({
     type: DataType.UUID,
@@ -45,8 +45,8 @@ export default class User extends Model<User> {
   @Column({ type: DataType.STRING, field: "refresh_token" })
     refreshToken: string;
 
-  @Column({ type: DataType.STRING, field: "two_fa_code", allowNull: true })
-    twoFACode: string;
+  @Column({ type: DataType.STRING, field: "slug", allowNull: true })
+    slug: string;
 
   @ForeignKey(() => Role)
   @Column({

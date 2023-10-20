@@ -1,5 +1,5 @@
-import { IUser } from "./../../@types/index";
-import userService from "../../services/UserService";
+import { IUser } from './../../@types/index';
+import userService from '../../services/UserService';
 import {
   changePasswordSchema,
   emailValidationSchema,
@@ -9,10 +9,10 @@ import {
   tokenValidationSchema,
   twofaValidationSchema,
   updateUserSchema,
-} from "./validation";
-import { NextFunction, Request, Response } from "express";
-import { generateBearerToken, success } from "../../utils";
-import { InvalidInput, ResourceNotFound } from "../../middlewares/error";
+} from './validation';
+import { NextFunction, Request, Response } from 'express';
+import { success } from '../../utils';
+import { InvalidInput, ResourceNotFound } from '../../middlewares/error';
 // import { AuthErrorHandler } from '../../exceptions/AuthErrorHandler';
 
 /**
@@ -24,6 +24,7 @@ import { InvalidInput, ResourceNotFound } from "../../middlewares/error";
 export const signUp = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = registerSchema.validate(req.body);
@@ -38,17 +39,18 @@ export const signUp = async (
     res.status(200).json({
       status: 200,
       message:
-        "User created successfully. Please check your email to verify your account",
+        'User created successfully. Please check your email to verify your account',
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 
 export const guestSignup = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = registerSchema.validate(req.body);
@@ -60,15 +62,15 @@ export const guestSignup = async (
     }
     req.body.roleId = 1;
     const user = await userService.signUp(req.body);
-    const { id, firstName, lastName, email } = user;
+    const { id, firstName, slug, lastName, email } = user;
     res.status(200).json({
       status: 200,
       message:
-        "User created successfully. Please check your email to verify your account",
-      user: { id, firstName, lastName, email },
+        'User created successfully. Please check your email to verify your account',
+      user: { id, firstName, slug, lastName, email },
     });
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 
@@ -95,7 +97,8 @@ export const loginUser = async (
     req.user = user;
     next();
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
+    // return res.status(500).json({ error: error.message });
   }
 };
 
@@ -122,7 +125,7 @@ export const verifyUser = async (
     req.user = user;
     next();
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 
@@ -134,6 +137,7 @@ export const verifyUser = async (
 export const resendVerification = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -147,13 +151,13 @@ export const resendVerification = async (
     const { email } = req.body;
     const response = await userService.resendVerification(email);
     return success(
-      "Email verification code resent successfully",
+      'Email verification code resent successfully',
       response,
       200,
       res
     );
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -175,7 +179,7 @@ export const checkEmail = async (
     const { email } = req.body;
     const emailAvailable = await userService.checkEmail(email);
     if (!emailAvailable) {
-      return success("Email is available for use", emailAvailable, 200, res);
+      return success('Email is available for use', emailAvailable, 200, res);
     }
   } catch (error) {
     next(error);
@@ -194,6 +198,7 @@ export const checkEmail = async (
 export const changeEmail = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -210,11 +215,11 @@ export const changeEmail = async (
     res.status(200).json({
       status: 200,
       message:
-        "User created successfully. Please check your email to verify your account",
+        'User created successfully. Please check your email to verify your account',
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -225,6 +230,7 @@ export const changeEmail = async (
 export const changePassword = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = changePasswordSchema.validate(req.body);
@@ -237,9 +243,9 @@ export const changePassword = async (
     }
 
     await userService.changePassword(req.body);
-    return success("Password reset successful", null, 200, res);
+    return success('Password reset successful', null, 200, res);
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -250,6 +256,7 @@ export const changePassword = async (
 export const forgotPassword = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = emailValidationSchema.validate(req.body);
@@ -263,10 +270,10 @@ export const forgotPassword = async (
 
     const response = await userService.forgotPassword(email);
     if (response) {
-      return success("Password reset link sent successfully", null, 200, res);
+      return success('Password reset link sent successfully', null, 200, res);
     }
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -277,6 +284,7 @@ export const forgotPassword = async (
 export const resetPassword = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { token, password } = req.body;
@@ -292,10 +300,10 @@ export const resetPassword = async (
     const user = await userService.resetPassword(token, password);
 
     if (user) {
-      return success("Password reset successful", null, 200, res);
+      return success('Password reset successful', null, 200, res);
     }
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -314,7 +322,7 @@ export const revalidateLogin = async (
     req.user = user;
     next();
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 /**
@@ -325,6 +333,7 @@ export const revalidateLogin = async (
 export const enable2fa = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -337,16 +346,17 @@ export const enable2fa = async (
     const { token } = req.body;
     const response = await userService.enable2fa(token);
     if (response) {
-      return success("Two factor authentication enabled", null, 200, res);
+      return success('Two factor authentication enabled', null, 200, res);
     }
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 
 export const disable2fa = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -362,10 +372,10 @@ export const disable2fa = async (
 
     const response = await userService.disable2fa(token);
     if (response) {
-      return success("Two factor authentication disabled", null, 200, res);
+      return success('Two factor authentication disabled', null, 200, res);
     }
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };
 
@@ -393,7 +403,7 @@ export const send2faCode = async (
     const { user, token } = response;
     return res.status(200).json({
       status: 200,
-      message: "Two factor code sent",
+      message: 'Two factor code sent',
       email: user.email,
       twoFactor: true,
       token,
@@ -431,12 +441,16 @@ export const verify2faCode = async (
   }
 };
 
-export const fetchAllUser = async (req: Request, res: Response) => {
+export const fetchAllUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const users = await userService.fetchAllUser();
-    return success("Fetched successfully", users, 200, res);
+    return success('Fetched successfully', users, 200, res);
   } catch (error) {
-    return res.status(500).json({ error });
+    next(error);
   }
 };
 
@@ -449,9 +463,9 @@ export const findUserById = async (
     const { userId } = req.params;
     const findUser = await userService.findUserById(userId);
     if (!findUser) {
-      throw new InvalidInput("User not found");
+      throw new InvalidInput('User not found');
     }
-    return success("Fetched successfully", findUser, 200, res);
+    return success('Fetched successfully', findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -466,9 +480,9 @@ export const deleteUserById = async (
     const { userId } = req.params;
     const findUser = await userService.deleteUserById(userId);
     if (!findUser) {
-      throw new InvalidInput("User not found");
+      throw new InvalidInput('User not found');
     }
-    return success("Deleted successfully", findUser, 200, res);
+    return success('Deleted successfully', findUser, 200, res);
   } catch (error) {
     next(error);
   }
@@ -490,30 +504,28 @@ export const updateUserById = async (
     }
     const { email } = req.user as IUser;
     const user = await userService.updateUserById(req.body, email);
-    return success("User details updated", user, 200, res);
+    return success('User details updated', user, 200, res);
   } catch (error) {
     next(error);
   }
 };
 
-export const loginResponse = async (
-  req: Request,
-  res: Response,
-) => {
+export const loginResponse = async (req: Request, res: Response) => {
   try {
     const user = req.user as IUser;
 
-    const token = await generateBearerToken(user);
+    const token = await userService.loginResponse(user);
 
-    res.header("Authorization", `Bearer ${token}`);
+    res.header('Authorization', `Bearer ${token}`);
 
     return res.status(200).json({
       status: 200,
-      message: "Login successful",
+      message: 'Login successful',
       data: {
         token,
         user: {
           id: user.id,
+          slug: user.slug,
           roleId: user.roleId,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -525,13 +537,14 @@ export const loginResponse = async (
       },
     });
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    return res.status(500).json({ error: error.message });
   }
 };
 
 export const setIsSeller = async (
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
   try {
     const { error } = tokenValidationSchema.validate(req.body);
@@ -544,9 +557,9 @@ export const setIsSeller = async (
     const { token } = req.body;
     const user = await userService.setIsSeller(token);
     if (user) {
-      return success("User set as seller", user, 200, res);
+      return success('User set as seller', user, 200, res);
     }
   } catch (error) {
-    return res.status(500).json({error:error.message});
+    next(error);
   }
 };

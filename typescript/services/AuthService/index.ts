@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import User from "../../models/User";
-import Role from "../../models/Role";
-import { IAuthService } from "./IAuthService";
-import { verifyToken } from "../../utils";
-import sequelize from "../../config/db.config";
+import User from '../../models/User';
+import Role from '../../models/Role';
+import { IAuthService } from './IAuthService';
+import { verifyToken } from '../../utils';
+import sequelize from '../../config/db.config';
 import {
   HttpError,
   ResourceNotFound,
   Unauthorized,
-} from "../../middlewares/error";
+} from '../../middlewares/error';
 
 interface IRoleUser {
   id: string;
@@ -34,17 +34,20 @@ export class AuthService implements IAuthService {
     try {
       const decoded = await verifyToken(token);
       if (!decoded) {
-        throw new Unauthorized("Invalid token");
+        throw new Unauthorized('Invalid token');
       }
 
       const user = await User.findOne({ where: { id: decoded.id } });
 
       if (!user) {
-        throw new ResourceNotFound("No user found");
+        throw new ResourceNotFound('No user found');
       }
       let response: IAuthorizeResponse;
 
-      const role = await Role.findOne({ where: { id: user.roleId } });
+      const role = await Role.findOne({
+        where: { id: 2 },
+        attributes: ['id', 'name'],
+      });
 
       const [userPermissions] = await sequelize.query(
         `SELECT permission.name FROM "user_permission"
@@ -69,7 +72,7 @@ export class AuthService implements IAuthService {
         response = {
           status: 200,
           authorized: true,
-          message: "user is authenticated",
+          message: 'user is authenticated',
           user: {
             id: user.id,
             role: role?.name,
@@ -82,7 +85,7 @@ export class AuthService implements IAuthService {
         response = {
           status: 200,
           authorized: true,
-          message: "user is authorized for this permission",
+          message: 'user is authorized for this permission',
           user: {
             id: user.id,
             permissions,
@@ -92,9 +95,10 @@ export class AuthService implements IAuthService {
 
         return response;
       }
-      throw new Unauthorized("user is not authorized for this permission");
+      throw new Unauthorized('user is not authorized for this permission');
     } catch (err) {
-      throw new HttpError(err.statusCode, err.message);
+      console.log(err);
+      throw new HttpError(err.statusCode || 500, err.message);
     }
   }
 }
