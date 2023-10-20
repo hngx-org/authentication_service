@@ -40,7 +40,7 @@ export const fetchRoles = async (req: Request, res: Response) => {
     const roles = await roleAndPermissionService.fetchRoles();
     return success("Fetched successfully", roles, 200, res);
   } catch (error) {
-    res.send(error.message);
+    return res.status(500).json({errpr:error.message});
   }
 };
 /**

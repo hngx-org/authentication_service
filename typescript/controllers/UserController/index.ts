@@ -432,7 +432,7 @@ export const verify2faCode = async (
     const user = await userService.verify2faCode(token, code);
     req.user = user;
     // return success("verified", user, 200, res);
-    next()
+    next();
   } catch (error) {
     // console.log(error);
     // res.status(500).json({ error: error.message });
@@ -440,16 +440,12 @@ export const verify2faCode = async (
   }
 };
 
-export const fetchAllUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const fetchAllUser = async (req: Request, res: Response) => {
   try {
     const users = await userService.fetchAllUser();
     return success("Fetched successfully", users, 200, res);
   } catch (error) {
-    next(error);
+    return res.status(500).json({ error });
   }
 };
 
