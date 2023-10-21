@@ -16,7 +16,7 @@
       "description": "development sever"
     },
     {
-      "url": "localhost:4000/api/auth",
+      "url": "staging.zuri.team/api/auth",
       "description": "local server"
     }
   ],
