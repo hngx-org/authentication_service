@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 // import { AuthErrorHandler } from '../exceptions/AuthErrorHandler';
 
 class HttpError extends Error {
-  statusCode: number;
-  errorCode: number;
-  status: string = 'error';
+  status: number;
+  success: boolean = false;
 
   constructor(statusCode: number, message: string) {
     super(message);
     this.name = this.constructor.name;
-    this.statusCode = statusCode;
-    this.errorCode = statusCode;
+    this.status = statusCode;
   }
 }
 
@@ -59,20 +57,20 @@ class ServerError extends HttpError {
 
 const routeNotFound = (req: Request, res: Response, next: NextFunction) => {
   const message = `Route not found: ${req.originalUrl}`;
-  res.status(404).json({ status: 'error', statusCode: 404, message });
+  res.status(404).json({ success: false, status: 404, message });
 };
 
 const errorHandler = (
   err: HttpError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction,
 ) => {
-  const { statusCode, status, message } = err;
-  const cleanedMessage = message.replace(/"/g, '');
-  res.status(statusCode).json({
+  const { success, status, message } = err;
+  const cleanedMessage = message.replace(/"/g, "");
+  res.status(status).json({
+    success,
     status,
-    statusCode,
     message: cleanedMessage,
   });
 };

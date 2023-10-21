@@ -117,8 +117,8 @@ export const sendVerificationEmail = async (
 
 export const errorResponse = (
   message: string | unknown,
-  statusCode: number,
+  status: number,
   res?: Response
 ) => {
-  return res.status(statusCode).json({ message: message });
+  return res.status(status).json({ status, message });
 };
