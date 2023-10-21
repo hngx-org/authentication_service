@@ -7,7 +7,7 @@
     "test": "jest --watchAll --detectOpenHandles",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix",
-    "start": "nodemon dist/index.js",
+    "start": "tsc && nodemon dist/index.js",
     "dev": "tsc && pnpm start",
     "clean": "rimraf dist",
     "build": "pnpm run clean && tsc",

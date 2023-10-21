@@ -16,7 +16,7 @@
       "description": "development sever"
     },
     {
-      "url": "localhost:3000/api/auth",
+      "url": "localhost:4000/api/auth",
       "description": "local server"
     }
   ],
