@@ -8,10 +8,10 @@ import { ITwoFactorPayload, IUser, ITokenPayload } from '../@types/index';
 export function success(
   message: string,
   args: unknown = {} || null,
-  statusCode: number = 200,
+  status: number = 200,
   res?: Response
 ) {
-  return res.status(statusCode).json({ statusCode, message, data: args });
+  return res.status(status).json({ status, message, data: args });
   // return {
   //   status: 'success',
   //   statusCode: statusCode || 200,
