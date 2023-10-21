@@ -5,6 +5,7 @@ const User = require('../models/Users');
 const {
   sendWelcomeMail,
 } = require('../controllers/MessagingController/sendWelcomeMail');
+const slugify = require('../helpers/slugify');
 
 passport.use(
   new GoogleStrategy(
@@ -26,6 +27,10 @@ passport.use(
             refresh_token: '',
             is_verified: true,
             provider: 'google',
+            slug: await slugify(
+              profile.name.givenName,
+              profile.name.familyName,
+            ),
           });
 
           if (user) {

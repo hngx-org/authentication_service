@@ -25,7 +25,6 @@ function errorHandler(err, req, res, next) {
       .status(err.statusCode)
       .json({ status: 'Error', code: err.errorCode, message: err.message });
   }
-
   res.status(500).json({
     error: 'An unexpected error occurred',
     errorCode: 'UNEXPECTED_ERROR',
