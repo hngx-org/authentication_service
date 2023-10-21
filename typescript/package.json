@@ -7,10 +7,11 @@
     "test": "jest --watchAll --detectOpenHandles",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix",
-    "start": "node dist/index.js",
-    "dev": "npm run clean && tsc && nodemon dist/index.js",
+    "start": "nodemon dist/index.js",
+    "dev": "tsc && pnpm start",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "build": "pnpm run clean && tsc",
+    "serve": "tsc && pm2 start dist/index.js --name zuri_typescript_convert",
     "jest": {
       "testEnvironment": "node",
       "coveragePathIgnorePatterns": [
@@ -39,8 +40,12 @@
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^5.0.5",
     "sequelize": "^6.33.0",
-    "sequelize-typescript": "^2.1.5"
+    "sequelize-typescript": "^2.1.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
@@ -51,12 +56,14 @@
     "@types/passport-facebook": "^3.0.2",
     "@types/passport-github2": "^1.2.7",
     "@types/passport-google-oauth20": "^2.0.13",
+    "@types/swagger-ui-express": "^4.1.5",
     "@types/validator": "^13.11.3",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "eslint": "^8.51.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
