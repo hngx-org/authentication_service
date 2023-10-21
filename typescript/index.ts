@@ -31,9 +31,9 @@ sequelize
     console.error('Error creating database and tables:', err);
   });
 
-app.use('/api/auth', userRouterHandler);
-app.use('/api/roles', rbacRouterHandler);
-app.use('/api/authorize', authRouter);
+app.use('/api/auth/api/auth', userRouterHandler);
+app.use('/api/auth/api/roles', rbacRouterHandler);
+app.use('/api/auth/api/authorize', authRouter);
 
 
 app.use(errorHandler);
