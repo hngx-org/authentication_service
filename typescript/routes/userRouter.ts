@@ -3,6 +3,7 @@ import {
   fetchAllUser,
   findUserById,
   guestSignup,
+  send2fa,
   updateUserById,
   verify2faCode,
 } from './../controllers/UserController/index';
@@ -31,7 +32,7 @@ import passport from 'passport';
 import '../services/Passport/PassportServiceFacebook';
 import '../services/Passport/PassportServiceGithub';
 import '../services/Passport/PassportServiceGoogle';
-import { handleAuth } from '../controllers/AuthController/oauthControllers';
+// import { handleAuth } from '../controllers/AuthController/oauthControllers';
 
 //Non protected User Auth routes
 userRouter.post('/check-email', checkEmail); // working
@@ -40,7 +41,7 @@ userRouter.post('/signup', signUp); // working
 userRouter.post('/signup-guest', guestSignup); // working
 userRouter.get('/verify/:token', verifyUser, loginResponse); // working
 userRouter.post('/verify/resend', resendVerification); // working
-userRouter.post('/login', loginUser, loginResponse); // working
+userRouter.post('/login', loginUser, send2fa, loginResponse); // working
 userRouter.get('/revalidate-login/:token', revalidateLogin, loginResponse); // working
 
 // Password reset routes
@@ -74,7 +75,8 @@ userRouter.get(
   passport.authenticate('google', {
     session: false,
   }),
-  handleAuth
+  send2fa,
+  loginResponse
 );
 
 // Facebook Oauth routes
@@ -85,7 +87,8 @@ userRouter.get(
 userRouter.get(
   '/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
-  handleAuth
+  send2fa,
+  loginResponse
 );
 
 // GITHUB Oauth routes
@@ -96,7 +99,8 @@ userRouter.get(
 userRouter.get(
   '/github/redirect',
   passport.authenticate('github', { session: false }),
-  handleAuth
+  send2fa,
+  loginResponse
 );
 userRouter.patch('/set-seller', setIsSeller);
 
