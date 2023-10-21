@@ -2,7 +2,10 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { Options } = require('../config/gauth.config');
 const User = require('../models/Users');
-const { sendWelcomeMail } = require('../controllers/MessagingController/sendWelcomeMail');
+const {
+  sendWelcomeMail,
+} = require('../controllers/MessagingController/sendWelcomeMail');
+const slugify = require('../helpers/slugify');
 
 passport.use(
   new GoogleStrategy(
@@ -24,6 +27,10 @@ passport.use(
             refresh_token: '',
             is_verified: true,
             provider: 'google',
+            slug: await slugify(
+              profile.name.givenName,
+              profile.name.familyName,
+            ),
           });
 
           if (user) {
@@ -32,7 +39,6 @@ passport.use(
             // Todo: add await if needed later
             sendWelcomeMail(fullName, user.email);
           }
-
         }
 
         if (!user) throw new Error('Errors');

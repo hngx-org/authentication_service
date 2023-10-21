@@ -9,9 +9,19 @@ const authorize = (req, res) => {
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          status: 401,
+          authorized: false,
+          isExpired: true,
+          message: "token expired"
+        });
+      }
       return res.status(401).json({
         status: 401,
-        error: 'Invalid token',
+        authorized: false,
+        message: "Invalid token",
+        isValid: false
       });
     }
 
@@ -49,6 +59,18 @@ const authorize = (req, res) => {
 	 WHERE roles_permissions.role_id = '${user.role_id}';`,
     );
 
+    if (user && role.name === 'guest') {
+      return res.status(200).json({
+        status: 200,
+        authorized: true,
+        message: 'user is authenticated',
+        user: {
+          id,
+          role: role.name,
+        },
+      });
+    }
+
     if (user && !user.is_verified) {
       return res.status(401).json({
         status: 401,
@@ -63,8 +85,6 @@ const authorize = (req, res) => {
         ...rolePermissions.map((permission) => permission.name),
       ]),
     ];
-
-    console.log(permissions);
 
     if (user && !permission) {
       response = {

@@ -1,21 +1,29 @@
+/*eslint-disable */
 const axios = require('axios');
+const logger = require('../../middleware/logger');
 async function sendWelcomeMail(name, recipient) {
-    try {
-        const emailServiceUrl = `${process.env.EMAIL_SERVICE_WELCOME_URL}`;
-        const redirectLink = `${process.env.AUTH_FRONTEND_DASHBOARD_URL}`;
-
-        const response = await axios.post(emailServiceUrl, {
-            name,
-            recipient,
-            call_to_action: redirectLink,
-        });
-        if (response.status === 200) {
-            console.log('Welcome email sent successfully.');
-        } else {
-            console.error('Failed to send welcome email.');
-        }
-    } catch (error) {
-        console.error('Error sending email:', error.message);
+  const responsObj = {};
+  try {
+    const emailServiceUrl = `${process.env.EMAIL_SERVICE_WELCOME_URL}`;
+    const redirectLink = `${process.env.AUTH_FRONTEND_URL}`;
+    const response = await axios.post(emailServiceUrl, {
+      name,
+      recipient,
+      call_to_action: redirectLink,
+    });
+    if (response.status === 200) {
+      responsObj.success = true;
+      responsObj.message = 'email sent';
+    } else {
+      responsObj.success = false;
+      responsObj.message = 'email not sent';
+      logger.warn('email not sent');
     }
+  } catch (error) {
+    responsObj.success = false;
+    responsObj.message = 'email not sent';
+    responsObj.error = error;
+    logger.error('email not sent');
+  }
 }
-module.exports = {sendWelcomeMail};
+module.exports = { sendWelcomeMail };

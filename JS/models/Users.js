@@ -69,6 +69,15 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    last_login: {
+      type: DataTypes.DATE,
+    },
+    is_seller: {
+      type: DataTypes.BOOLEAN,
+    },
+    slug: {
+      type: DataTypes.STRING(255),
+    },
   },
   {
     freezeTableName: true,

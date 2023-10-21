@@ -2,7 +2,9 @@
 const { HttpError } = require('../errors/httpErrors');
 
 function errorLogger(err, req, res, next) {
-  if (err instanceof HttpError === false) console.log(err.message);
+  if (err && err.oauthError) {
+    return res.status(err.status).json(err);
+  }
   next(err);
 }
 
@@ -23,7 +25,6 @@ function errorHandler(err, req, res, next) {
       .status(err.statusCode)
       .json({ status: 'Error', code: err.errorCode, message: err.message });
   }
-
   res.status(500).json({
     error: 'An unexpected error occurred',
     errorCode: 'UNEXPECTED_ERROR',
