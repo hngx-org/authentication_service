@@ -3,11 +3,8 @@ const axios = require('axios');
 
 const sendSignUpEmail = async (req, res) => {
   const { id, firstName, email } = req.user;
-  const {
-    EMAIL_SERVICE_VERIFY_EMAIL_URL,
-    VERIFY_EMAIL_ENDPOINT_LIVE,
-    VERIFY_EMAIL_ENDPOINT_DEV,
-  } = process.env;
+  const { EMAIL_SERVICE_VERIFY_EMAIL_URL, VERIFY_EMAIL_ENDPOINT_LIVE } =
+    process.env;
 
   const jwt_payload = {
     id,
@@ -19,10 +16,7 @@ const sendSignUpEmail = async (req, res) => {
     expiresIn: 600,
   });
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL;
-  const verificationLink =
-    process.env.NODE_ENV === 'production'
-      ? `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`
-      : `${VERIFY_EMAIL_ENDPOINT_DEV}?token=${token}`;
+  const verificationLink = `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`;
 
   try {
     const response = await axios.post(emailServiceUrl, {
