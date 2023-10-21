@@ -422,8 +422,8 @@ export const send2fa = async (
     if (req.user.twoFactorAuth) {
       const response = await userService.send2faCode(req.user.email);
       const { user, token } = response;
-      return res.status(200).json({
-        status: 200,
+      return res.status(202).json({
+        status: 202,
         message: 'TWO FACTOR AUTHENTICATION CODE SENT',
         email: user.email,
         twoFactorAuth: true,
