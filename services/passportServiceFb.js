@@ -8,6 +8,7 @@ const { log } = require('../middleware/logger');
 const {
   sendWelcomeMail,
 } = require('../controllers/MessagingController/sendWelcomeMail');
+const slugify = require('../helpers/slugify');
 
 dotenv.config();
 // Facebook Strategy
@@ -45,6 +46,10 @@ passport.use(
             refresh_token: '',
             is_verified: true,
             provider: 'facebook',
+            slug: await slugify(
+              profile.name.givenName,
+              profile.name.familyName,
+            ),
           });
           if (user) {
             // new response to sign user in immediately after verification
