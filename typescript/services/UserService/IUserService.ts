@@ -47,4 +47,5 @@ export interface IUserService {
   ): Promise<unknown>;
 
   resendVerification(email: string, res: unknown): Promise<unknown>;
+  slugify(str: string): Promise<string>;
 }

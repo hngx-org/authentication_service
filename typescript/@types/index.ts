@@ -20,6 +20,7 @@ export interface IUser {
   isSeller?: boolean;
   createdAt?: Date;
   userRole?: IRole;
+  slug?: string;
 }
 
 export interface IPasswordResetToken {
