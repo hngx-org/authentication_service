@@ -7,7 +7,7 @@ const enable2faSchema = Joi.object({
   token: Joi.string().required(),
 });
 
-const enable2fa = async (req, res) => {
+const disable2fa = async (req, res) => {
   const { error } = enable2faSchema.validate(req.body);
 
   if (error) {
@@ -33,10 +33,12 @@ const enable2fa = async (req, res) => {
         message: 'User not found',
       });
     }
-    user.update({ two_factor_auth: true });
+
+    user.update({ two_factor_auth: false });
+
     return res.status(200).json({
       status: 200,
-      message: 'Two factor authentication enabled',
+      message: 'Two factor authentication disabled',
     });
   } catch (error) {
     if (error.name && error.name === 'TokenExpiredError')
@@ -52,4 +54,4 @@ const enable2fa = async (req, res) => {
   }
 };
 
-module.exports = enable2fa;
+module.exports = disable2fa;

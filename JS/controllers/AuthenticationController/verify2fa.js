@@ -1,12 +1,14 @@
+/*eslint-disable*/
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const User = require('../../models/Users');
 
 const verify2faSchema = Joi.object({
-  code: Joi.number().min(100000).max(999999).required(),
+  token: Joi.string().required(),
+  code: Joi.string().alphanum().length(6, 'utf-8'),
 });
 
-const verify2fa = async (req, res) => {
+const verify2fa = async (req, res, next) => {
   const { error } = verify2faSchema.validate(req.body);
 
   if (error) {
@@ -16,54 +18,41 @@ const verify2fa = async (req, res) => {
     });
   }
 
-  const { code, email } = req.body;
+  const { code, token: inToken } = req.body;
+  try {
+    const { id, code: confirmCode } = jwt.verify(
+      inToken,
+      process.env.JWT_SECRET,
+    );
+    console.log(typeof code, typeof confirmCode);
+    if (code !== confirmCode)
+      return res.status(401).json({
+        status: 401,
+        message: 'Invalid code',
+      });
 
-  const user = await User.findOne({ where: { email } });
+    const user = await User.findByPk(id);
 
-  if (!user) {
-    return res.status(404).json({
-      status: 404,
-      message: 'User not found',
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User not found',
+      });
+    }
+    req.user = user;
+    return next();
+  } catch (error) {
+    if (error.name && error.name === 'TokenExpiredError')
+      return res.status(401).json({
+        status: 401,
+        message: 'code timer expired',
+      });
+
+    return res.status(500).json({
+      status: 401,
+      message: 'internal server error',
     });
   }
-
-  console.log(user.refresh_token);
-  console.log(code);
-
-  if (user.refresh_token !== code) {
-    return res.status(400).json({
-      status: 400,
-      message: 'Invalid code',
-    });
-  }
-
-  await user.update({ refresh_token: null, two_factor_auth: true });
-
-  const jwt_payload = {
-    id: user.id,
-    firstName: user.first_name,
-    email: user.email,
-  };
-
-  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET);
-  res.header('Authorization', `Bearer ${token}`);
-
-  return res.status(200).json({
-    status: 200,
-    message: 'Two factor code verified',
-    data: {
-      token,
-      user: {
-        id: user.id,
-        roleId: user.role_id,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        email: user.email,
-        isVerified: user.is_verified,
-        twoFactorAuth: user.two_factor_auth,
-      },
-    },
-  });
 };
 
 module.exports = verify2fa;

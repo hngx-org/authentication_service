@@ -15,7 +15,9 @@ const sendSignUpEmail = async (req, res) => {
     email,
   };
 
-  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET, {expiresIn: 600});
+  const token = jwt.sign(jwt_payload, process.env.JWT_SECRET, {
+    expiresIn: 600,
+  });
   const emailServiceUrl = EMAIL_SERVICE_VERIFY_EMAIL_URL;
   const verificationLink =
     process.env.NODE_ENV === 'production'
