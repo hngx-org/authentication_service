@@ -1,4 +1,4 @@
-import { IUser } from './../../@types/index';
+import { GenericRequest, IUser } from './../../@types/index';
 import userService from '../../services/UserService';
 import {
   changePasswordSchema,
@@ -408,6 +408,30 @@ export const send2faCode = async (
       twoFactor: true,
       token,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const send2fa = async (
+  req: GenericRequest<IUser>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (req.user.twoFactorAuth) {
+      const response = await userService.send2faCode(req.user.email);
+      const { user, token } = response;
+      return res.status(200).json({
+        status: 200,
+        message: 'TWO FACTOR AUTHENTICATION CODE SENT',
+        email: user.email,
+        twoFactorAuth: true,
+        token,
+      });
+    } else {
+      next();
+    }
   } catch (error) {
     next(error);
   }
