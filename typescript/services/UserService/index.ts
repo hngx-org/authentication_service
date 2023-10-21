@@ -28,7 +28,7 @@ import {
 } from '../../middlewares/error';
 import { IUserSignUp } from '../../@types/index';
 
-export class UserService implements IUserService {
+class UserService implements IUserService {
   public async findUserByEmail(email: string): Promise<User | null> {
     try {
       const user = await User.findOne({ where: { email } });
@@ -53,12 +53,13 @@ export class UserService implements IUserService {
         throw new Conflict('User already exists');
       }
       const hashedPassword = await hashPassword(password);
+      const slug = await this.slugify(firstName, lastName);
 
       const newUser = await User.create({
         firstName,
         lastName,
         email,
-        slug: await this.slugify(`${firstName} ${lastName}`),
+        slug,
         password: hashedPassword,
       });
 
@@ -559,22 +560,25 @@ export class UserService implements IUserService {
     return token;
   }
 
-  public async slugify(str: string): Promise<string> {
+  public async slugify(firstName: string, lastName: string): Promise<string> {
+    let str = firstName + '-' + lastName;
     str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
 
     str = str.toLowerCase(); // convert string to lowercase
 
     str = str
       .replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-      .replace(/\s+/g, '_') // replace spaces with hyphens
-      .replace(/-+/g, '_'); // remove consecutive hyphens
+      .replace(/-+/g, '-'); // remove consecutive hyphens
 
     // check if slug already exists
-    const count = await User.count({ where: { slug: str } });
+    // Check if slug already exists
+    const count = await User.count({
+      where: { firstName: firstName, lastName: lastName },
+    });
 
-    // if slug exists, append count to slug
+    // If slug exists, append count to slug
     if (count) {
-      str += '_' + count;
+      str += '-' + count;
     }
 
     return str;
