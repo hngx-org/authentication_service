@@ -7,10 +7,18 @@
     "test": "jest --watchAll --detectOpenHandles",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix",
+<<<<<<< HEAD
     "start": "node dist/index.js",
     "dev": "pnpm run clean && tsc && nodemon dist/index.js",
     "clean": "rimraf dist",
     "build": "pnpm run clean && tsc",
+=======
+    "start": "nodemon dist/index.js",
+    "dev": "tsc && pnpm start",
+    "clean": "rimraf dist",
+    "build": "pnpm run clean && tsc",
+    "serve": "tsc && pm2 start dist/index.js --name zuri_typescript_convert",
+>>>>>>> c2b2c7d (package.json)
     "jest": {
       "testEnvironment": "node",
       "coveragePathIgnorePatterns": [
@@ -44,6 +52,7 @@
     "sequelize-typescript": "^2.1.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
@@ -61,6 +70,7 @@
     "eslint": "^8.51.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
