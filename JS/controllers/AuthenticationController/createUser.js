@@ -4,7 +4,7 @@ const slugify = require('../../helpers/slugify');
 
 const createUser = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
-  const hashedPassword =  bcrypt.hashSync(password, 10);
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   try {
     const newUser = await User.create({

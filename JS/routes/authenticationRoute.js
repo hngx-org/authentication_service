@@ -96,9 +96,21 @@ router.get(
 );
 
 // 2fa routes
+router.post('/2fa/disable', AuthenticationController.disable2fa);
 router.post('/2fa/enable', AuthenticationController.enable2fa);
 router.post('/2fa/send-code', AuthenticationController.send2faCode);
-router.post('/2fa/verify-code', AuthenticationController.verify2fa);
 
-router.get('/revalidate-login/:token', revalidateLogin);
+router.post(
+  '/2fa/verify-code',
+  AuthenticationController.verify2fa,
+  AuthenticationController.loginResponse,
+);
+
+router.get(
+  '/revalidate-login/:token',
+  revalidateLogin,
+  AuthenticationController.loginResponse,
+);
+
+router.patch('/set-seller', AuthenticationController.setIsSeller);
 module.exports = router;
