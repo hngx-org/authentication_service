@@ -23,6 +23,7 @@ const verifyUser = async (req, res, next) => {
 
     req.user = user;
     // new response to sign user in immediately after verification
+
     const fullName = `${user.first_name} ${user.last_name}`;
     sendWelcomeMail(fullName, user.email);
     return next();
