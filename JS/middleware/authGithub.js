@@ -5,6 +5,7 @@ const User = require('../models/Users');
 const {
   sendWelcomeMail,
 } = require('../controllers/MessagingController/sendWelcomeMail');
+const slugify = require('../helpers/slugify');
 
 module.exports = (passport) => {
   passport.use(
@@ -38,6 +39,10 @@ module.exports = (passport) => {
               first_name: profile.displayName.split(' ')[0],
               last_name: profile.displayName.split(' ')[1],
               refresh_token: '',
+              slug: await slugify(
+                profile.displayName.split(' ')[0],
+                profile.displayName.split(' ')[1],
+              ),
             });
             if (user) {
               // new response to sign user in immediately after verification
