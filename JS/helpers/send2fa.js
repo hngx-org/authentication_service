@@ -12,13 +12,10 @@ const send2fa = async (user) => {
     id: user.id,
     code,
   };
-  console.log(code);
   const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
     expiresIn: 15 * 60 * 1000,
   });
-  console.log(token);
   const responseObj = { email: user.email, twoFactorAuth: true };
-
   await axios
     .post(EMAIL_SERVICE_2FA_URL, {
       recipient: user.email,
@@ -26,7 +23,6 @@ const send2fa = async (user) => {
       code,
     })
     .then((response) => {
-      console.log(response);
       if (response.status === 200) {
         responseObj.status = 200;
         responseObj.token = token;
