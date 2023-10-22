@@ -5,18 +5,18 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host":"staging.zuri.team/api/auth",
+  "host": "localhost:3000/api/auth",
   "servers": [
     {
       "url": "staging.zuri.team/api/auth",
       "description": "production server"
     },
     {
-      "url": "auth.akuya.tech/api/auth",
+      "url": "auth.akuya.tech",
       "description": "development sever"
     },
     {
-      "url": "staging.zuri.team/api/auth",
+      "url": "localhost:3000/api/auth",
       "description": "local server"
     }
   ],
@@ -27,10 +27,6 @@
       "description": "Authentication Endpoints"
     },
     {
-      "name": "Google-Auth",
-      "description": "google authentication endpoints"
-    },
-    {
       "name": "PASSWORD RESET AND EMAIL VERIFICATION",
       "description": "password reset and email verification Endpoints"
     },
@@ -39,12 +35,29 @@
       "description": "two step verification Endpoints"
     },
     {
-      "name": "Get-Authorization",
+      "name": "Get Authorization",
       "description": "Get authorization Endpoints"
+    },
+    {
+      "name": "Role Based Access",
+      "description": "role based access authentication endpoints"
+    },
+    {
+      "name": "Protected Auth",
+      "description": "google authentication endpoints"
+    },
+    {
+      "name": "Guest",
+      "description": "Guest auth Endpoints"
+    },
+    {
+      "name": "Admin",
+      "description": "Admin auth Endpoints"
     }
   ],
   "schemes": [
-    "https"
+    "https",
+    "http"
   ],
   "securityDefinitions": {
     "JWT": {
@@ -68,6 +81,43 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/check-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "check email to vilidate, if it can be used to register or not.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "test@gmail.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "404": {
+            "description": "Not Found, User Not Found."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
           }
         }
       }
@@ -130,43 +180,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "404": {
-            "description": "Not Found, User Not Found."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/api/auth/check-email": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "check email to vilidate, if it can be used to register or not.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "example": "test@gmail.com"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -258,6 +271,33 @@
         }
       }
     },
+    "/api/auth/revalidate-login/{token}": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to revalidate User login",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
     "/api/auth/reset-password": {
       "post": {
         "tags": [
@@ -320,6 +360,54 @@
               "required": [
                 "email",
                 "token"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password/change": {
+      "post": {
+        "tags": [
+          "PASSWORD RESET AND EMAIL VERIFICATION"
+        ],
+        "description": "Handles the process of user changing password.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "any"
+                },
+                "oldPassword": {
+                  "type": "string",
+                  "example": "any"
+                },
+                "newPassword": {
+                  "type": "string",
+                  "example": "any"
+                }
+              },
+              "required": [
+                "token",
+                "oldPassword",
+                "newPassword"
               ]
             }
           }
@@ -418,7 +506,7 @@
         "tags": [
           "2FA"
         ],
-        "description": "Handles the process of verifying the token sent to user's email against the token provided by user",
+        "description": "Handles the process of verifying the code sent to user's email against the code provided by user",
         "parameters": [
           {
             "name": "body",
@@ -431,14 +519,14 @@
                   "type": "string",
                   "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
                 },
-                "email": {
+                "code": {
                   "type": "string",
-                  "example": "test@gmail.com"
+                  "example": "any"
                 }
               },
               "required": [
                 "token",
-                "email"
+                "code"
               ]
             }
           }
@@ -456,12 +544,50 @@
         }
       }
     },
-    "/api/authorize/roles": {
+    "/api/auth/2fa/disable": {
+      "post": {
+        "tags": [
+          "2FA"
+        ],
+        "description": "Handles the process of disabling 2fa for a logged in user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "any"
+                }
+              },
+              "required": [
+                "token"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/api/roles": {
       "get": {
         "tags": [
-          "Get Authorization"
+          "Role Based Access"
         ],
-        "summary": "Get authrorized roles for users",
+        "summary": "Fetch all roles",
         "consumes": [
           "application/json"
         ],
@@ -470,7 +596,90 @@
         ],
         "responses": {
           "200": {
-            "description": "Success, user created successfully."
+            "description": "Success, data fetched successfully."
+          }
+        }
+      }
+    },
+    "/api/roles/permissions": {
+      "get": {
+        "tags": [
+          "Role Based Access"
+        ],
+        "summary": "Fetch all permissions",
+        "responses": {
+          "200": {
+            "description": "Success, data fetched successfully."
+          }
+        }
+      }
+    },
+    "/api/roles/roles-permissions": {
+      "get": {
+        "tags": [
+          "Role Based Access"
+        ],
+        "summary": "Fetch all role permissions",
+        "responses": {
+          "200": {
+            "description": "Success, data fetched successfully."
+          }
+        }
+      }
+    },
+    "/api/roles/seed-role": {
+      "post": {
+        "tags": [
+          "Role Based Access"
+        ],
+        "summary": "Fetch all role permissions",
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/api/roles/seed-permission": {
+      "post": {
+        "tags": [
+          "Role Based Access"
+        ],
+        "summary": "seed permission",
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "/api/roles/seed-role-permission": {
+      "post": {
+        "tags": [
+          "Role Based Access"
+        ],
+        "summary": "seed role permission",
+        "responses": {
+          "200": {
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
           }
         }
       }
@@ -642,102 +851,45 @@
         }
       }
     },
-    "/api/authorize/permissions": {
-      "get": {
+    "/api/auth/set-seller": {
+      "patch": {
         "tags": [
           "Get Authorization"
         ],
-        "summary": "Get authorized permissions for a user",
+        "description": "Handles the process of setting a user to become a seller",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "any"
+                }
+              },
+              "required": [
+                "token"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Success, user created successfully."
+            "description": "Success, Successfully processed request."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
           }
         }
       }
     },
-    "/users/permission": {
-      "post": {
-        "tags": [
-          "Get Authorization"
-        ],
-        "summary": "Authorize user for a specific permission",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "authorizationRequest",
-            "description": "Authorization request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "type": "string",
-                  "description": "User id "
-                },
-                "permissionId": {
-                  "type": "string",
-                  "description": "Permission id"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "404": {
-            "description": "Not Found, User Not Found."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Get Authorization"
-        ],
-        "summary": "unauthorize user for a specific permission",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "authorizationRequest",
-            "description": "Authorization request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "type": "string",
-                  "description": "User id "
-                },
-                "permissionId": {
-                  "type": "string",
-                  "description": "Permission id"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "404": {
-            "description": "Not Found, User Not Found."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },   
-     "/users/{id}/role": {
+    "/users/{id}/role": {
       "put": {
         "tags": [
           "Get Authorization"
@@ -758,7 +910,7 @@
               "type": "object",
               "properties": {
                 "roleId": {
-                  "type": "string",
+                  "type": "integer",
                   "description": "User role id"
                 },
                 "roleName": {
@@ -784,8 +936,8 @@
           }
         }
       }
-    },   
-     "/users": {
+    },
+    "/users": {
       "get": {
         "tags": [
           "Admin"
@@ -793,13 +945,13 @@
         "summary": "Authorize user for a specific permission",
         "parameters": [
           {
-            "in": "header", 
+            "in": "header",
             "name": "Authorization",
             "description": "JWT token for user authentication",
             "required": true,
-            "type": "string", 
-            "default": "Bearer your-jwt-token", 
-            "format": "JWT" 
+            "type": "string",
+            "default": "Bearer your-jwt-token",
+            "format": "JWT"
           }
         ],
         "responses": {
@@ -826,13 +978,13 @@
         ],
         "parameters": [
           {
-            "in": "header", 
+            "in": "header",
             "name": "Authorization",
             "description": "JWT token for user authentication",
             "required": true,
-            "type": "string", 
-            "default": "Bearer your-jwt-token", 
-            "format": "JWT" 
+            "type": "string",
+            "default": "Bearer your-jwt-token",
+            "format": "JWT"
           },
           {
             "in": "body",
@@ -933,37 +1085,79 @@
           }
         }
       }
-    }
-},
-"definitions": {
-  "users": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "string",
-        "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
-      },
-      "firstName": {
-        "type": "string",
-        "example": "John"
-      },
-      "lastName": {
-        "type": "string",
-        "example": "John"
-      },
-      "email": {
-        "type": "string",
-        "example": "test@gmail.com"
-      },
-      "username": {
-        "type": "string",
-        "example": "johndoe"
-      },
-      "password": {
-        "type": "string",
-        "example": "myPassword2021"
+    },
+    "/api/auth/signup-guest": {
+      "post": {
+        "tags": [
+          "Guest"
+        ],
+        "description": "Endpoint to Register Guest User",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "example": "john"
+                },
+                "lastName": {
+                  "type": "string",
+                  "example": "doe"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "test@gmail.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created, guest User Created Successfully."
+          },
+          "400": {
+            "description": "Bad Request, The user sent an invalid request."
+          },
+          "500": {
+            "description": "Internal Server Error, Error processing request from the server."
+          }
+        }
+      }
+    },
+    "definitions": {
+      "users": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "John"
+          },
+          "email": {
+            "type": "string",
+            "example": "test@gmail.com"
+          },
+          "username": {
+            "type": "string",
+            "example": "johndoe"
+          },
+          "password": {
+            "type": "string",
+            "example": "myPassword2021"
+          }
+        }
       }
     }
   }
-}
 }
