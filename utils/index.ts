@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import axios from 'axios';
 import { ITwoFactorPayload, IUser, ITokenPayload } from '../@types/index';
-
+import { Forbidden, Unauthorized } from '../middlewares/error';
 export function success(
   message: string,
   args: unknown = {} || null,
@@ -19,29 +19,22 @@ export function success(
   //   data: args,
   // }
 }
-
 export async function hashPassword(password: string): Promise<string> {
   return await bcrypt.hash(password, 10);
 }
-
 export async function comparePassword(
   password: string,
   hash: string
 ): Promise<boolean> {
   return await bcrypt.compare(password, hash);
 }
-
 export const generateBearerToken = (user: IUser): string => {
   const payload: { id: string } = {
     id: user.id,
   };
-
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: 60 * 60 * 24,
-  })
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
   return token;
-}
-
+};
 export const generate2faToken = (user: IUser, code: string): string => {
   const payload: ITwoFactorPayload = {
     id: user.id,
@@ -52,42 +45,42 @@ export const generate2faToken = (user: IUser, code: string): string => {
   });
   return token;
 };
-
 export const generateToken = (user: IUser): string => {
   const payload: ITokenPayload = {
     id: user.id,
     email: user.email,
     firstName: user.firstName,
   };
-
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: 600,
   });
   return token;
 };
-
 export const verifyToken = (token: string): ITokenPayload | null => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as ITokenPayload;
     return decoded;
   } catch (err) {
-    return null;
+    if (err instanceof TokenExpiredError) {
+      throw new Forbidden('Link has expired');
+    }
+    throw new Forbidden('The link is invalid');
   }
 };
-
 export const verify2faToken = (token: string): ITwoFactorPayload | null => {
   try {
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET
     ) as ITwoFactorPayload;
-
     return decoded;
   } catch (err) {
-    return null;
+    if (err instanceof TokenExpiredError) {
+      throw new Unauthorized('The OTP code has expired');
+    }
+    throw new Unauthorized('The code is invalid');
   }
 };
-
 export const sendVerificationEmail = async (
   name: string,
   recipient: string,
@@ -96,7 +89,6 @@ export const sendVerificationEmail = async (
   try {
     // TODO email link not valid
     const verification_link = `${process.env.AUTH_FRONTEND_URL}/auth/verification-complete?token=${token}`;
-
     const response = await axios.post(
       `${process.env.EMAIL_SERVICE_URL}/api/user/email-verification`,
       {
@@ -106,7 +98,6 @@ export const sendVerificationEmail = async (
         verification_link,
       }
     );
-
     if (response.status === 200) {
       return 'Verification email sent successfully.';
     } else {
@@ -116,7 +107,6 @@ export const sendVerificationEmail = async (
     // return error;
   }
 };
-
 export const errorResponse = (
   message: string | unknown,
   status: number,
