@@ -34,7 +34,9 @@ export const signUp = async (
       );
       throw new InvalidInput(errorMessages);
     }
+
     const user = await userService.signUp(req.body);
+
     const { id, slug, firstName, lastName, email } = user;
     res.status(200).json({
       status: 200,
