@@ -76,7 +76,7 @@ export default class User extends Model<User> {
   @Column({ type: DataType.DATE, field: "last_login" })
     lastLogin: Date;
 
-  @Column({ type: DataType.BOOLEAN, field: "is_seller" })
+  @Column({ type: DataType.BOOLEAN, field: "is_seller", defaultValue: false })
     isSeller: boolean;
 
   @CreatedAt
