@@ -36,9 +36,11 @@ export const generateBearerToken = (user: IUser): string => {
     id: user.id,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET);
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: 60 * 60 * 24,
+  })
   return token;
-};
+}
 
 export const generate2faToken = (user: IUser, code: string): string => {
   const payload: ITwoFactorPayload = {

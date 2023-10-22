@@ -14,6 +14,7 @@ config(); // Load environment variables from .env file
 
 const app = express();
 
+app.options('*',cors());
 app.use(
   cors({
     origin: '*',
