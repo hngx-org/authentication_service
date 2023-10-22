@@ -586,4 +586,5 @@ class UserService implements IUserService {
 }
 
 const userService = new UserService();
+
 export default userService;
