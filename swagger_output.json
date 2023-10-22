@@ -627,63 +627,6 @@
         }
       }
     },
-    "/api/roles/seed-role": {
-      "post": {
-        "tags": [
-          "Role Based Access"
-        ],
-        "summary": "Fetch all role permissions",
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/api/roles/seed-permission": {
-      "post": {
-        "tags": [
-          "Role Based Access"
-        ],
-        "summary": "seed permission",
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
-    "/api/roles/seed-role-permission": {
-      "post": {
-        "tags": [
-          "Role Based Access"
-        ],
-        "summary": "seed role permission",
-        "responses": {
-          "200": {
-            "description": "Success, Successfully processed request."
-          },
-          "400": {
-            "description": "Bad Request, The user sent an invalid request."
-          },
-          "500": {
-            "description": "Internal Server Error, Error processing request from the server."
-          }
-        }
-      }
-    },
     "/api/authorize": {
       "post": {
         "tags": [
