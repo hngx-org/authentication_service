@@ -8,33 +8,6 @@ import { Response, Request } from "express";
  * @param res
  * @param next
  */
-export const seedRole = async (
-  req: Request,
-  res: Response,
-) => {
-  try {
-    await roleAndPermissionService.seedRole();
-    success("seed successfully", null, 201, res);
-  } catch (error) {
-    res.send(error.message);
-  }
-};
-
-export const seedPermission = async (req: Request, res: Response) => {
-  try {
-    await roleAndPermissionService.seedPermission();
-    success("seed successfully", null, 201, res);
-  } catch (error) {
-    res.send(error.message);
-  }
-};
-
-/**
- *
- * @param req
- * @param res
- * @param next
- */
 export const fetchRoles = async (req: Request, res: Response) => {
   try {
     const roles = await roleAndPermissionService.fetchRoles();
@@ -57,19 +30,7 @@ export const fetchPermission = async (req: Request, res: Response) => {
     res.send(error.message);
   }
 };
-/**
- *
- * @param req
- * @param res
- */
-export const seedRolePermissions = async (req: Request, res: Response) => {
-  try {
-    const permission = await roleAndPermissionService.seedRolePermissions();
-    success("seed successfully", permission, 201, res);
-  } catch (error) {
-    res.send(error.message);
-  }
-};
+
 /**
  * 
  * @param req 
