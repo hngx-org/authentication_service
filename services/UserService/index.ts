@@ -3,6 +3,7 @@ import {
   resetPasswordNotification,
   sendSignUpNotification,
   twoFactorAuthNotification,
+  resendSignupNotification,
   welcomeEmailNotification,
 } from '../../controllers/UserController/messaging';
 import {
@@ -532,7 +533,7 @@ class UserService implements IUserService {
 
       const token = generateToken(user);
 
-      const response = await sendSignUpNotification(user, token);
+      const response = await resendSignupNotification(user, token);
       return response;
     } catch (error) {
       throw new HttpError(error.status || 500, error.message);
