@@ -92,12 +92,12 @@ class UserService implements IUserService {
       const user = await this.findUserByEmail(email);
 
       if (!user) {
-        throw new Unauthorized('Invalid email or password');
+        throw new Unauthorized('Invalid credentials');
       }
 
       const isMatch = await comparePassword(password, user.password);
       if (!isMatch) {
-        throw new Unauthorized('Invalid email or password');
+        throw new Unauthorized('Invalid credentials');
       }
 
       if (user.isVerified === false) {
