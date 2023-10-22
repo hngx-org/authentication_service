@@ -40,7 +40,6 @@
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^5.0.5",
     "sequelize": "^6.33.0",
     "sequelize-typescript": "^2.1.5",
     "swagger-jsdoc": "^6.2.8",
