@@ -5,7 +5,7 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host": "staging.zuri.team/api/auth",
+  "host": "localhost:3000/api/auth",
   "servers": [
     {
       "url": "staging.zuri.team/api/auth",
