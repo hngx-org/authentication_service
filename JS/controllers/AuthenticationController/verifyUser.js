@@ -5,10 +5,10 @@ const { sendWelcomeMail } = require('../MessagingController/sendWelcomeMail');
 const verifyUser = async (req, res, next) => {
   // validate this also
   const { token } = req.params;
-  const { SIGN_UP_JWT_SECRET } = process.env;
+  const { JWT_SECRET } = process.env;
 
   try {
-    const decodedUser = jwt.verify(token, SIGN_UP_JWT_SECRET);
+    const decodedUser = jwt.verify(token, JWT_SECRET);
 
     // verify user in database
     const user = await User.findOne({ where: { email: decodedUser.email } });
@@ -23,6 +23,7 @@ const verifyUser = async (req, res, next) => {
 
     req.user = user;
     // new response to sign user in immediately after verification
+
     const fullName = `${user.first_name} ${user.last_name}`;
     sendWelcomeMail(fullName, user.email);
     return next();
