@@ -13,7 +13,6 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import { success } from '../../utils';
 import { InvalidInput, ResourceNotFound } from '../../middlewares/error';
-// import { AuthErrorHandler } from '../../exceptions/AuthErrorHandler';
 
 /**
  * @param req
@@ -34,14 +33,11 @@ export const signUp = async (
       );
       throw new InvalidInput(errorMessages);
     }
-
-    const user = await userService.signUp(req.body);
-
-    const { id, slug, firstName, lastName, email } = user;
+    const response = await userService.signUp(req.body);
+    const { id, slug, firstName, lastName, email } = response.newUser;
     res.status(200).json({
       status: 200,
-      message:
-        'User created successfully. Please check your email to verify your account',
+      message: `User created successfully. ${response.mailSent}`,
       user: { id, slug, firstName, lastName, email },
     });
   } catch (error) {
@@ -63,12 +59,11 @@ export const guestSignup = async (
       throw new InvalidInput(errorMessages);
     }
     req.body.roleId = 1;
-    const user = await userService.signUp(req.body);
-    const { id, firstName, slug, lastName, email } = user;
+    const response = await userService.signUp(req.body);
+    const { id, firstName, slug, lastName, email } = response.newUser;
     res.status(200).json({
       status: 200,
-      message:
-        'User created successfully. Please check your email to verify your account',
+      message: `User created successfully. ${response.mailSent}`,
       user: { id, firstName, slug, lastName, email },
     });
   } catch (error) {
@@ -152,12 +147,7 @@ export const resendVerification = async (
     }
     const { email } = req.body;
     const response = await userService.resendVerification(email);
-    return success(
-      'Email verification code resent successfully',
-      response,
-      200,
-      res
-    );
+    return success(`${response}`, null, 200, res);
   } catch (error) {
     next(error);
   }
@@ -212,12 +202,11 @@ export const changeEmail = async (
     }
     const token = req.headers.authorization as string;
 
-    const user = await userService.changeEmail(token, req.body.email);
-    const { id, firstName, lastName, email } = user;
+    const response = await userService.changeEmail(token, req.body.email);
+    const { id, firstName, lastName, email } = response.user;
     res.status(200).json({
       status: 200,
-      message:
-        'User created successfully. Please check your email to verify your account',
+      message: `User created successfully. ${response.mailSent}`,
       user: { id, firstName, lastName, email },
     });
   } catch (error) {
@@ -271,9 +260,7 @@ export const forgotPassword = async (
     }
 
     const response = await userService.forgotPassword(email);
-    if (response) {
-      return success('Password reset link sent successfully', null, 200, res);
-    }
+    return success(`${response}`, null, 200, res);
   } catch (error) {
     next(error);
   }
@@ -402,10 +389,10 @@ export const send2faCode = async (
     const { email } = req.body;
 
     const response = await userService.send2faCode(email);
-    const { user, token } = response;
+    const { user, token, mailSent } = response;
     return res.status(200).json({
       status: 200,
-      message: 'Two factor code sent',
+      message: `${mailSent}`,
       email: user.email,
       twoFactor: true,
       token,
@@ -423,10 +410,10 @@ export const send2fa = async (
   try {
     if (req.user.twoFactorAuth) {
       const response = await userService.send2faCode(req.user.email);
-      const { user, token } = response;
+      const { user, token, mailSent } = response;
       return res.status(202).json({
         status: 202,
-        message: 'TWO FACTOR AUTHENTICATION CODE SENT',
+        message: `${mailSent}`,
         email: user.email,
         twoFactorAuth: true,
         token,
