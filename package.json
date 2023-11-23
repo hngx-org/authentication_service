@@ -11,13 +11,13 @@
     "dev": "tsc && pnpm start",
     "clean": "rimraf dist",
     "build": "pnpm run clean && tsc",
-    "serve": "tsc && pm2 start dist/index.js --name zuri_typescript_convert",
-    "jest": {
-      "testEnvironment": "node",
-      "coveragePathIgnorePatterns": [
-        "/node_modules/"
-      ]
-    }
+    "serve": "tsc && pm2 start dist/index.js --name zuri_typescript_convert"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "",
   "license": "ISC",
