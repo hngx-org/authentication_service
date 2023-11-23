@@ -7,10 +7,10 @@ export default class RolePermission extends Model<RolePermission> {
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true, autoIncrementIdentity: true })
       id: number;
 
-    @Column({type: DataType.INTEGER, references: {model: 'roles', key: 'id'}, field: 'role_id'})
+    @Column({type: DataType.INTEGER, references: {model: 'role', key: 'id'}, field: 'role_id'})
       roleId: number;
 
-    @Column({type: DataType.INTEGER, references: {model: 'permissions', key: 'id'} , field: 'permission_id'})
+    @Column({type: DataType.INTEGER, references: {model: 'permission', key: 'id'} , field: 'permission_id'})
       permissionId: number;
 
     @CreatedAt
