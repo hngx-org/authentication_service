@@ -9,7 +9,7 @@ export default class PasswordResetToken extends Model<PasswordResetToken> {
   @Column({type: DataType.STRING, allowNull: false})
     token: string;
 
-  @Column({type: DataType.UUID, allowNull: false, references: {model: "users", key: "id"}})
+  @Column({type: DataType.UUID, allowNull: false, references: {model: "user", key: "id"}})
     userId: string;
 
   @Column({type: DataType.DATE, allowNull: false})
