@@ -406,9 +406,10 @@ class UserService implements IUserService {
         throw new ResourceNotFound('User not found');
       }
 
-      if (user.twoFactorAuth === false) {
-        throw new Forbidden('2fa is not enabled');
-      }
+      //CODE COMMENTED OUT BECAUSE 2FA MUST BE SENT BEFORE IT IS ENABLED
+      // if (user.twoFactorAuth === false) {
+      //   throw new Forbidden('2fa is not enabled');
+      // }
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const token = generate2faToken(user, code);
 
