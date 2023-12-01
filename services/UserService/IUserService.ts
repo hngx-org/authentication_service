@@ -46,6 +46,11 @@ export interface IUserService {
     res: unknown
   ): Promise<unknown>;
 
+  updateRole(
+    payload: { roleId: number;},
+    userId: string,
+    res: unknown): Promise<unknown>;
+
   resendVerification(email: string, res: unknown): Promise<unknown>;
   slugify(firstName: string, lastName: string): Promise<string>;
 }
