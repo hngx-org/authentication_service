@@ -27,6 +27,7 @@ import {
   Unauthorized,
 } from '../../middlewares/error';
 import { IUserSignUp } from '../../@types/index';
+import { response } from 'express';
 
 class UserService implements IUserService {
   public async findUserByEmail(email: string): Promise<User | null> {
@@ -513,6 +514,26 @@ class UserService implements IUserService {
         { id: user.id, email: user.email },
         201
       );
+    } catch (error) {
+      throw new HttpError(error.status || 500, error.message);
+    }
+  }
+
+  public async updateRole(
+    payload: { roleId: number;},
+    userId: string
+  ): Promise<unknown> {
+    const { roleId } = payload;
+    try {
+      const user = await User.findByPk(userId);
+
+      if (!user) {
+        throw new ResourceNotFound('User not found');
+      }
+      user.roleId = roleId;
+      await user.save();
+      const response = { id: user.id, roleId: user.roleId } 
+      return response
     } catch (error) {
       throw new HttpError(error.status || 500, error.message);
     }

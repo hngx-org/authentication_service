@@ -9,6 +9,7 @@ import {
   tokenValidationSchema,
   twofaValidationSchema,
   updateUserSchema,
+  updateRoleSchema,
 } from './validation';
 import { NextFunction, Request, Response } from 'express';
 import { success } from '../../utils';
@@ -518,6 +519,28 @@ export const updateUserById = async (
     const { email } = req.user as IUser;
     const user = await userService.updateUserById(req.body, email);
     return success('User details updated', user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { error } = updateRoleSchema.validate(req.body);
+
+    if (error) {
+      const errorMessages = error.details.map(
+        (detail: { message: string }) => detail.message
+      );
+      throw new InvalidInput(errorMessages);
+    }
+    const { userId } = req.params;
+    const updatedRole = await userService.updateRole(req.body, userId);
+    return success('Role updated successfully', updatedRole, 200, res);
   } catch (error) {
     next(error);
   }

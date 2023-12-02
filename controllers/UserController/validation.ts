@@ -41,3 +41,7 @@ export const updateUserSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
 });
+
+export const updateRoleSchema = Joi.object({
+  roleId: Joi.number().required(),
+});

@@ -6,6 +6,7 @@ import {
   send2fa,
   updateUserById,
   verify2faCode,
+  updateRole,
 } from './../controllers/UserController/index';
 import { protectedRoute } from './../middlewares/auth';
 import express from 'express';
@@ -60,6 +61,7 @@ userRouter.get('/users', fetchAllUser);
 userRouter.get('/users/:userId', findUserById);
 userRouter.delete('/users/:userId', deleteUserById);
 userRouter.put('/users/update/', protectedRoute, updateUserById);
+userRouter.put('/:userId/role', protectedRoute, updateRole);
 
 // oauth routes
 
