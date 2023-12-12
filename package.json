@@ -1,5 +1,5 @@
 {
-  "name": "zuri_typescript_convert",
+  "name": "zuri_auth_api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "dev": "tsc && pnpm start",
     "clean": "rimraf dist",
     "build": "pnpm run clean && tsc",
-    "serve": "tsc && pm2 start dist/index.js --name zuri_typescript_convert"
+    "serve": "tsc && pm2 start dist/index.js --name zuri_auth_api"
   },
   "jest": {
     "testEnvironment": "node",
