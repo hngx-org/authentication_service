@@ -9,7 +9,7 @@ import {
   ForeignKey,
 } from "sequelize-typescript";
 
-@Table({ tableName: "user_permission", timestamps: false })
+@Table({ tableName: "user_permissions", timestamps: false })
 export default class UserPermission extends Model<UserPermission> {
   @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
     id: number;

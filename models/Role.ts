@@ -1,7 +1,7 @@
 import {Column, DataType, Model, Table} from 'sequelize-typescript';
 
-@Table({tableName: 'role', timestamps: false})
-export default class Role extends Model<Role> {
+@Table({tableName: 'roles', timestamps: false})
+export default class Role extends Model {
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true})
       id: number;
 
