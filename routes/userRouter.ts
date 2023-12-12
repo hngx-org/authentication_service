@@ -59,9 +59,9 @@ userRouter.post('/2fa/verify-code', verify2faCode, loginResponse);
 // Protected User routes
 userRouter.get('/users', fetchAllUser);
 userRouter.get('/users/:userId', findUserById);
-userRouter.delete('/users/:userId', deleteUserById);
+userRouter.delete('/users/:userId', protectedRoute, deleteUserById);
 userRouter.put('/users/update/', protectedRoute, updateUserById);
-userRouter.put('/:userId/role', protectedRoute, updateRole);
+userRouter.put('/users/:userId/role', protectedRoute, updateRole);
 
 // oauth routes
 

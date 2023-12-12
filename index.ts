@@ -34,11 +34,11 @@ sequelize
     console.error('Error creating database and tables:', err);
   });
 
-app.use('/api/auth/api/auth', userRouterHandler);
-app.use('/api/auth/api/roles', rbacRouterHandler);
-app.use('/api/auth/api/authorize', authRouter);
+app.use('/api/v1/auth', userRouterHandler);
+app.use('/api/v1/auth/roles', rbacRouterHandler);
+app.use('/api/v1/auth/authorize', authRouter);
 // app.use('/api/auth/api/docs', swaggerRouter);
-app.use('/api/auth/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1/auth/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.use(errorHandler);
