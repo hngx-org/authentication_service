@@ -119,7 +119,7 @@ const all_permissions = [
   ...event_permissions,
 ];
 
-export default {
+export {
   roles,
   product_permissions,
   order_permissions,

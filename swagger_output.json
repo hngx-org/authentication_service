@@ -5,18 +5,18 @@
     "title": "zuri portfolio authentication_service API",
     "description": "Documentation for zuri portfolio authentication_service API."
   },
-  "host": "staging.zuri.team/api/auth",
+  "host": "zauth.pesovatech.com/api/v1",
   "servers": [
     {
-      "url": "staging.zuri.team/api/auth",
+      "url": "zauth.pesovatech.com/api/v1",
       "description": "production server"
     },
     {
-      "url": "auth.akuya.tech",
+      "url": "zauth.pesovatech.com",
       "description": "development sever"
     },
     {
-      "url": "localhost:3000/api/auth",
+      "url": "zauth.pesovatech.com/api/v1",
       "description": "local server"
     }
   ],
@@ -85,7 +85,7 @@
         }
       }
     },
-    "/api/auth/check-email": {
+    "/auth/check-email": {
       "post": {
         "tags": [
           "Auth"
@@ -122,7 +122,7 @@
         }
       }
     },
-    "/api/auth/signup": {
+    "/auth/signup": {
       "post": {
         "tags": [
           "Auth"
@@ -168,7 +168,7 @@
         }
       }
     },
-    "/api/auth/verify/{token}": {
+    "/auth/verify/{token}": {
       "get": {
         "tags": [
           "Auth"
@@ -198,7 +198,7 @@
         }
       }
     },
-    "/api/auth/verify/resend": {
+    "/auth/verify/resend": {
       "post": {
         "tags": [
           "Auth"
@@ -235,7 +235,7 @@
         }
       }
     },
-    "/api/auth/login": {
+    "/auth/login": {
       "post": {
         "tags": [
           "Auth"
@@ -271,7 +271,7 @@
         }
       }
     },
-    "/api/auth/revalidate-login/{token}": {
+    "/auth/revalidate-login/{token}": {
       "get": {
         "tags": [
           "Auth"
@@ -298,7 +298,7 @@
         }
       }
     },
-    "/api/auth/reset-password": {
+    "/auth/reset-password": {
       "post": {
         "tags": [
           "PASSWORD RESET AND EMAIL VERIFICATION"
@@ -377,7 +377,7 @@
         }
       }
     },
-    "/api/auth/reset-password/change": {
+    "/auth/reset-password/change": {
       "post": {
         "tags": [
           "PASSWORD RESET AND EMAIL VERIFICATION"
@@ -425,7 +425,7 @@
         }
       }
     },
-    "/api/auth/2fa/enable": {
+    "/auth/2fa/enable": {
       "post": {
         "tags": [
           "2FA"
@@ -463,7 +463,7 @@
         }
       }
     },
-    "/api/auth/2fa/send-code": {
+    "/auth/2fa/send-code": {
       "post": {
         "tags": [
           "2FA"
@@ -501,7 +501,7 @@
         }
       }
     },
-    "/api/auth/2fa/verify-code": {
+    "/auth/2fa/verify-code": {
       "post": {
         "tags": [
           "2FA"
@@ -544,7 +544,7 @@
         }
       }
     },
-    "/api/auth/2fa/disable": {
+    "/auth/2fa/disable": {
       "post": {
         "tags": [
           "2FA"
@@ -582,7 +582,7 @@
         }
       }
     },
-    "/api/roles": {
+    "/roles": {
       "get": {
         "tags": [
           "Role Based Access"
@@ -601,7 +601,7 @@
         }
       }
     },
-    "/api/roles/permissions": {
+    "/roles/permissions": {
       "get": {
         "tags": [
           "Role Based Access"
@@ -614,7 +614,7 @@
         }
       }
     },
-    "/api/roles/roles-permissions": {
+    "/roles/roles-permissions": {
       "get": {
         "tags": [
           "Role Based Access"
@@ -627,7 +627,7 @@
         }
       }
     },
-    "/api/authorize": {
+    "/authorize": {
       "post": {
         "tags": [
           "Get Authorization"
@@ -794,7 +794,7 @@
         }
       }
     },
-    "/api/auth/set-seller": {
+    "/auth/set-seller": {
       "patch": {
         "tags": [
           "Get Authorization"
@@ -1029,7 +1029,7 @@
         }
       }
     },
-    "/api/auth/signup-guest": {
+    "/auth/signup-guest": {
       "post": {
         "tags": [
           "Guest"

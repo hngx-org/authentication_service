@@ -1,4 +1,4 @@
-import {Model, DataType, Column, Table, CreatedAt, BelongsToMany} from "sequelize-typescript";
+import {Model, DataType, Column, Table, CreatedAt, BelongsToMany, ForeignKey} from "sequelize-typescript";
 import Permission from "./Permission";
 import Role from "./Role";
 
@@ -7,10 +7,12 @@ export default class RolePermission extends Model<RolePermission> {
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true, autoIncrementIdentity: true })
       id: number;
 
-    @Column({type: DataType.INTEGER, references: {model: 'role', key: 'id'}, field: 'role_id'})
+    @ForeignKey(() => Role)
+    @Column({type: DataType.INTEGER, field: 'role_id'})
       roleId: number;
 
-    @Column({type: DataType.INTEGER, references: {model: 'permission', key: 'id'} , field: 'permission_id'})
+    @ForeignKey(() => Permission)
+    @Column({type: DataType.INTEGER, field: 'permission_id'})
       permissionId: number;
 
     @CreatedAt

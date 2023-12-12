@@ -1,6 +1,7 @@
+/* eslint-disable camelcase */
 import { Request, Response } from 'express';
 import authService from '../../services/AuthService';
-import rbac from '../../utils/usersRolesPermission';
+import {all_permissions} from '../../utils/usersRolesPermission';
 
 export const authorize = async (
   req: Request,
@@ -15,7 +16,7 @@ export const authorize = async (
       });
     }
 
-    if (permission && !rbac.all_permissions.includes(permission)) {
+    if (permission && !all_permissions.includes(permission)) {
       return res
         .status(400)
         .json({ status: 400, message: 'invalid permission' });

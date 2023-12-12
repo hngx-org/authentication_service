@@ -6,10 +6,23 @@ import {
   CreatedAt,
   ForeignKey,
   HasOne,
+  DefaultScope,
+  Scopes,
 } from "sequelize-typescript";
 import Role from "./Role";
+import Permission from "./Permission";
 
-@Table({ tableName: "user", timestamps: false })
+
+@DefaultScope(() => ({
+  include: [Role],
+}))
+@Scopes(() => ({
+  withRole: {
+    include: [Role],
+  },
+}))
+
+@Table({ tableName: "users", timestamps: false })
 export default class User extends Model<User> {
   @Column({
     type: DataType.UUID,
@@ -53,7 +66,6 @@ export default class User extends Model<User> {
     type: DataType.INTEGER,
     defaultValue: 2,
     allowNull: false,
-    field: "role_id",
   })
     roleId: number;
 
@@ -82,6 +94,9 @@ export default class User extends Model<User> {
   @CreatedAt
     createdAt: Date;
 
-  @HasOne(() => Role, "role_id")
+  @HasOne(() => Role, "roleId")
     userRole: Role;
+  
+  // TODO: remove and use role
+  permissions?: Permission[];
 }
