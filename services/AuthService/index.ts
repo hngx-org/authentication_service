@@ -10,7 +10,7 @@ import {
 
 interface IRoleUser {
   id: string;
-  role?: string;
+  role?: number;
   permissions?: Array<string>;
 }
 
@@ -56,7 +56,7 @@ export class AuthService implements IAuthService {
           message: 'user is authenticated',
           user: {
             id: user.id,
-            role: user.userRole?.name,
+            role: user.roleId,
           },
         };
         return response;
@@ -72,7 +72,7 @@ export class AuthService implements IAuthService {
           user: {
             id: user.id,
             permissions,
-            role: user.userRole?.name,
+            role: user.roleId,
           },
         };
 
