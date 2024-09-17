@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { IUser } from '../../@types';
 import axios from 'axios';
+import { ServerError } from "../../middlewares/error";
 // const { EMAIL_SERVICE_URL, AUTH_FRONTEND_URL } = process.env;
 const {
   AUTH_FRONTEND_URL,
@@ -32,6 +33,21 @@ export const sendSignUpNotification = async (user: IUser, token: string) => {
     return 'Failed to send verification email';
   }
 };
+export const resendSignupNotification = async (user: IUser, token: string) => {
+  // const verificationLink = ${AUTH_FRONTEND_URL}/auth/verification-complete?token=${token};
+  const verificationLink = `${VERIFY_EMAIL_ENDPOINT_LIVE}?token=${token}`;
+  const jsonData = {
+    recipient: user.email,
+    name: user.firstName,
+    verification_link: verificationLink,
+  };
+  try {
+    await axios.post(EMAIL_SERVICE_VERIFY_EMAIL_URL, jsonData);
+    return 'Verification email sent successfully.';
+  } catch (error) {
+    throw new ServerError('Failed to send verification email');
+  }
+};
 /**
 *
 * @param recipient
@@ -48,9 +64,9 @@ export const resetPasswordNotification = async (user: IUser, token: string) => {
   };
   try {
     await axios.post(EMAIL_SERVICE_PASSWORD_RESET_URL, jsonData);
-    return 'Verification email sent successfully.';
+    return 'Password reset email sent successfully.';
   } catch (error) {
-    return 'Failed to send verification email';
+    throw new ServerError('Failed to send reset password email');
   }
 };
 /**
@@ -69,7 +85,7 @@ export const twoFactorAuthNotification = async (user: IUser, code: string) => {
     await axios.post(EMAIL_SERVICE_2FA_URL, jsonData);
     return '2FA code email sent successfully.';
   } catch (error) {
-    return 'Failed to send 2FA code email';
+    throw new ServerError('Failed to send 2FA code email');
   }
 };
 /**
@@ -88,6 +104,6 @@ export const welcomeEmailNotification = async (user: IUser) => {
     await axios.post(EMAIL_SERVICE_WELCOME_URL, jsonData);
     return 'Welcome email sent successfully.';
   } catch (error) {
-    return 'Failed to send welcome email';
+    throw new ServerError('Failed to send welcome email');
   }
 };
